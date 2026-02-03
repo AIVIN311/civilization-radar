@@ -104,8 +104,9 @@ def main():
         by_domain_heat[domain].append(heat)
 
         # slot 的 L2/L3 擴散：同一時窗多少 domain 出現 L2/L3
-        if level_max in ("L2", "L3"):
-            by_slot_domains_L2L3[ts].add(domain)
+        if level_max == "L3":
+         by_slot_domains_L2L3[ts].add(domain)
+
 
     # domain baseline（用全 7 天中位數當 v0.2 baseline）
     baseline = {d: (median(hs) if hs else 0.0) for d, hs in by_domain_heat.items()}
@@ -154,7 +155,7 @@ def main():
         per_domain_seq[domain].append((ts, series, req, sig, level_max, heat, A, D, Hstar, matched_json))
 
     # 算 W：每個 domain 依時間排序做指數衰減加權
-    inserts = []
+    inserts_map = {}
     for domain, seq in per_domain_seq.items():
         seq.sort(key=lambda x: x[0])  # ts iso 直接排序 OK
         hstars = [x[8] for x in seq]
@@ -170,13 +171,15 @@ def main():
                 w += hstars[idx] * weight
                 wsum += weight
             W = w / max(EPS, wsum)
-            inserts.append((ts, domain, series, req, sig, level_max, heat, A, D, Hstar, W, matched_json))
+            W = math.log1p(W)
+            inserts_map[(ts, domain)] = (ts, domain, series, req, sig, level_max, heat, A, D, Hstar, W, matched_json)
+            inserts = list(inserts_map.values())
+            cur.executemany("""
+            INSERT OR REPLACE INTO metrics_v02
+            (ts, domain, series, req, sig, level_max, heat, A, D, Hstar, W, matched_json)
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+            """, inserts)
 
-    cur.executemany("""
-        INSERT INTO metrics_v02
-        (ts, domain, series, req, sig, level_max, heat, A, D, Hstar, W, matched_json)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
-    """, inserts)
 
     # 建 views
     cur.execute("DROP VIEW IF EXISTS v02_domain_latest")
@@ -209,7 +212,7 @@ def main():
 
     con.commit()
     con.close()
-    print(f"v0.2 done -> metrics_v02 rows={len(inserts)}; views=v02_domain_latest,v02_series_latest")
+    print(f"v0.2 done -> metrics_v02 rows={len(inserts)}; views=v02_domain_latest,v02_series_latest") # type: ignore
 
 if __name__ == "__main__":
     main()

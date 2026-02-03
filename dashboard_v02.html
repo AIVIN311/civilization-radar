@@ -1,0 +1,168 @@
+<!doctype html><html><head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1'>
+<title>文明雷達 v0.2</title>
+
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;margin:0;background:#fff;color:#111}
+main{max-width:1200px;margin:0 auto;padding:28px 18px}
+h1{margin:0 0 10px;font-size:28px}
+.meta{color:#666;margin-bottom:18px;line-height:1.5}
+.grid{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}
+.card{border:1px solid #eee;border-radius:14px;padding:16px}
+table{width:100%;border-collapse:collapse}
+th,td{padding:10px 8px;border-bottom:1px solid #f1f1f1;vertical-align:top}
+th{color:#666;font-weight:600;text-align:left}
+small{color:#666}
+.badge{display:inline-block;padding:2px 8px;border:1px solid #eee;border-radius:999px;font-size:12px;color:#444}
+.k{font-variant-numeric:tabular-nums}
+.w{font-weight:700}
+.l3{font-weight:700}
+.dim{color:#777}
+</style>
+
+</head><body><main>
+<h1>文明雷達 v0.2</h1>
+<div class='meta'>最新時段：2026-02-03T15:30:00+08:00 · 區間 30m · 資料來源：metrics_v02 → v02_domain_latest / v02_series_latest<br><span class='dim'>排序依據：W（預警指數） · 指標：Level（探測深度）/ Heat（當下結構熱度）/ A（異常偏離）/ D（同步擴散）/ W（時間累積預警）</span></div>
+<div class='grid'>
+<div class='card'><h3>領域預警榜（以 W 排序）</h3>
+<table><thead><tr>
+<th>Domain</th><th>Series</th><th class='k'>req</th><th>Level</th><th class='k'>Heat</th><th class='k'>A</th><th class='k'>D</th><th class='k'>W</th><th>Matched</th><th>Sig</th>
+</tr></thead><tbody>
+<tr>
+<td><a href='https://algorithmicallocation.com/' target='_blank' rel='noopener noreferrer'>algorithmicallocation.com</a></td>
+<td>governance</td>
+<td class='k'>720</td>
+<td class='l3'>L3</td>
+<td class='k'>10.998</td>
+<td class='k'>0.000</td>
+<td class='k'>0.286</td>
+<td class='k w'>14.769</td>
+<td><small>baseline_root, env_secret</small></td>
+<td><span class='badge'>env_scan</span></td>
+</tr>
+<tr>
+<td><a href='https://postfiatreservesystems.com/' target='_blank' rel='noopener noreferrer'>postfiatreservesystems.com</a></td>
+<td>monetary_infrastructure</td>
+<td class='k'>44</td>
+<td class='l3'>L3</td>
+<td class='k'>9.793</td>
+<td class='k'>1.458</td>
+<td class='k'>0.200</td>
+<td class='k w'>5.036</td>
+<td><small>baseline_root, env_secret</small></td>
+<td><span class='badge'>env_scan</span></td>
+</tr>
+<tr>
+<td><a href='https://algorithmiclegitimacy.com/' target='_blank' rel='noopener noreferrer'>algorithmiclegitimacy.com</a></td>
+<td>governance</td>
+<td class='k'>90</td>
+<td class=''>L1</td>
+<td class='k'>2.159</td>
+<td class='k'>-0.049</td>
+<td class='k'>0.200</td>
+<td class='k w'>4.804</td>
+<td><small>—</small></td>
+<td><span class='badge'>baseline</span></td>
+</tr>
+<tr>
+<td><a href='https://syntheticrealitycrisis.com/' target='_blank' rel='noopener noreferrer'>syntheticrealitycrisis.com</a></td>
+<td>synthetic_systems</td>
+<td class='k'>85</td>
+<td class=''>L1</td>
+<td class='k'>2.334</td>
+<td class='k'>0.028</td>
+<td class='k'>0.200</td>
+<td class='k w'>4.062</td>
+<td><small>—</small></td>
+<td><span class='badge'>other</span></td>
+</tr>
+<tr>
+<td><a href='https://climateinterventionism.com/' target='_blank' rel='noopener noreferrer'>climateinterventionism.com</a></td>
+<td>civilization</td>
+<td class='k'>146</td>
+<td class=''>L1</td>
+<td class='k'>2.567</td>
+<td class='k'>0.128</td>
+<td class='k'>0.200</td>
+<td class='k w'>2.847</td>
+<td><small>—</small></td>
+<td><span class='badge'>other</span></td>
+</tr>
+<tr>
+<td><a href='https://civilizationcaching.com/' target='_blank' rel='noopener noreferrer'>civilizationcaching.com</a></td>
+<td>civilization</td>
+<td class='k'>55</td>
+<td class=''>L1</td>
+<td class='k'>1.948</td>
+<td class='k'>0.000</td>
+<td class='k'>0.286</td>
+<td class='k w'>2.616</td>
+<td><small>—</small></td>
+<td><span class='badge'>baseline</span></td>
+</tr>
+<tr>
+<td><a href='https://biometricsovereignty.com/' target='_blank' rel='noopener noreferrer'>biometricsovereignty.com</a></td>
+<td>identity_data</td>
+<td class='k'>135</td>
+<td class=''>L1</td>
+<td class='k'>2.534</td>
+<td class='k'>0.123</td>
+<td class='k'>0.200</td>
+<td class='k w'>2.402</td>
+<td><small>—</small></td>
+<td><span class='badge'>other</span></td>
+</tr>
+</tbody></table></div>
+<div class='card'><h3>系列預警榜（同一時段，W_avg 排序）</h3>
+<table><thead><tr>
+<th>Series</th><th class='k'>domains</th><th class='k'>L3</th><th class='k'>Heat_avg</th><th class='k'>A_avg</th><th class='k'>D_avg</th><th class='k'>W_avg</th>
+</tr></thead><tbody>
+<tr>
+<td>governance</td>
+<td class='k'>2</td>
+<td class='k l3'>1</td>
+<td class='k'>6.581</td>
+<td class='k'>-0.024</td>
+<td class='k'>0.286</td>
+<td class='k w'>9.169</td>
+</tr>
+<tr>
+<td>monetary_infrastructure</td>
+<td class='k'>1</td>
+<td class='k l3'>0</td>
+<td class='k'>2.178</td>
+<td class='k'>-0.046</td>
+<td class='k'>0.286</td>
+<td class='k w'>5.254</td>
+</tr>
+<tr>
+<td>synthetic_systems</td>
+<td class='k'>1</td>
+<td class='k l3'>0</td>
+<td class='k'>2.103</td>
+<td class='k'>-0.076</td>
+<td class='k'>0.286</td>
+<td class='k w'>4.899</td>
+</tr>
+<tr>
+<td>civilization</td>
+<td class='k'>2</td>
+<td class='k l3'>1</td>
+<td class='k'>5.987</td>
+<td class='k'>0.745</td>
+<td class='k'>0.286</td>
+<td class='k w'>4.698</td>
+</tr>
+<tr>
+<td>identity_data</td>
+<td class='k'>1</td>
+<td class='k l3'>0</td>
+<td class='k'>2.108</td>
+<td class='k'>-0.061</td>
+<td class='k'>0.286</td>
+<td class='k w'>2.610</td>
+</tr>
+</tbody></table>
+<div style='margin-top:12px'><small>解讀：A↑＝相對自身基線升溫，D↑＝同時段 L2/L3 擴散比例上升，W↑＝時間累積後的預警指數。L3 高且 W 高，通常代表「深層探測」同步化。</small></div>
+</div>
+</div></main></body></html>
