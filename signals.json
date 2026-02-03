@@ -1,0 +1,76 @@
+{
+  "version": "0.1",
+  "levels": {
+    "L1": {
+      "label": "presence",
+      "desc": "表層存在確認（像 ping 世界地圖）",
+      "weight": 0.4
+    },
+    "L2": {
+      "label": "fingerprint",
+      "desc": "角色/框架辨識（你是什麼類型的系統）",
+      "weight": 1.0
+    },
+    "L3": {
+      "label": "exfiltration",
+      "desc": "核心資源探測（想摸到內臟/秘密）",
+      "weight": 2.2
+    }
+  },
+  "signals": [
+    {
+      "id": "baseline_root",
+      "level": "L1",
+      "weight": 0.2,
+      "match_any": ["/", "/index.html", "/favicon.ico", "/robots.txt", "/sitemap.xml"]
+    },
+    {
+      "id": "common_probe",
+      "level": "L2",
+      "weight": 0.8,
+      "match_any": ["/login", "/signin", "/admin", "/dashboard", "/api", "/graphql", "/health", "/status"]
+    },
+    {
+      "id": "wp_probe",
+      "level": "L2",
+      "weight": 1.2,
+      "match_any": ["/wp-login.php", "/wp-admin", "/xmlrpc.php", "/wp-content", "/wp-includes"]
+    },
+    {
+      "id": "framework_probe",
+      "level": "L2",
+      "weight": 1.1,
+      "match_any": ["/phpmyadmin", "/actuator", "/swagger", "/openapi.json", "/.well-known", "/server-status"]
+    },
+    {
+      "id": "env_secret",
+      "level": "L3",
+      "weight": 2.5,
+      "match_any": ["/.env", "/.env.local", "/config.ini", "/settings.py", "/application.yml", "/docker-compose.yml"]
+    },
+    {
+      "id": "git_leak",
+      "level": "L3",
+      "weight": 2.6,
+      "match_any": ["/.git/config", "/.git/HEAD", "/.git/index"]
+    },
+    {
+      "id": "backup_leak",
+      "level": "L3",
+      "weight": 2.2,
+      "match_regex": ["\\.bak$", "\\.old$", "\\.zip$", "\\.tar\\.gz$", "\\.sql$"]
+    },
+    {
+      "id": "log_leak",
+      "level": "L3",
+      "weight": 2.0,
+      "match_any": ["/error.log", "/debug.log", "/logs", "/log", "/_logs"]
+   }
+  ],
+  "sig_hint_weights": {
+    "env_scan": 2.2,
+    "dns_spike": 1.3,
+    "baseline": 0.2,
+    "other": 0.4
+  }
+}
