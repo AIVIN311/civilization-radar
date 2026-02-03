@@ -4,7 +4,7 @@ import sqlite3
 from datetime import datetime
 
 DB_PATH = "radar.db"
-OUT_HTML = "dashboard.html"
+OUT_HTML = "dashboard_v01.html"
 
 def heat(req: int) -> float:
     return math.log(1 + max(req, 0))
