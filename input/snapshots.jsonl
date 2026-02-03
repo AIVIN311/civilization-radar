@@ -1,0 +1,3 @@
+{"ts":"2026-02-03T15:30:00+08:00","domain":"algorithmicallocation.com","series":"governance","req":720,"mitigated":56,"cf_served":168,"origin_served":496,"top_countries":{"FR":236,"US":204,"NL":83},"sig":"env_scan","notes":"paths include /.env, /config.ini, /app/.env"}
+{"ts":"2026-02-03T15:30:00+08:00","domain":"algorithmiclegitimacy.com","series":"governance","req":11800,"mitigated":0,"cf_served":0,"origin_served":0,"top_countries":{"HK":1630,"DE":1140,"US":1030},"sig":"dns_spike","notes":"dns queries sampled 10% in cf dashboard"}
+{"ts":"2026-02-03T15:30:00+08:00","domain":"civilizationcaching.com","series":"civilization","req":55,"mitigated":0,"cf_served":0,"origin_served":0,"top_countries":{"NL":20,"US":10},"sig":"baseline","notes":"quiet node"}

@@ -1,0 +1,12 @@
+{
+  "groups": [
+    {
+      "id": "governance",
+      "label": "Governance & Legitimacy",
+      "items": [
+        ["algorithmiclegitimacy.com", "https://algorithmiclegitimacy.com/"],
+        ["algorithmicallocation.com", "https://algorithmicallocation.com/"]
+      ]
+    }
+  ]
+}
