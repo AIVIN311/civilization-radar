@@ -1,0 +1,9 @@
+# Python
+__pycache__/
+*.pyc
+
+# Local database / generated
+*.db
+
+# Generated HTML snapshots (optional)
+dashboard.html
