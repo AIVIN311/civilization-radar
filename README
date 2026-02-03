@@ -1,0 +1,17 @@
+# Civilization Radar
+
+A distributed monitoring system for detecting abnormal signals across civilization-level domains.
+
+## Features
+- Snapshot-based traffic ingestion
+- Heat anomaly scoring
+- Domain series aggregation
+- Early-warning radar dashboard
+
+## Current Version
+v0.1 – simulated pipeline + HTML dashboard
+
+## Roadmap
+- Real API ingestion (Cloudflare, DNS, logs)
+- Correlation diffusion model
+- Predictive warning curves
