@@ -1,0 +1,25 @@
+{
+  "fields": {
+    "algorithmic_governance": {
+      "aliases": ["governance", "algorithmic_governance"]
+    },
+    "synthetic_systems": {
+      "aliases": ["synthetic", "synthetic_systems"]
+    },
+    "identity_data": {
+      "aliases": ["identity", "identity_data"]
+    },
+    "civilization_dynamics": {
+      "aliases": ["civilization", "civilization_dynamics"]
+    },
+    "monetary_infrastructure": {
+      "aliases": ["monetary", "finance", "monetary_infrastructure"]
+    },
+    "offworld_expansion": {
+      "aliases": ["offworld", "space", "offworld_expansion"]
+    },
+    "human_manifesto": {
+      "aliases": ["human", "manifesto"]
+    }
+  }
+}

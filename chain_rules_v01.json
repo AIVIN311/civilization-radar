@@ -1,0 +1,27 @@
+{
+  "responsibility_collapse": {
+    "triggers": ["syntheticliability.com","algorithmiclegitimacy.com"],
+    "amplifiers": ["automatedjurisprudence.com"],
+    "impacts": ["biometricsovereignty.com","posthumousidentity.com"],
+    "severity_boost": 0.35
+  },
+  "reality_contamination": {
+    "triggers": ["syntheticpollution.com","syntheticrealitycrisis.com"],
+    "amplifiers": ["posttruthresilience.com"],
+    "impacts": [
+      "humanintelligenceisirreplaceable.com",
+      "thefutureisalreadyhereitisjustnotevenlydistributed.com"
+    ],
+    "severity_boost": 0.40
+  },
+  "synthetic_metabolic_overload": {
+    "triggers": ["modelautophagy.com","siliconmetabolism.com"],
+    "amplifiers": ["computationalscarcity.com","energyjurisdiction.com"],
+    "impacts": [
+      "dollardisruption.com",
+      "climateinterventionism.com",
+      "theageoffusion.com"
+    ],
+    "severity_boost": 0.45
+  }
+}
