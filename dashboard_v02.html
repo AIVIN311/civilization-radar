@@ -1,168 +1,239 @@
 <!doctype html><html><head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width,initial-scale=1'>
-<title>文明雷達 v0.2</title>
+<title>文明雷達 v0.2（戰情中心）</title>
 
 <style>
 body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;margin:0;background:#fff;color:#111}
-main{max-width:1200px;margin:0 auto;padding:28px 18px}
+main{max-width:1220px;margin:0 auto;padding:28px 18px}
 h1{margin:0 0 10px;font-size:28px}
 .meta{color:#666;margin-bottom:18px;line-height:1.5}
-.grid{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}
+.grid{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;align-items:start}
 .card{border:1px solid #eee;border-radius:14px;padding:16px}
 table{width:100%;border-collapse:collapse}
 th,td{padding:10px 8px;border-bottom:1px solid #f1f1f1;vertical-align:top}
-th{color:#666;font-weight:600;text-align:left}
+th{color:#666;font-weight:650;text-align:left;font-size:13px}
+td{font-size:14px}
 small{color:#666}
 .badge{display:inline-block;padding:2px 8px;border:1px solid #eee;border-radius:999px;font-size:12px;color:#444}
-.k{font-variant-numeric:tabular-nums}
-.w{font-weight:700}
-.l3{font-weight:700}
-.dim{color:#777}
+.muted{color:#888}
+.kpi{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.kpi .pill{border:1px solid #eee;border-radius:999px;padding:6px 10px;font-size:12px;color:#444}
+.spark{color:#111} /* SVG uses currentColor */
+.delta{font-size:12px;padding:2px 6px;border-radius:8px;border:1px solid #eee;display:inline-block}
+.delta.up{color:#0b6}
+.delta.down{color:#c33}
+.delta.flat{color:#888}
+
+/* 戰情燈號 */
+.r{display:inline-flex;align-items:center;gap:8px}
+.dot{width:10px;height:10px;border-radius:999px;display:inline-block}
+.r-green .dot{background:#18a058}
+.r-yellow .dot{background:#f0b429}
+.r-orange .dot{background:#f97316}
+.r-red .dot{background:#ef4444}
+.r .label{font-size:12px;color:#444;border:1px solid #eee;border-radius:999px;padding:2px 8px}
+
+/* Level */
+.lv{font-weight:700}
+.lv.L3{color:#b91c1c}
+.lv.L2{color:#c2410c}
+.lv.L1{color:#444}
 </style>
 
 </head><body><main>
-<h1>文明雷達 v0.2</h1>
-<div class='meta'>最新時段：2026-02-03T15:30:00+08:00 · 區間 30m · 資料來源：metrics_v02 → v02_domain_latest / v02_series_latest<br><span class='dim'>排序依據：W（預警指數） · 指標：Level（探測深度）/ Heat（當下結構熱度）/ A（異常偏離）/ D（同步擴散）/ W（時間累積預警）</span></div>
+<h1>文明雷達 v0.2（戰情中心）</h1>
+<div class='meta'>最新時段：2026-02-03T23:30:00+08:00 · 區間 30m · 資料來源：metrics_v02 → v02_domain_latest / v02_series_latest<br>排序依據：W（預警指數） · 指標：Level / Heat / A / D / W · sparkline：最近 16 個時段<br>門檻：背景&lt;1.20，可疑≥1.20，警戒≥1.80，事件≥2.30（L3 會有輕微偏置）</div>
 <div class='grid'>
-<div class='card'><h3>領域預警榜（以 W 排序）</h3>
-<table><thead><tr>
-<th>Domain</th><th>Series</th><th class='k'>req</th><th>Level</th><th class='k'>Heat</th><th class='k'>A</th><th class='k'>D</th><th class='k'>W</th><th>Matched</th><th>Sig</th>
-</tr></thead><tbody>
+<div class='card'>
+<h3>領域預警榜（以 W 排序）</h3>
+<table><thead><tr><th>燈號</th><th>Domain</th><th>Series</th><th>req</th><th>Level</th><th>W</th><th>Δ</th><th>Heat</th><th>A</th><th>D</th><th>W 曲線</th><th>Matched</th><th>Sig</th></tr></thead><tbody>
 <tr>
+<td><span class='r r-red'><span class='dot'></span><span class='label'>事件</span></span></td>
 <td><a href='https://algorithmicallocation.com/' target='_blank' rel='noopener noreferrer'>algorithmicallocation.com</a></td>
 <td>governance</td>
-<td class='k'>720</td>
-<td class='l3'>L3</td>
-<td class='k'>10.998</td>
-<td class='k'>0.000</td>
-<td class='k'>0.286</td>
-<td class='k w'>2.758</td>
-<td><small>baseline_root, env_secret</small></td>
+<td>720</td>
+<td><span class='lv L3'>L3</span></td>
+<td><b>2.758</b></td>
+<td><span class='delta flat'>→ +0.000</span></td>
+<td>10.998</td>
+<td>0.000</td>
+<td>0.286</td>
+<td class='spark'><span class='muted'>—</span></td>
+<td><small>[&quot;baseline_root&quot;, &quot;env_secret&quot;]</small></td>
 <td><span class='badge'>env_scan</span></td>
 </tr>
 <tr>
+<td><span class='r r-orange'><span class='dot'></span><span class='label'>警戒</span></span></td>
 <td><a href='https://postfiatreservesystems.com/' target='_blank' rel='noopener noreferrer'>postfiatreservesystems.com</a></td>
 <td>monetary_infrastructure</td>
-<td class='k'>44</td>
-<td class='l3'>L3</td>
-<td class='k'>9.793</td>
-<td class='k'>1.458</td>
-<td class='k'>0.200</td>
-<td class='k w'>1.798</td>
-<td><small>baseline_root, env_secret</small></td>
+<td>44</td>
+<td><span class='lv L3'>L3</span></td>
+<td><b>1.798</b></td>
+<td><span class='delta up'>↑ +0.557</span></td>
+<td>9.793</td>
+<td>1.458</td>
+<td>0.200</td>
+<td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,2.1 11.1,3.4 20.1,4.9 29.2,11.6 38.3,12.1 47.3,19.7 56.4,20.0 65.5,19.1 74.5,19.5 83.6,17.6 92.7,18.2 101.7,18.4 110.8,18.9 119.9,19.3 128.9,19.5 138.0,2.0" fill="none" stroke="currentColor" stroke-width="1.6" />
+      <circle cx="138.0" cy="2.0" r="1.8" fill="currentColor"></circle>
+      <title>W last=1.798</title>
+    </svg>
+    </td>
+<td><small>[&quot;baseline_root&quot;, &quot;env_secret&quot;]</small></td>
 <td><span class='badge'>env_scan</span></td>
 </tr>
 <tr>
+<td><span class='r r-yellow'><span class='dot'></span><span class='label'>可疑</span></span></td>
 <td><a href='https://algorithmiclegitimacy.com/' target='_blank' rel='noopener noreferrer'>algorithmiclegitimacy.com</a></td>
 <td>governance</td>
-<td class='k'>90</td>
-<td class=''>L1</td>
-<td class='k'>2.159</td>
-<td class='k'>-0.049</td>
-<td class='k'>0.200</td>
-<td class='k w'>1.759</td>
-<td><small>—</small></td>
+<td>90</td>
+<td><span class='lv L1'>L1</span></td>
+<td><b>1.759</b></td>
+<td><span class='delta flat'>→ -0.033</span></td>
+<td>2.159</td>
+<td>-0.049</td>
+<td>0.200</td>
+<td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,8.1 11.1,10.3 20.1,12.2 29.2,13.9 38.3,15.9 47.3,17.2 56.4,17.2 65.5,2.0 74.5,4.4 83.6,6.4 92.7,8.7 101.7,10.8 110.8,12.7 119.9,14.6 128.9,18.6 138.0,20.0" fill="none" stroke="currentColor" stroke-width="1.6" />
+      <circle cx="138.0" cy="20.0" r="1.8" fill="currentColor"></circle>
+      <title>W last=1.759</title>
+    </svg>
+    </td>
+<td><small>[]</small></td>
 <td><span class='badge'>baseline</span></td>
 </tr>
 <tr>
+<td><span class='r r-yellow'><span class='dot'></span><span class='label'>可疑</span></span></td>
 <td><a href='https://syntheticrealitycrisis.com/' target='_blank' rel='noopener noreferrer'>syntheticrealitycrisis.com</a></td>
 <td>synthetic_systems</td>
-<td class='k'>85</td>
-<td class=''>L1</td>
-<td class='k'>2.334</td>
-<td class='k'>0.028</td>
-<td class='k'>0.200</td>
-<td class='k w'>1.622</td>
-<td><small>—</small></td>
+<td>85</td>
+<td><span class='lv L1'>L1</span></td>
+<td><b>1.622</b></td>
+<td><span class='delta flat'>→ -0.018</span></td>
+<td>2.334</td>
+<td>0.028</td>
+<td>0.200</td>
+<td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,10.1 11.1,16.5 20.1,17.5 29.2,18.9 38.3,20.0 47.3,2.0 56.4,3.9 65.5,5.3 74.5,6.0 83.6,7.8 92.7,9.5 101.7,10.7 110.8,12.3 119.9,13.1 128.9,14.6 138.0,15.4" fill="none" stroke="currentColor" stroke-width="1.6" />
+      <circle cx="138.0" cy="15.4" r="1.8" fill="currentColor"></circle>
+      <title>W last=1.622</title>
+    </svg>
+    </td>
+<td><small>[]</small></td>
 <td><span class='badge'>other</span></td>
 </tr>
 <tr>
+<td><span class='r r-yellow'><span class='dot'></span><span class='label'>可疑</span></span></td>
 <td><a href='https://climateinterventionism.com/' target='_blank' rel='noopener noreferrer'>climateinterventionism.com</a></td>
 <td>civilization</td>
-<td class='k'>146</td>
-<td class=''>L1</td>
-<td class='k'>2.567</td>
-<td class='k'>0.128</td>
-<td class='k'>0.200</td>
-<td class='k w'>1.347</td>
-<td><small>—</small></td>
+<td>146</td>
+<td><span class='lv L1'>L1</span></td>
+<td><b>1.347</b></td>
+<td><span class='delta down'>↓ -0.178</span></td>
+<td>2.567</td>
+<td>0.128</td>
+<td>0.200</td>
+<td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,2.0 11.1,3.2 20.1,4.4 29.2,8.3 38.3,8.6 47.3,9.5 56.4,10.5 65.5,11.4 74.5,12.9 83.6,13.3 92.7,13.7 101.7,13.5 110.8,14.2 119.9,14.5 128.9,15.1 138.0,20.0" fill="none" stroke="currentColor" stroke-width="1.6" />
+      <circle cx="138.0" cy="20.0" r="1.8" fill="currentColor"></circle>
+      <title>W last=1.347</title>
+    </svg>
+    </td>
+<td><small>[]</small></td>
 <td><span class='badge'>other</span></td>
 </tr>
 <tr>
+<td><span class='r r-yellow'><span class='dot'></span><span class='label'>可疑</span></span></td>
 <td><a href='https://civilizationcaching.com/' target='_blank' rel='noopener noreferrer'>civilizationcaching.com</a></td>
 <td>civilization</td>
-<td class='k'>55</td>
-<td class=''>L1</td>
-<td class='k'>1.948</td>
-<td class='k'>0.000</td>
-<td class='k'>0.286</td>
-<td class='k w'>1.285</td>
-<td><small>—</small></td>
+<td>55</td>
+<td><span class='lv L1'>L1</span></td>
+<td><b>1.285</b></td>
+<td><span class='delta flat'>→ +0.000</span></td>
+<td>1.948</td>
+<td>0.000</td>
+<td>0.286</td>
+<td class='spark'><span class='muted'>—</span></td>
+<td><small>[]</small></td>
 <td><span class='badge'>baseline</span></td>
 </tr>
 <tr>
+<td><span class='r r-yellow'><span class='dot'></span><span class='label'>可疑</span></span></td>
 <td><a href='https://biometricsovereignty.com/' target='_blank' rel='noopener noreferrer'>biometricsovereignty.com</a></td>
 <td>identity_data</td>
-<td class='k'>135</td>
-<td class=''>L1</td>
-<td class='k'>2.534</td>
-<td class='k'>0.123</td>
-<td class='k'>0.200</td>
-<td class='k w'>1.224</td>
-<td><small>—</small></td>
+<td>135</td>
+<td><span class='lv L1'>L1</span></td>
+<td><b>1.224</b></td>
+<td><span class='delta flat'>→ +0.033</span></td>
+<td>2.534</td>
+<td>0.123</td>
+<td>0.200</td>
+<td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,2.0 11.1,4.8 20.1,4.8 29.2,8.9 38.3,9.9 47.3,9.3 56.4,10.2 65.5,9.8 74.5,13.8 83.6,18.4 92.7,18.8 101.7,19.2 110.8,18.3 119.9,18.0 128.9,20.0 138.0,14.1" fill="none" stroke="currentColor" stroke-width="1.6" />
+      <circle cx="138.0" cy="14.1" r="1.8" fill="currentColor"></circle>
+      <title>W last=1.224</title>
+    </svg>
+    </td>
+<td><small>[]</small></td>
 <td><span class='badge'>other</span></td>
 </tr>
-</tbody></table></div>
-<div class='card'><h3>系列預警榜（同一時段，W_avg 排序）</h3>
-<table><thead><tr>
-<th>Series</th><th class='k'>domains</th><th class='k'>L3</th><th class='k'>Heat_avg</th><th class='k'>A_avg</th><th class='k'>D_avg</th><th class='k'>W_avg</th>
-</tr></thead><tbody>
-<tr>
-<td>governance</td>
-<td class='k'>2</td>
-<td class='k l3'>1</td>
-<td class='k'>6.581</td>
-<td class='k'>-0.024</td>
-<td class='k'>0.286</td>
-<td class='k w'>2.139</td>
-</tr>
+</tbody></table>
+</div>
+<div class='card'>
+<h3>系列預警榜（W_avg 排序）</h3>
+<table><thead><tr><th>Series</th><th>domains</th><th>L3</th><th>Heat_avg</th><th>A_avg</th><th>D_avg</th><th>W_avg</th></tr></thead><tbody>
 <tr>
 <td>monetary_infrastructure</td>
-<td class='k'>1</td>
-<td class='k l3'>0</td>
-<td class='k'>2.178</td>
-<td class='k'>-0.046</td>
-<td class='k'>0.286</td>
-<td class='k w'>1.833</td>
+<td>1</td>
+<td>1</td>
+<td>9.793</td>
+<td>1.458</td>
+<td>0.200</td>
+<td><b>1.798</b></td>
+</tr>
+<tr>
+<td>governance</td>
+<td>1</td>
+<td>0</td>
+<td>2.159</td>
+<td>-0.049</td>
+<td>0.200</td>
+<td><b>1.759</b></td>
 </tr>
 <tr>
 <td>synthetic_systems</td>
-<td class='k'>1</td>
-<td class='k l3'>0</td>
-<td class='k'>2.103</td>
-<td class='k'>-0.076</td>
-<td class='k'>0.286</td>
-<td class='k w'>1.775</td>
+<td>1</td>
+<td>0</td>
+<td>2.334</td>
+<td>0.028</td>
+<td>0.200</td>
+<td><b>1.622</b></td>
 </tr>
 <tr>
 <td>civilization</td>
-<td class='k'>2</td>
-<td class='k l3'>1</td>
-<td class='k'>5.987</td>
-<td class='k'>0.745</td>
-<td class='k'>0.286</td>
-<td class='k w'>1.668</td>
+<td>1</td>
+<td>0</td>
+<td>2.567</td>
+<td>0.128</td>
+<td>0.200</td>
+<td><b>1.347</b></td>
 </tr>
 <tr>
 <td>identity_data</td>
-<td class='k'>1</td>
-<td class='k l3'>0</td>
-<td class='k'>2.108</td>
-<td class='k'>-0.061</td>
-<td class='k'>0.286</td>
-<td class='k w'>1.284</td>
+<td>1</td>
+<td>0</td>
+<td>2.534</td>
+<td>0.123</td>
+<td>0.200</td>
+<td><b>1.224</b></td>
 </tr>
 </tbody></table>
-<div style='margin-top:12px'><small>解讀：A↑＝相對自身基線升溫，D↑＝同時段 L2/L3 擴散比例上升，W↑＝時間累積後的預警指數。L3 高且 W 高，通常代表「深層探測」同步化。</small></div>
+<div class='kpi'><span class='pill'>解讀：W↑＝時間累積預警；Δ↑＝短期升溫；Level=L3 且燈號偏紅 → 優先級最高</span><span class='pill'>下一刀（你一說我就做）：展開 matched（點擊展開）、只顯示 L3 的警報模式</span></div>
 </div>
-</div></main></body></html>
+</div>
+</main></body></html>
