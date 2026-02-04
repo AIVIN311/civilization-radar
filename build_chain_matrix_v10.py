@@ -1,3 +1,5 @@
+import os
+import json
 import sqlite3
 import math
 
@@ -6,6 +8,18 @@ K = 16  # window size, align with dashboard sparkline
 TH_BG = 1.20
 TH_SUS = 1.80
 TAU = 12.0  # push decay time constant (slots)
+EVENT_FORCING_PATH = "event_forcing_v0.2.json"
+DEBUG_EVENT_FORCING = False
+
+# load event forcing once
+E_DECAY = {}
+if os.path.exists(EVENT_FORCING_PATH):
+    try:
+        with open(EVENT_FORCING_PATH, "r", encoding="utf-8") as f:
+            payload = json.load(f)
+        E_DECAY = payload.get("E_decay", {}) or {}
+    except Exception:
+        E_DECAY = {}
 
 def pearson(x, y):
     n = min(len(x), len(y))
@@ -185,6 +199,11 @@ def main():
 
             inc_sum = sum(float(r[2] or 0.0) for r in incoming)
             W_proj = W + inc_sum
+            slot_key = ts_now
+            forcing = float(E_DECAY.get(slot_key, {}).get(dst, 0.0))
+            if DEBUG_EVENT_FORCING and forcing > 0:
+                print("FORCING HIT", slot_key, dst, forcing)
+            W_proj += forcing
 
             # top src
             if incoming:
@@ -259,6 +278,11 @@ def main():
 
             inc_sum = sum(float(r[2] or 0.0) for r in incoming)
             W_proj = W + inc_sum
+            slot_key = latest_ts
+            forcing = float(E_DECAY.get(slot_key, {}).get(dst, 0.0))
+            if DEBUG_EVENT_FORCING and forcing > 0:
+                print("FORCING HIT", slot_key, dst, forcing)
+            W_proj += forcing
 
             if incoming:
                 top_src = incoming[0][0]

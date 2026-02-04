@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "tau": 12.0,
+    "lambda_event": 0.2,
+    "slotting": "slot_of_ts(ts) -> ts[:13] (hourly bucket placeholder)"
+  },
+  "E_raw": {
+    "2026-02-04T03": {
+      "monetary_infrastructure": 0.12800000000000003,
+      "algorithmic_governance": 0.08800000000000002,
+      "identity_data": 0.12800000000000003,
+      "civilization_resilience": 0.048,
+      "civilization": 0.018
+    }
+  },
+  "E_decay": {
+    "2026-02-04T03": {
+      "monetary_infrastructure": 0.12800000000000003,
+      "algorithmic_governance": 0.08800000000000002,
+      "identity_data": 0.12800000000000003,
+      "civilization_resilience": 0.048,
+      "civilization": 0.018
+    }
+  }
+}

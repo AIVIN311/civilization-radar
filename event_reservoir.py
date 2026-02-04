@@ -1,100 +1,119 @@
-# event_reservoir.py
-import json, math, os
+import json
+import math
 from collections import defaultdict
 
-TAU = 12  # same as your chain decay
-LAMBDA_EVENT = 0.20  # event forcing strength (start conservative)
+
+INPUT_PATH = "output/event_maps.jsonl"
+OUTPUT_PATH = "event_forcing_v0.2.json"
+
+TAU = 12.0
+LAMBDA_EVENT = 0.20
+
 
 def slot_of_ts(ts: str) -> str:
-    # v0: treat each event ts as its own slot key
-    # if you already have slotting logic in your pipeline, replace this.
-    return ts[:13]  # "YYYY-MM-DDTHH" hourly bucket
+    # Placeholder: hourly bucket (YYYY-MM-DDTHH)
+    return (ts or "")[:13]
 
-def decay_factor(delta_slots: int, tau: float=TAU) -> float:
-    return math.exp(-delta_slots / tau)
 
-def load_jsonl(path):
-    out = []
+def load_event_maps(path: str):
+    events = []
     with open(path, "r", encoding="utf-8") as f:
         for line in f:
-            if line.strip():
-                out.append(json.loads(line))
-    return out
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                events.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    return events
 
-def build_reservoir(event_maps_path: str):
-    rows = load_jsonl(event_maps_path)
 
-    # E_raw[slot][series] = max_energy_in_slot (merge duplicates)
-    E_raw = defaultdict(lambda: defaultdict(float))
+def build_raw(events):
+    # E_raw[slot][series] = max(scaled_energy)
+    raw = defaultdict(dict)
+    for ev in events:
+        ts = ev.get("ts") or ev.get("timestamp") or ""
+        slot = slot_of_ts(ts)
+        if not slot:
+            continue
+        for m in ev.get("maps", []) or []:
+            series = m.get("series")
+            if not series:
+                continue
+            try:
+                energy = float(m.get("energy", 0.0))
+            except (TypeError, ValueError):
+                energy = 0.0
+            scaled = energy * LAMBDA_EVENT
+            prev = raw[slot].get(series, 0.0)
+            if scaled > prev:
+                raw[slot][series] = scaled
+    return raw
 
-    for ev in rows:
-        slot = slot_of_ts(ev["ts"])
-        fp = ev.get("fingerprint")
-        # you can use novelty here later; v0 just uses energy
-        for m in ev.get("maps", []):
-            s = m["series"]
-            e = float(m.get("energy", 0.0)) * LAMBDA_EVENT  # scale here (noise control)
-            if e > E_raw[slot][s]:
-                E_raw[slot][s] = e
 
-    return E_raw
+def build_decay(raw):
+    # E_decay[slot][series] = E_raw + exp(-1/tau) * prev_decay
+    decay = defaultdict(dict)
+    slots = sorted(raw.keys())
+    if not slots:
+        return decay, slots
 
-def to_sorted_slots(E_raw):
-    slots = sorted(E_raw.keys())
-    return slots
+    decay_factor = math.exp(-1.0 / TAU)
+    prev = defaultdict(float)
 
-def compute_decayed_series(E_raw):
-    """
-    Output:
-      E_decay[slot][series] = sum_{past slots} E_raw[past][series] * exp(-Δ/τ)
-    v0: simple forward accumulation; assumes equally-spaced "hour slots".
-    """
-    slots = to_sorted_slots(E_raw)
-    # map slot -> index
-    idx = {s:i for i,s in enumerate(slots)}
+    for slot in slots:
+        current = {}
+        # carry over all previous series with decay
+        for series, prev_val in prev.items():
+            if prev_val <= 0:
+                continue
+            current[series] = prev_val * decay_factor
+        # add current raw
+        for series, raw_val in raw.get(slot, {}).items():
+            current[series] = current.get(series, 0.0) + raw_val
+        # persist
+        for series, val in current.items():
+            if val > 0:
+                decay[slot][series] = val
+        prev = defaultdict(float, current)
 
-    E_decay = defaultdict(dict)
-    accum = defaultdict(float)
+    return decay, slots
 
-    for i, slot in enumerate(slots):
-        # decay existing accum by 1 step each slot
-        # (since slots are hourly buckets in v0)
-        for s in list(accum.keys()):
-            accum[s] *= decay_factor(1)
-
-        # inject new
-        for s, e in E_raw[slot].items():
-            accum[s] += e
-
-        E_decay[slot] = dict(accum)
-
-    return E_decay
 
 def main():
-    in_path = "output/event_maps.jsonl"
-    out_path = "event_forcing_v0.2.json"
+    events = load_event_maps(INPUT_PATH)
+    raw = build_raw(events)
+    decay, slots = build_decay(raw)
 
-    if not os.path.exists(in_path):
-        raise FileNotFoundError(f"missing {in_path}, run run_bridge.py first")
-
-    E_raw = build_reservoir(in_path)
-    E_decay = compute_decayed_series(E_raw)
-
-    payload = {
+    out = {
         "meta": {
             "tau": TAU,
             "lambda_event": LAMBDA_EVENT,
-            "slotting": "hourly_bucket_ts[:13]",
-            "note": "event forcing is applied to projected feeding (B-mode), not W_avg"
+            "slotting": "slot_of_ts(ts) -> ts[:13] (hourly bucket placeholder)",
         },
-        "E_raw": {k: v for k, v in E_raw.items()},
-        "E_decay": {k: v for k, v in E_decay.items()}
+        "E_raw": raw,
+        "E_decay": decay,
     }
 
-    with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(payload, f, ensure_ascii=False, indent=2)
+    with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
+        json.dump(out, f, ensure_ascii=False, indent=2)
 
-    print("done ->", out_path)
+    latest_slot = slots[-1] if slots else None
+    latest_forcing = decay.get(latest_slot, {}) if latest_slot else {}
+    top5 = sorted(latest_forcing.items(), key=lambda x: x[1], reverse=True)[:5]
+
+    print(f"slots: {len(slots)}")
+    if latest_slot:
+        print(f"latest_slot: {latest_slot}")
+    if top5:
+        print("top5_series_latest_forcing:")
+        for series, val in top5:
+            print(f"  {series}: {val:.6f}")
+    else:
+        print("top5_series_latest_forcing: (none)")
+    print(f"output: {OUTPUT_PATH}")
+
 
 if __name__ == "__main__":
     main()
