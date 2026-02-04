@@ -1,0 +1,447 @@
+{
+  "version": "v0.4",
+  "meta": {
+    "name": "semantic_bridge_rules",
+    "purpose": "event_type × actors × geo → series mapping for Civilization Dynamics Radar",
+    "series_keys_targeted": [
+      "monetary_infrastructure",
+      "civilization_resilience",
+      "offworld_expansion",
+      "identity_data",
+      "human_manifesto",
+      "synthetic_systems",
+      "algorithmic_governance",
+      "civilization"
+    ],
+    "alias": {
+      "governance": "algorithmic_governance"
+    }
+  },
+
+  "series_catalog": {
+    "monetary_infrastructure": { "default_cap": 0.85, "default_priority": "core" },
+    "civilization_resilience": { "default_cap": 0.90, "default_priority": "core" },
+    "offworld_expansion": { "default_cap": 0.70, "default_priority": "secondary" },
+    "identity_data": { "default_cap": 0.80, "default_priority": "core" },
+    "human_manifesto": { "default_cap": 0.70, "default_priority": "secondary" },
+    "synthetic_systems": { "default_cap": 0.80, "default_priority": "core" },
+    "algorithmic_governance": { "default_cap": 0.85, "default_priority": "core" },
+    "civilization": { "default_cap": 0.50, "default_priority": "secondary" }
+  },
+
+  "taxonomy": {
+    "event_type": [
+      "military",
+      "policy",
+      "legal",
+      "economy",
+      "finance",
+      "tech",
+      "cyber",
+      "energy",
+      "health",
+      "disaster",
+      "space",
+      "climate",
+      "info_ops",
+      "social",
+      "other"
+    ],
+    "actor_tags": [
+      "state_us",
+      "state_cn",
+      "state_ru",
+      "state_eu",
+      "state_au",
+      "state_tw",
+      "bloc_nato",
+      "bloc_quad",
+      "bloc_asean",
+      "company_bigtech",
+      "company_ai",
+      "company_chip",
+      "company_finance",
+      "org_un",
+      "org_who",
+      "org_imf",
+      "org_worldbank",
+      "military",
+      "intelligence",
+      "regulator",
+      "unknown"
+    ],
+    "geo_tags": [
+      "geo_tw",
+      "geo_indo_pacific",
+      "geo_europe",
+      "geo_middle_east",
+      "geo_arctic",
+      "geo_space",
+      "geo_global",
+      "unknown"
+    ]
+  },
+
+  "rules": [
+    {
+      "rule_id": "bridge_v0.4_r101",
+      "when": {
+        "event_type": ["policy", "legal"],
+        "actors_any": ["regulator"],
+        "geo_any": ["geo_global", "geo_europe", "geo_indo_pacific", "geo_tw"]
+      },
+      "then": [
+        { "series": "algorithmic_governance", "w_base": 0.80, "cap": 0.85, "priority": "core" },
+        { "series": "identity_data", "w_base": 0.45, "cap": 0.70, "priority": "core" },
+        { "series": "monetary_infrastructure", "w_base": 0.25, "cap": 0.55, "priority": "secondary" }
+      ],
+      "notes": "Regulatory policy/legal actions tend to move governance + identity constraints and sometimes monetary rails.",
+      "evidence_tags": ["event_type:policy|legal", "actor:regulator", "geo:any"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r102",
+      "when": {
+        "event_type": ["policy"],
+        "actors_any": ["state_us", "state_cn", "state_eu"],
+        "geo_any": ["geo_indo_pacific", "geo_tw"]
+      },
+      "then": [
+        { "series": "algorithmic_governance", "w_base": 0.55, "cap": 0.75, "priority": "core" },
+        { "series": "civilization_resilience", "w_base": 0.35, "cap": 0.65, "priority": "core" },
+        { "series": "monetary_infrastructure", "w_base": 0.25, "cap": 0.60, "priority": "secondary" }
+      ],
+      "notes": "Policy moves among major states in IP/TW raise governance constraints and resilience pressure.",
+      "evidence_tags": ["event_type:policy", "actor:state", "geo:indo_pacific|tw"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r103",
+      "when": {
+        "event_type": ["legal"],
+        "actors_any": ["state_us", "state_cn", "state_eu", "regulator"],
+        "geo_any": ["geo_global"]
+      },
+      "then": [
+        { "series": "algorithmic_governance", "w_base": 0.65, "cap": 0.80, "priority": "core" },
+        { "series": "monetary_infrastructure", "w_base": 0.35, "cap": 0.65, "priority": "secondary" }
+      ],
+      "notes": "Legal actions with global scope often reshape governance and, secondarily, financial plumbing.",
+      "evidence_tags": ["event_type:legal", "actor:state|regulator", "geo:global"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r201",
+      "when": {
+        "event_type": ["military"],
+        "actors_any": ["state_cn", "state_tw", "state_us", "military", "intelligence"],
+        "geo_any": ["geo_tw", "geo_indo_pacific"]
+      },
+      "then": [
+        { "series": "civilization_resilience", "w_base": 0.80, "cap": 0.90, "priority": "core" },
+        { "series": "monetary_infrastructure", "w_base": 0.25, "cap": 0.55, "priority": "secondary" },
+        { "series": "algorithmic_governance", "w_base": 0.30, "cap": 0.55, "priority": "secondary" }
+      ],
+      "notes": "Military activity in TW/IP loads resilience pressure; costs and governance responses follow.",
+      "evidence_tags": ["event_type:military", "actor:state|military|intel", "geo:tw|indo_pacific"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r202",
+      "when": {
+        "event_type": ["military"],
+        "actors_any": ["bloc_nato", "state_ru", "state_eu", "military"],
+        "geo_any": ["geo_europe"]
+      },
+      "then": [
+        { "series": "civilization_resilience", "w_base": 0.65, "cap": 0.85, "priority": "core" },
+        { "series": "monetary_infrastructure", "w_base": 0.35, "cap": 0.65, "priority": "secondary" }
+      ],
+      "notes": "European military tensions usually propagate into resilience + monetary cost channels.",
+      "evidence_tags": ["event_type:military", "actor:nato|ru|eu", "geo:europe"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r203",
+      "when": {
+        "event_type": ["military"],
+        "actors_any": ["intelligence"],
+        "geo_any": ["geo_global"]
+      },
+      "then": [
+        { "series": "civilization_resilience", "w_base": 0.45, "cap": 0.70, "priority": "core" },
+        { "series": "human_manifesto", "w_base": 0.25, "cap": 0.55, "priority": "secondary" }
+      ],
+      "notes": "Global intelligence-related military signals affect resilience; narrative posture may also shift.",
+      "evidence_tags": ["event_type:military", "actor:intelligence", "geo:global"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r301",
+      "when": {
+        "event_type": ["finance"],
+        "actors_any": ["org_imf", "org_worldbank", "regulator"],
+        "geo_any": ["geo_global"]
+      },
+      "then": [
+        { "series": "monetary_infrastructure", "w_base": 0.80, "cap": 0.85, "priority": "core" },
+        { "series": "algorithmic_governance", "w_base": 0.30, "cap": 0.60, "priority": "secondary" }
+      ],
+      "notes": "IMF/WB/regulatory finance events reshape monetary rails; governance moves secondarily.",
+      "evidence_tags": ["event_type:finance", "actor:imf|worldbank|regulator", "geo:global"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r302",
+      "when": {
+        "event_type": ["economy", "finance"],
+        "actors_any": ["state_us", "state_cn", "state_eu"],
+        "geo_any": ["geo_global", "geo_indo_pacific", "geo_europe"]
+      },
+      "then": [
+        { "series": "monetary_infrastructure", "w_base": 0.65, "cap": 0.85, "priority": "core" },
+        { "series": "civilization_resilience", "w_base": 0.35, "cap": 0.70, "priority": "core" },
+        { "series": "synthetic_systems", "w_base": 0.20, "cap": 0.50, "priority": "secondary" }
+      ],
+      "notes": "Macro economy/finance among major blocs hits monetary pressure, then resilience; tech systems may react.",
+      "evidence_tags": ["event_type:economy|finance", "actor:state", "geo:any"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r303",
+      "when": {
+        "event_type": ["finance"],
+        "actors_any": ["company_finance"],
+        "geo_any": ["geo_global"]
+      },
+      "then": [
+        { "series": "monetary_infrastructure", "w_base": 0.55, "cap": 0.75, "priority": "core" },
+        { "series": "algorithmic_governance", "w_base": 0.25, "cap": 0.55, "priority": "secondary" }
+      ],
+      "notes": "Large financial-sector events affect monetary infrastructure; governance/regulation reacts.",
+      "evidence_tags": ["event_type:finance", "actor:company_finance", "geo:global"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r401",
+      "when": {
+        "event_type": ["tech"],
+        "actors_any": ["company_ai", "company_bigtech"],
+        "geo_any": ["geo_global", "geo_indo_pacific", "geo_europe", "geo_tw"]
+      },
+      "then": [
+        { "series": "synthetic_systems", "w_base": 0.75, "cap": 0.80, "priority": "core" },
+        { "series": "algorithmic_governance", "w_base": 0.55, "cap": 0.80, "priority": "core" },
+        { "series": "identity_data", "w_base": 0.35, "cap": 0.65, "priority": "secondary" }
+      ],
+      "notes": "AI/bigtech events push synthetic systems; governance and identity externalities follow.",
+      "evidence_tags": ["event_type:tech", "actor:ai|bigtech", "geo:any"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r402",
+      "when": {
+        "event_type": ["tech"],
+        "actors_any": ["company_chip"],
+        "geo_any": ["geo_tw", "geo_indo_pacific"]
+      },
+      "then": [
+        { "series": "synthetic_systems", "w_base": 0.55, "cap": 0.75, "priority": "core" },
+        { "series": "monetary_infrastructure", "w_base": 0.35, "cap": 0.70, "priority": "secondary" },
+        { "series": "civilization_resilience", "w_base": 0.25, "cap": 0.60, "priority": "secondary" }
+      ],
+      "notes": "Chips/semis events in TW/IP feed synthetic systems, then monetary/resilience impacts.",
+      "evidence_tags": ["event_type:tech", "actor:company_chip", "geo:tw|indo_pacific"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r403",
+      "when": {
+        "event_type": ["tech"],
+        "actors_any": ["state_us", "state_cn", "state_eu"],
+        "geo_any": ["geo_global"]
+      },
+      "then": [
+        { "series": "synthetic_systems", "w_base": 0.45, "cap": 0.70, "priority": "core" },
+        { "series": "algorithmic_governance", "w_base": 0.35, "cap": 0.65, "priority": "secondary" }
+      ],
+      "notes": "State-led tech policy pushes systems and governance constraints (export controls, standards, etc.).",
+      "evidence_tags": ["event_type:tech", "actor:state", "geo:global"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r501",
+      "when": {
+        "event_type": ["cyber"],
+        "actors_any": ["intelligence", "regulator", "state_us", "state_cn", "state_ru", "company_bigtech"],
+        "geo_any": ["geo_global", "geo_tw", "geo_indo_pacific", "geo_europe"]
+      },
+      "then": [
+        { "series": "identity_data", "w_base": 0.80, "cap": 0.80, "priority": "core" },
+        { "series": "algorithmic_governance", "w_base": 0.55, "cap": 0.80, "priority": "core" },
+        { "series": "civilization_resilience", "w_base": 0.30, "cap": 0.60, "priority": "secondary" }
+      ],
+      "notes": "Cyber events reshape identity/data exposure and governance posture; resilience is secondary.",
+      "evidence_tags": ["event_type:cyber", "actor:intel|regulator|state|bigtech", "geo:any"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r502",
+      "when": {
+        "event_type": ["cyber"],
+        "actors_any": ["company_finance"],
+        "geo_any": ["geo_global"]
+      },
+      "then": [
+        { "series": "monetary_infrastructure", "w_base": 0.50, "cap": 0.75, "priority": "core" },
+        { "series": "identity_data", "w_base": 0.45, "cap": 0.70, "priority": "secondary" }
+      ],
+      "notes": "Cyber incidents in finance hit monetary plumbing and spill into identity exposure.",
+      "evidence_tags": ["event_type:cyber", "actor:company_finance", "geo:global"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r601",
+      "when": {
+        "event_type": ["space"],
+        "actors_any": ["state_us", "state_cn", "state_ru", "company_bigtech", "company_ai", "company_chip", "regulator"],
+        "geo_any": ["geo_space", "geo_global"]
+      },
+      "then": [
+        { "series": "offworld_expansion", "w_base": 0.85, "cap": 0.70, "priority": "secondary" },
+        { "series": "synthetic_systems", "w_base": 0.30, "cap": 0.55, "priority": "secondary" },
+        { "series": "algorithmic_governance", "w_base": 0.20, "cap": 0.45, "priority": "secondary" }
+      ],
+      "notes": "Space/offworld activity feeds offworld expansion; systems + governance can be downstream.",
+      "evidence_tags": ["event_type:space", "actor:state|company|regulator", "geo:space|global"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r602",
+      "when": {
+        "event_type": ["space"],
+        "actors_any": ["regulator", "org_un", "state_us", "state_cn", "state_eu"],
+        "geo_any": ["geo_global"]
+      },
+      "then": [
+        { "series": "offworld_expansion", "w_base": 0.55, "cap": 0.70, "priority": "secondary" },
+        { "series": "algorithmic_governance", "w_base": 0.25, "cap": 0.50, "priority": "secondary" }
+      ],
+      "notes": "Space governance/standards/legal moves affect offworld expansion and governance constraints.",
+      "evidence_tags": ["event_type:space", "actor:regulator|un|state", "geo:global"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r701",
+      "when": {
+        "event_type": ["disaster"],
+        "actors_any": ["state_tw", "state_au", "state_us", "state_cn", "state_eu", "org_un", "unknown"],
+        "geo_any": ["geo_tw", "geo_indo_pacific", "geo_global"]
+      },
+      "then": [
+        { "series": "civilization_resilience", "w_base": 0.85, "cap": 0.90, "priority": "core" },
+        { "series": "monetary_infrastructure", "w_base": 0.35, "cap": 0.65, "priority": "secondary" }
+      ],
+      "notes": "Disasters load resilience pressure first; monetary costs follow.",
+      "evidence_tags": ["event_type:disaster", "geo:any"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r702",
+      "when": {
+        "event_type": ["climate", "health"],
+        "actors_any": ["org_un", "org_who", "state_us", "state_cn", "state_eu", "regulator", "unknown"],
+        "geo_any": ["geo_global", "geo_indo_pacific", "geo_tw", "geo_europe"]
+      },
+      "then": [
+        { "series": "civilization_resilience", "w_base": 0.75, "cap": 0.85, "priority": "core" },
+        { "series": "algorithmic_governance", "w_base": 0.25, "cap": 0.55, "priority": "secondary" },
+        { "series": "identity_data", "w_base": 0.20, "cap": 0.50, "priority": "secondary" }
+      ],
+      "notes": "Climate/health governance creates resilience pressure; governance + identity are secondary.",
+      "evidence_tags": ["event_type:climate|health", "actor:un|who|state|regulator", "geo:any"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r801",
+      "when": {
+        "event_type": ["info_ops", "social"],
+        "actors_any": ["state_us", "state_cn", "state_ru", "intelligence", "unknown"],
+        "geo_any": ["geo_tw", "geo_indo_pacific", "geo_global"]
+      },
+      "then": [
+        { "series": "human_manifesto", "w_base": 0.70, "cap": 0.70, "priority": "secondary" },
+        { "series": "civilization_resilience", "w_base": 0.35, "cap": 0.65, "priority": "core" },
+        { "series": "algorithmic_governance", "w_base": 0.25, "cap": 0.55, "priority": "secondary" }
+      ],
+      "notes": "Info ops/social polarization moves narrative posture (human_manifesto) and strains resilience/governance.",
+      "evidence_tags": ["event_type:info_ops|social", "actor:state|intel|unknown", "geo:any"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r802",
+      "when": {
+        "event_type": ["info_ops"],
+        "actors_any": ["company_bigtech", "regulator"],
+        "geo_any": ["geo_global", "geo_europe"]
+      },
+      "then": [
+        { "series": "algorithmic_governance", "w_base": 0.55, "cap": 0.80, "priority": "core" },
+        { "series": "human_manifesto", "w_base": 0.35, "cap": 0.65, "priority": "secondary" }
+      ],
+      "notes": "Platform/regulatory info-ops controversies primarily shift governance, secondarily narrative posture.",
+      "evidence_tags": ["event_type:info_ops", "actor:bigtech|regulator", "geo:any"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r901",
+      "when": {
+        "event_type": ["other"],
+        "actors_any": ["unknown"],
+        "geo_any": ["geo_global", "unknown"]
+      },
+      "then": [
+        { "series": "civilization", "w_base": 0.25, "cap": 0.50, "priority": "secondary" }
+      ],
+      "notes": "Fallback bucket to preserve weak pulses when classification is unknown.",
+      "evidence_tags": ["event_type:other", "actor:unknown", "geo:unknown|global"]
+    },
+
+    {
+      "rule_id": "bridge_v0.4_r902",
+      "when": {
+        "event_type": ["policy", "legal", "finance", "tech", "cyber", "military", "space", "disaster", "climate", "health", "info_ops", "social", "economy", "energy", "other"],
+        "actors_any": ["unknown"],
+        "geo_any": ["geo_global", "unknown"]
+      },
+      "then": [
+        { "series": "civilization", "w_base": 0.15, "cap": 0.40, "priority": "secondary" }
+      ],
+      "notes": "Universal low-energy fallback to prevent events from dropping out entirely.",
+      "evidence_tags": ["actor:unknown", "geo:global|unknown"]
+    }
+  ],
+
+  "confidence_model": {
+    "formula": "confidence = clamp(0.2 + 0.5*R + 0.2*E + 0.1*N, 0, 1)",
+    "R_source_reliability": {
+      "news": 0.70,
+      "sensor": 0.80,
+      "manual": 0.65,
+      "unknown": 0.50
+    },
+    "E_evidence_scoring": {
+      "event_type_hit": 0.25,
+      "actors_hit": 0.25,
+      "geo_hit": 0.25,
+      "topic_or_tags_hit": 0.25,
+      "cap": 1.0
+    },
+    "N_novelty_hint": {
+      "first_seen": 1.0,
+      "repeated_within_window": 0.60,
+      "clustered_repeat": 0.40,
+      "stale_repeat": 0.20
+    }
+  }
+}

@@ -62,7 +62,7 @@ a:hover{text-decoration:underline}
 
 </head><body><main>
 <h1>文明雷達 v0.3（鏈式戰情）</h1>
-<div class=meta>最新時段：2026-02-04T06:00:00+08:00 · sparkline 回看 16 slots<br>門檻：背景&lt;1.20，可疑≥1.20，警戒≥1.80，事件≥2.30（L3 微偏置）<br>鏈式資料：已載入</div>
+<div class=meta>最新時段：2026-02-04T06:00:00+08:00 · sparkline 回看 16 slots<br>門檻（A 自適應）：背景&lt;1.0，可疑≥1.0，警戒≥2.0，事件≥3.0<br>鏈式資料：已載入</div>
 
 <div class=controls>
   <button data-mode="all" class=active>全部</button>
@@ -78,357 +78,357 @@ a:hover{text-decoration:underline}
 <div class='card left'>
 <h3 style='margin:4px 0 10px'>領域預警榜</h3>
 <table id=domainTable><thead><tr>
-<th></th><th>Domain</th><th>Series</th><th>Level</th><th>W</th><th>Δ</th><th>Spark</th><th>Matched</th><th>Sig</th>
+<th></th><th>Domain</th><th>Series</th><th>Level</th><th>A</th><th>W</th><th>Δ</th><th>Spark</th><th>Matched</th><th>Sig</th>
 </tr></thead><tbody>
-<tr data-risk='事件' data-level='L2' data-chain='0' data-text='sovereignairesilience.com synthetic_systems wp_scan'><td><span class='dot r-red'></span></td><td><a href='https://sovereignairesilience.com/' target='_blank' rel='noopener noreferrer'>sovereignairesilience.com</a></td><td>synthetic_systems</td><td class='lv L2'>L2</td><td><b>2.681</b></td><td><span class='delta up'>↑ +0.254</span></td><td class='spark'>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='postfiatreservesystems.com monetary_infrastructure other'><td><span class='dot r-green'></span></td><td><a href='https://postfiatreservesystems.com/' target='_blank' rel='noopener noreferrer'>postfiatreservesystems.com</a></td><td>monetary_infrastructure</td><td>背景</td><td><small>0.95</small></td><td><b>5.021</b></td><td><span class='delta up'>↑ +0.351</span></td><td class='spark'>
     <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,3.2 11.1,6.2 20.1,4.2 29.2,7.9 38.3,12.0 47.3,13.9 56.4,19.3 65.5,20.0 74.5,6.2 83.6,8.5 92.7,10.8 101.7,9.7 110.8,16.1 119.9,7.7 128.9,5.0 138.0,2.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="2.0" r="2" fill="currentColor"/>
+      <polyline points="2.0,19.9 11.1,19.1 20.1,8.8 29.2,2.0 38.3,3.5 47.3,5.7 56.4,7.1 65.5,20.0 74.5,19.8 83.6,7.6 92.7,9.0 101.7,10.4 110.8,11.7 119.9,19.7 128.9,4.0 138.0,2.4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="2.4" r="2" fill="currentColor"/>
     </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[&quot;baseline_root&quot;, &quot;wp_probe&quot;]</div></td><td><span class='badge'>wp_scan</span></td>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
 </tr>
-<tr data-risk='事件' data-level='L3' data-chain='0' data-text='offworldassetrights.com offworld_expansion config_scan'><td><span class='dot r-red'></span></td><td><a href='https://offworldassetrights.com/' target='_blank' rel='noopener noreferrer'>offworldassetrights.com</a></td><td>offworld_expansion</td><td class='lv L3'>L3</td><td><b>2.531</b></td><td><span class='delta up'>↑ +0.816</span></td><td class='spark'>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='syntheticpollution.com synthetic_systems baseline'><td><span class='dot r-green'></span></td><td><a href='https://syntheticpollution.com/' target='_blank' rel='noopener noreferrer'>syntheticpollution.com</a></td><td>synthetic_systems</td><td>背景</td><td><small>-0.79</small></td><td><b>4.769</b></td><td><span class='delta down'>↓ -0.321</span></td><td class='spark'>
     <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,7.7 11.1,7.0 20.1,9.9 29.2,3.6 38.3,2.0 47.3,5.7 56.4,8.4 65.5,13.9 74.5,20.0 83.6,19.4 92.7,11.9 101.7,13.5 110.8,15.1 119.9,16.3 128.9,13.4 138.0,3.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <polyline points="2.0,18.9 11.1,4.2 20.1,5.7 29.2,7.2 38.3,8.6 47.3,19.7 56.4,20.0 65.5,19.6 74.5,18.7 83.6,18.8 92.7,18.7 101.7,19.1 110.8,19.6 119.9,4.5 128.9,2.0 138.0,3.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
       <circle cx="138.0" cy="3.5" r="2" fill="currentColor"/>
     </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[&quot;baseline_root&quot;, &quot;env_secret&quot;]</div></td><td><span class='badge'>config_scan</span></td>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
 </tr>
-<tr data-risk='事件' data-level='L1' data-chain='0' data-text='syntheticsolvency.com monetary_infrastructure other'><td><span class='dot r-red'></span></td><td><a href='https://syntheticsolvency.com/' target='_blank' rel='noopener noreferrer'>syntheticsolvency.com</a></td><td>monetary_infrastructure</td><td class='lv L1'>L1</td><td><b>2.524</b></td><td><span class='delta up'>↑ +0.205</span></td><td class='spark'>
+<tr data-risk='可疑' data-level='L1' data-chain='0' data-text='theageoffusion.com civilization_resilience other'><td><span class='dot r-yellow'></span></td><td><a href='https://theageoffusion.com/' target='_blank' rel='noopener noreferrer'>theageoffusion.com</a></td><td>civilization_resilience</td><td>可疑</td><td><small>1.75</small></td><td><b>4.641</b></td><td><span class='delta up'>↑ +2.305</span></td><td class='spark'>
     <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,12.1 11.1,13.4 20.1,16.0 29.2,17.9 38.3,14.5 47.3,5.3 56.4,9.5 65.5,9.0 74.5,13.4 83.6,20.0 92.7,6.5 101.7,3.5 110.8,4.2 119.9,2.0 128.9,8.8 138.0,5.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="5.5" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
-</tr>
-<tr data-risk='事件' data-level='L1' data-chain='0' data-text='algorithmicallocation.com algorithmic_governance other'><td><span class='dot r-red'></span></td><td><a href='https://algorithmicallocation.com/' target='_blank' rel='noopener noreferrer'>algorithmicallocation.com</a></td><td>algorithmic_governance</td><td class='lv L1'>L1</td><td><b>2.437</b></td><td><span class='delta up'>↑ +0.325</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,3.0 11.1,6.5 20.1,9.4 29.2,15.1 38.3,20.0 47.3,5.7 56.4,8.4 65.5,2.0 74.5,5.1 83.6,11.1 92.7,9.0 101.7,8.8 110.8,11.0 119.9,13.3 128.9,9.3 138.0,5.4" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="5.4" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
-</tr>
-<tr data-risk='事件' data-level='L1' data-chain='0' data-text='technologicalpathdependency.com synthetic_systems baseline'><td><span class='dot r-red'></span></td><td><a href='https://technologicalpathdependency.com/' target='_blank' rel='noopener noreferrer'>technologicalpathdependency.com</a></td><td>synthetic_systems</td><td class='lv L1'>L1</td><td><b>2.401</b></td><td><span class='delta up'>↑ +0.260</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,13.6 11.1,15.0 20.1,19.5 29.2,18.5 38.3,18.2 47.3,18.2 56.4,11.5 65.5,13.4 74.5,9.3 83.6,7.9 92.7,11.8 101.7,13.5 110.8,17.0 119.9,20.0 128.9,5.5 138.0,2.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <polyline points="2.0,9.5 11.1,19.1 20.1,19.3 29.2,19.5 38.3,20.0 47.3,17.0 56.4,17.9 65.5,17.7 74.5,17.6 83.6,3.3 92.7,5.1 101.7,4.9 110.8,6.6 119.9,13.6 128.9,14.6 138.0,2.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
       <circle cx="138.0" cy="2.0" r="2" fill="currentColor"/>
     </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
 </tr>
-<tr data-risk='事件' data-level='L3' data-chain='0' data-text='civilizationprotocols.com civilization_resilience config_scan'><td><span class='dot r-red'></span></td><td><a href='https://civilizationprotocols.com/' target='_blank' rel='noopener noreferrer'>civilizationprotocols.com</a></td><td>civilization_resilience</td><td class='lv L3'>L3</td><td><b>2.335</b></td><td><span class='delta flat'>→ +0.058</span></td><td class='spark'>
+<tr data-risk='可疑' data-level='L2' data-chain='0' data-text='sovereignairesilience.com synthetic_systems wp_scan'><td><span class='dot r-yellow'></span></td><td><a href='https://sovereignairesilience.com/' target='_blank' rel='noopener noreferrer'>sovereignairesilience.com</a></td><td>synthetic_systems</td><td>可疑</td><td><small>1.80</small></td><td><b>4.590</b></td><td><span class='delta up'>↑ +0.113</span></td><td class='spark'>
     <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,13.2 11.1,9.5 20.1,7.0 29.2,9.1 38.3,11.7 47.3,16.3 56.4,20.0 65.5,15.7 74.5,17.5 83.6,19.2 92.7,17.0 101.7,19.1 110.8,10.8 119.9,2.0 128.9,5.6 138.0,4.7" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="4.7" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[&quot;baseline_root&quot;, &quot;env_secret&quot;]</div></td><td><span class='badge'>config_scan</span></td>
-</tr>
-<tr data-risk='警戒' data-level='L1' data-chain='0' data-text='climateinterventionism.com civilization_resilience baseline'><td><span class='dot r-orange'></span></td><td><a href='https://climateinterventionism.com/' target='_blank' rel='noopener noreferrer'>climateinterventionism.com</a></td><td>civilization_resilience</td><td class='lv L1'>L1</td><td><b>2.271</b></td><td><span class='delta up'>↑ +0.559</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,7.5 11.1,4.5 20.1,7.9 29.2,11.6 38.3,3.3 47.3,3.9 56.4,6.9 65.5,9.6 74.5,15.7 83.6,19.3 92.7,19.4 101.7,19.5 110.8,20.0 119.9,8.5 128.9,10.2 138.0,2.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <polyline points="2.0,9.8 11.1,13.0 20.1,12.7 29.2,14.7 38.3,16.6 47.3,17.0 56.4,19.5 65.5,20.0 74.5,3.9 83.6,5.5 92.7,7.2 101.7,6.5 110.8,12.5 119.9,3.0 128.9,2.6 138.0,2.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
       <circle cx="138.0" cy="2.0" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='事件' data-level='L3' data-chain='0' data-text='thepacificpivot.com civilization_resilience env_scan'><td><span class='dot r-red'></span></td><td><a href='https://thepacificpivot.com/' target='_blank' rel='noopener noreferrer'>thepacificpivot.com</a></td><td>civilization_resilience</td><td class='lv L3'>L3</td><td><b>2.231</b></td><td><span class='delta flat'>→ +0.031</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,19.4 11.1,19.1 20.1,18.4 29.2,17.6 38.3,10.6 47.3,7.8 56.4,10.3 65.5,12.5 74.5,16.0 83.6,19.6 92.7,20.0 101.7,5.6 110.8,8.7 119.9,2.0 128.9,5.0 138.0,4.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="4.5" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[&quot;baseline_root&quot;, &quot;env_secret&quot;]</div></td><td><span class='badge'>env_scan</span></td>
-</tr>
-<tr data-risk='警戒' data-level='L1' data-chain='0' data-text='postfiatreservesystems.com monetary_infrastructure other'><td><span class='dot r-orange'></span></td><td><a href='https://postfiatreservesystems.com/' target='_blank' rel='noopener noreferrer'>postfiatreservesystems.com</a></td><td>monetary_infrastructure</td><td class='lv L1'>L1</td><td><b>2.223</b></td><td><span class='delta up'>↑ +0.335</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,19.4 11.1,18.9 20.1,11.9 29.2,2.0 38.3,5.3 47.3,9.8 56.4,11.8 65.5,19.7 74.5,19.6 83.6,9.8 92.7,12.3 101.7,13.8 110.8,15.7 119.9,20.0 128.9,8.0 138.0,3.1" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="3.1" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
-</tr>
-<tr data-risk='警戒' data-level='L1' data-chain='0' data-text='cognitiveassetclass.com monetary_infrastructure baseline'><td><span class='dot r-orange'></span></td><td><a href='https://cognitiveassetclass.com/' target='_blank' rel='noopener noreferrer'>cognitiveassetclass.com</a></td><td>monetary_infrastructure</td><td class='lv L1'>L1</td><td><b>2.191</b></td><td><span class='delta down'>↓ -0.228</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,19.4 11.1,11.9 20.1,13.7 29.2,14.8 38.3,8.4 47.3,11.9 56.4,13.6 65.5,15.0 74.5,19.0 83.6,20.0 92.7,19.8 101.7,19.5 110.8,9.3 119.9,2.0 128.9,4.9 138.0,7.4" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="7.4" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='警戒' data-level='L1' data-chain='0' data-text='syntheticpollution.com synthetic_systems baseline'><td><span class='dot r-orange'></span></td><td><a href='https://syntheticpollution.com/' target='_blank' rel='noopener noreferrer'>syntheticpollution.com</a></td><td>synthetic_systems</td><td class='lv L1'>L1</td><td><b>2.176</b></td><td><span class='delta down'>↓ -0.190</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,19.7 11.1,5.3 20.1,8.3 29.2,10.6 38.3,12.6 47.3,19.4 56.4,19.9 65.5,20.0 74.5,19.4 83.6,19.8 92.7,19.2 101.7,19.5 110.8,19.9 119.9,10.1 128.9,2.0 138.0,5.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="5.0" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='警戒' data-level='L1' data-chain='0' data-text='dollardisruption.com monetary_infrastructure baseline'><td><span class='dot r-orange'></span></td><td><a href='https://dollardisruption.com/' target='_blank' rel='noopener noreferrer'>dollardisruption.com</a></td><td>monetary_infrastructure</td><td class='lv L1'>L1</td><td><b>2.169</b></td><td><span class='delta down'>↓ -0.215</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,19.9 11.1,20.0 20.1,13.8 29.2,4.5 38.3,7.3 47.3,2.8 56.4,6.9 65.5,12.9 74.5,14.5 83.6,19.7 92.7,12.2 101.7,13.3 110.8,15.0 119.9,16.6 128.9,2.0 138.0,5.3" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="5.3" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='警戒' data-level='L1' data-chain='0' data-text='siliconmetabolism.com synthetic_systems baseline'><td><span class='dot r-orange'></span></td><td><a href='https://siliconmetabolism.com/' target='_blank' rel='noopener noreferrer'>siliconmetabolism.com</a></td><td>synthetic_systems</td><td class='lv L1'>L1</td><td><b>2.143</b></td><td><span class='delta up'>↑ +0.939</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,19.0 11.1,18.8 20.1,18.9 29.2,18.7 38.3,9.5 47.3,2.0 56.4,4.8 65.5,7.5 74.5,12.0 83.6,19.1 92.7,19.1 101.7,19.1 110.8,19.5 119.9,19.9 128.9,20.0 138.0,7.9" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="7.9" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='警戒' data-level='L1' data-chain='0' data-text='syntheticrealitycrisis.com synthetic_systems baseline'><td><span class='dot r-orange'></span></td><td><a href='https://syntheticrealitycrisis.com/' target='_blank' rel='noopener noreferrer'>syntheticrealitycrisis.com</a></td><td>synthetic_systems</td><td class='lv L1'>L1</td><td><b>2.049</b></td><td><span class='delta down'>↓ -0.199</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,19.7 11.1,19.5 20.1,19.5 29.2,7.8 38.3,10.5 47.3,12.8 56.4,14.8 65.5,9.7 74.5,12.3 83.6,14.3 92.7,15.5 101.7,20.0 110.8,12.4 119.9,14.1 128.9,2.0 138.0,5.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="5.5" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='警戒' data-level='L1' data-chain='0' data-text='theageoffusion.com civilization_resilience other'><td><span class='dot r-orange'></span></td><td><a href='https://theageoffusion.com/' target='_blank' rel='noopener noreferrer'>theageoffusion.com</a></td><td>civilization_resilience</td><td class='lv L1'>L1</td><td><b>2.019</b></td><td><span class='delta up'>↑ +0.598</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,12.8 11.1,19.8 20.1,20.0 29.2,19.5 38.3,19.8 47.3,19.3 56.4,19.9 65.5,19.8 74.5,19.2 83.6,2.0 92.7,5.4 101.7,3.9 110.8,7.5 119.9,16.1 128.9,17.1 138.0,7.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="7.5" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
-</tr>
-<tr data-risk='警戒' data-level='L1' data-chain='0' data-text='theanswerisblowininthewind.com human_manifesto baseline'><td><span class='dot r-orange'></span></td><td><a href='https://theanswerisblowininthewind.com/' target='_blank' rel='noopener noreferrer'>theanswerisblowininthewind.com</a></td><td>human_manifesto</td><td class='lv L1'>L1</td><td><b>1.992</b></td><td><span class='delta down'>↓ -0.200</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,18.6 11.1,4.8 20.1,7.4 29.2,2.0 38.3,5.1 47.3,11.3 56.4,13.1 65.5,19.5 74.5,19.6 83.6,20.0 92.7,19.7 101.7,19.4 110.8,19.6 119.9,19.3 128.9,4.3 138.0,7.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="7.0" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='警戒' data-level='L2' data-chain='0' data-text='algorithmicenforcement.com algorithmic_governance wp_scan'><td><span class='dot r-orange'></span></td><td><a href='https://algorithmicenforcement.com/' target='_blank' rel='noopener noreferrer'>algorithmicenforcement.com</a></td><td>algorithmic_governance</td><td class='lv L2'>L2</td><td><b>1.988</b></td><td><span class='delta down'>↓ -0.234</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,20.0 11.1,6.2 20.1,9.4 29.2,5.4 38.3,5.8 47.3,11.3 56.4,3.1 65.5,3.3 74.5,2.0 83.6,5.4 92.7,11.4 101.7,9.9 110.8,15.1 119.9,9.1 128.9,8.1 138.0,11.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="11.0" r="2" fill="currentColor"/>
     </svg>
     </td><td><span class='match'>展開</span><div class='matchbox'>[&quot;baseline_root&quot;, &quot;wp_probe&quot;]</div></td><td><span class='badge'>wp_scan</span></td>
 </tr>
-<tr data-risk='警戒' data-level='L1' data-chain='0' data-text='algorithmicreserves.com monetary_infrastructure other'><td><span class='dot r-orange'></span></td><td><a href='https://algorithmicreserves.com/' target='_blank' rel='noopener noreferrer'>algorithmicreserves.com</a></td><td>monetary_infrastructure</td><td class='lv L1'>L1</td><td><b>1.922</b></td><td><span class='delta flat'>→ -0.018</span></td><td class='spark'>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='theanswerisblowininthewind.com human_manifesto baseline'><td><span class='dot r-green'></span></td><td><a href='https://theanswerisblowininthewind.com/' target='_blank' rel='noopener noreferrer'>theanswerisblowininthewind.com</a></td><td>human_manifesto</td><td>背景</td><td><small>0.32</small></td><td><b>4.579</b></td><td><span class='delta down'>↓ -0.323</span></td><td class='spark'>
     <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,7.0 11.1,2.0 20.1,5.3 29.2,9.7 38.3,12.2 47.3,11.2 56.4,8.7 65.5,11.1 74.5,13.1 83.6,16.5 92.7,20.0 101.7,19.8 110.8,9.1 119.9,10.2 128.9,11.7 138.0,11.9" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="11.9" r="2" fill="currentColor"/>
+      <polyline points="2.0,19.2 11.1,2.2 20.1,3.7 29.2,2.0 38.3,3.5 47.3,8.1 56.4,9.6 65.5,20.0 74.5,19.9 83.6,19.7 92.7,19.3 101.7,19.2 110.8,19.5 119.9,19.5 128.9,2.1 138.0,3.6" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="3.6" r="2" fill="currentColor"/>
     </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
 </tr>
-<tr data-risk='警戒' data-level='L1' data-chain='0' data-text='volatilityasinfrastructure.com monetary_infrastructure other'><td><span class='dot r-orange'></span></td><td><a href='https://volatilityasinfrastructure.com/' target='_blank' rel='noopener noreferrer'>volatilityasinfrastructure.com</a></td><td>monetary_infrastructure</td><td class='lv L1'>L1</td><td><b>1.907</b></td><td><span class='delta down'>↓ -0.525</span></td><td class='spark'>
+<tr data-risk='事件' data-level='L3' data-chain='0' data-text='offworldassetrights.com offworld_expansion config_scan'><td><span class='dot r-red'></span></td><td><a href='https://offworldassetrights.com/' target='_blank' rel='noopener noreferrer'>offworldassetrights.com</a></td><td>offworld_expansion</td><td>事件 <span class='badge'>L3</span></td><td><small>16.03</small></td><td><b>4.553</b></td><td><span class='delta up'>↑ +1.215</span></td><td class='spark'>
     <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,20.0 11.1,19.5 20.1,19.7 29.2,8.0 38.3,10.5 47.3,12.3 56.4,9.2 65.5,14.6 74.5,15.7 83.6,17.0 92.7,8.9 101.7,2.0 110.8,4.9 119.9,7.5 128.9,5.4 138.0,11.2" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="11.2" r="2" fill="currentColor"/>
+      <polyline points="2.0,6.3 11.1,6.1 20.1,8.0 29.2,2.7 38.3,3.0 47.3,5.1 56.4,6.8 65.5,12.5 74.5,20.0 83.6,17.5 92.7,7.4 101.7,9.0 110.8,10.5 119.9,12.1 128.9,8.6 138.0,2.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="2.0" r="2" fill="currentColor"/>
     </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[&quot;baseline_root&quot;, &quot;env_secret&quot;]</div></td><td><span class='badge'>config_scan</span></td>
 </tr>
-<tr data-risk='警戒' data-level='L3' data-chain='0' data-text='orbitallockdown.com offworld_expansion env_scan'><td><span class='dot r-orange'></span></td><td><a href='https://orbitallockdown.com/' target='_blank' rel='noopener noreferrer'>orbitallockdown.com</a></td><td>offworld_expansion</td><td class='lv L3'>L3</td><td><b>1.881</b></td><td><span class='delta up'>↑ +0.647</span></td><td class='spark'>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='syntheticrealitycrisis.com synthetic_systems baseline'><td><span class='dot r-green'></span></td><td><a href='https://syntheticrealitycrisis.com/' target='_blank' rel='noopener noreferrer'>syntheticrealitycrisis.com</a></td><td>synthetic_systems</td><td>背景</td><td><small>-0.07</small></td><td><b>4.547</b></td><td><span class='delta down'>↓ -0.324</span></td><td class='spark'>
     <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,20.0 11.1,20.0 20.1,19.9 29.2,2.0 38.3,5.6 47.3,8.3 56.4,10.6 65.5,19.3 74.5,3.6 83.6,7.6 92.7,10.0 101.7,11.7 110.8,19.3 119.9,19.8 128.9,20.0 138.0,8.7" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="8.7" r="2" fill="currentColor"/>
+      <polyline points="2.0,19.9 11.1,19.3 20.1,19.7 29.2,8.4 38.3,10.0 47.3,11.5 56.4,12.9 65.5,2.0 74.5,3.6 83.6,5.3 92.7,6.8 101.7,20.0 110.8,8.0 119.9,9.5 128.9,2.7 138.0,4.4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="4.4" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='siliconmetabolism.com synthetic_systems baseline'><td><span class='dot r-green'></span></td><td><a href='https://siliconmetabolism.com/' target='_blank' rel='noopener noreferrer'>siliconmetabolism.com</a></td><td>synthetic_systems</td><td>背景</td><td><small>-1.55</small></td><td><b>4.513</b></td><td><span class='delta up'>↑ +3.174</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,18.8 11.1,18.8 20.1,18.8 29.2,19.2 38.3,5.8 47.3,2.0 56.4,3.4 65.5,4.8 74.5,7.7 83.6,19.0 92.7,19.3 101.7,19.5 110.8,19.7 119.9,20.0 128.9,19.5 138.0,5.4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="5.4" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+</tr>
+<tr data-risk='事件' data-level='L3' data-chain='0' data-text='thepacificpivot.com civilization_resilience env_scan'><td><span class='dot r-red'></span></td><td><a href='https://thepacificpivot.com/' target='_blank' rel='noopener noreferrer'>thepacificpivot.com</a></td><td>civilization_resilience</td><td>事件 <span class='badge'>L3</span></td><td><small>37.09</small></td><td><b>4.476</b></td><td><span class='delta down'>↓ -0.287</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,19.5 11.1,18.8 20.1,17.5 29.2,17.7 38.3,9.0 47.3,8.1 56.4,9.6 65.5,11.0 74.5,15.1 83.6,20.0 92.7,20.0 101.7,2.0 110.8,3.5 119.9,2.1 128.9,3.6 138.0,5.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="5.0" r="2" fill="currentColor"/>
     </svg>
     </td><td><span class='match'>展開</span><div class='matchbox'>[&quot;baseline_root&quot;, &quot;env_secret&quot;]</div></td><td><span class='badge'>env_scan</span></td>
 </tr>
-<tr data-risk='警戒' data-level='L1' data-chain='0' data-text='theincrementalism.com civilization_resilience baseline'><td><span class='dot r-orange'></span></td><td><a href='https://theincrementalism.com/' target='_blank' rel='noopener noreferrer'>theincrementalism.com</a></td><td>civilization_resilience</td><td class='lv L1'>L1</td><td><b>1.861</b></td><td><span class='delta up'>↑ +0.768</span></td><td class='spark'>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='technologicalpathdependency.com synthetic_systems baseline'><td><span class='dot r-green'></span></td><td><a href='https://technologicalpathdependency.com/' target='_blank' rel='noopener noreferrer'>technologicalpathdependency.com</a></td><td>synthetic_systems</td><td>背景</td><td><small>-0.38</small></td><td><b>4.466</b></td><td><span class='delta up'>↑ +0.131</span></td><td class='spark'>
     <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,19.8 11.1,19.8 20.1,19.7 29.2,2.0 38.3,5.3 47.3,4.5 56.4,7.3 65.5,15.2 74.5,15.6 83.6,18.8 92.7,18.3 101.7,18.8 110.8,19.2 119.9,20.0 128.9,19.5 138.0,9.4" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="9.4" r="2" fill="currentColor"/>
+      <polyline points="2.0,10.5 11.1,11.9 20.1,19.7 29.2,18.6 38.3,18.3 47.3,18.6 56.4,3.8 65.5,5.5 74.5,2.6 83.6,2.1 92.7,5.4 101.7,7.1 110.8,12.0 119.9,20.0 128.9,2.7 138.0,2.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="2.0" r="2" fill="currentColor"/>
     </svg>
     </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
 </tr>
-<tr data-risk='警戒' data-level='L3' data-chain='0' data-text='algorithmicsovereignty.com algorithmic_governance config_scan'><td><span class='dot r-orange'></span></td><td><a href='https://algorithmicsovereignty.com/' target='_blank' rel='noopener noreferrer'>algorithmicsovereignty.com</a></td><td>algorithmic_governance</td><td class='lv L3'>L3</td><td><b>1.796</b></td><td><span class='delta flat'>→ -0.023</span></td><td class='spark'>
+<tr data-risk='事件' data-level='L3' data-chain='0' data-text='orbitallockdown.com offworld_expansion env_scan'><td><span class='dot r-red'></span></td><td><a href='https://orbitallockdown.com/' target='_blank' rel='noopener noreferrer'>orbitallockdown.com</a></td><td>offworld_expansion</td><td>事件 <span class='badge'>L3</span></td><td><small>53.75</small></td><td><b>4.223</b></td><td><span class='delta up'>↑ +2.885</span></td><td class='spark'>
     <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,5.7 11.1,2.0 20.1,4.3 29.2,5.0 38.3,3.2 47.3,4.1 56.4,10.7 65.5,7.5 74.5,6.9 83.6,10.6 92.7,14.6 101.7,5.6 110.8,12.9 119.9,18.3 128.9,19.5 138.0,20.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <polyline points="2.0,19.7 11.1,19.9 20.1,19.8 29.2,2.0 38.3,3.7 47.3,5.3 56.4,6.9 65.5,19.6 74.5,2.2 83.6,3.9 92.7,5.5 101.7,7.1 110.8,19.3 119.9,19.7 128.9,20.0 138.0,4.8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="4.8" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[&quot;baseline_root&quot;, &quot;env_secret&quot;]</div></td><td><span class='badge'>env_scan</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='climateinterventionism.com civilization_resilience baseline'><td><span class='dot r-green'></span></td><td><a href='https://climateinterventionism.com/' target='_blank' rel='noopener noreferrer'>climateinterventionism.com</a></td><td>civilization_resilience</td><td>背景</td><td><small>-1.49</small></td><td><b>4.222</b></td><td><span class='delta up'>↑ +0.984</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,6.4 11.1,6.3 20.1,8.4 29.2,12.2 38.3,3.2 47.3,2.0 56.4,3.8 65.5,5.5 74.5,10.6 83.6,18.9 92.7,19.1 101.7,19.2 110.8,20.0 119.9,6.9 128.9,8.3 138.0,2.8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="2.8" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+</tr>
+<tr data-risk='事件' data-level='L3' data-chain='0' data-text='invisibledetermination.com algorithmic_governance config_scan'><td><span class='dot r-red'></span></td><td><a href='https://invisibledetermination.com/' target='_blank' rel='noopener noreferrer'>invisibledetermination.com</a></td><td>algorithmic_governance</td><td>事件 <span class='badge'>L3</span></td><td><small>56.41</small></td><td><b>4.036</b></td><td><span class='delta up'>↑ +1.219</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,5.9 11.1,2.9 20.1,4.7 29.2,7.4 38.3,9.2 47.3,20.0 56.4,2.0 65.5,3.8 74.5,2.6 83.6,4.4 92.7,10.4 101.7,3.6 110.8,6.6 119.9,8.3 128.9,9.7 138.0,2.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="2.5" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[&quot;baseline_root&quot;, &quot;env_secret&quot;]</div></td><td><span class='badge'>config_scan</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='cognitiveassetclass.com monetary_infrastructure baseline'><td><span class='dot r-green'></span></td><td><a href='https://cognitiveassetclass.com/' target='_blank' rel='noopener noreferrer'>cognitiveassetclass.com</a></td><td>monetary_infrastructure</td><td>背景</td><td><small>-0.22</small></td><td><b>4.011</b></td><td><span class='delta down'>↓ -0.317</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,19.6 11.1,9.2 20.1,10.8 29.2,12.1 38.3,3.8 47.3,6.1 56.4,7.7 65.5,9.3 74.5,19.1 83.6,19.9 92.7,20.0 101.7,20.0 110.8,5.2 119.9,2.0 128.9,3.7 138.0,5.4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="5.4" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='theincrementalism.com civilization_resilience baseline'><td><span class='dot r-green'></span></td><td><a href='https://theincrementalism.com/' target='_blank' rel='noopener noreferrer'>theincrementalism.com</a></td><td>civilization_resilience</td><td>背景</td><td><small>0.04</small></td><td><b>4.009</b></td><td><span class='delta up'>↑ +2.792</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,18.5 11.1,19.0 20.1,18.7 29.2,2.0 38.3,3.7 47.3,3.9 56.4,5.6 65.5,13.0 74.5,13.7 83.6,18.1 92.7,18.1 101.7,18.7 110.8,19.5 119.9,20.0 128.9,19.2 138.0,4.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="4.5" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='syntheticsolvency.com monetary_infrastructure other'><td><span class='dot r-green'></span></td><td><a href='https://syntheticsolvency.com/' target='_blank' rel='noopener noreferrer'>syntheticsolvency.com</a></td><td>monetary_infrastructure</td><td>背景</td><td><small>-0.25</small></td><td><b>3.924</b></td><td><span class='delta up'>↑ +0.894</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,9.4 11.1,11.4 20.1,14.6 29.2,17.1 38.3,16.1 47.3,11.9 56.4,14.9 65.5,13.2 74.5,17.0 83.6,20.0 92.7,2.0 101.7,2.0 110.8,4.2 119.9,6.1 128.9,15.3 138.0,6.9" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="6.9" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='emotionalquantification.com identity_data baseline'><td><span class='dot r-green'></span></td><td><a href='https://emotionalquantification.com/' target='_blank' rel='noopener noreferrer'>emotionalquantification.com</a></td><td>identity_data</td><td>背景</td><td><small>-1.11</small></td><td><b>3.841</b></td><td><span class='delta down'>↓ -0.311</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,10.8 11.1,6.3 20.1,7.8 29.2,9.4 38.3,4.6 47.3,7.5 56.4,9.0 65.5,10.5 74.5,19.2 83.6,19.5 92.7,20.0 101.7,19.3 110.8,2.0 119.9,3.6 128.9,5.2 138.0,6.8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="6.8" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='dollardisruption.com monetary_infrastructure baseline'><td><span class='dot r-green'></span></td><td><a href='https://dollardisruption.com/' target='_blank' rel='noopener noreferrer'>dollardisruption.com</a></td><td>monetary_infrastructure</td><td>背景</td><td><small>-0.54</small></td><td><b>3.788</b></td><td><span class='delta down'>↓ -0.314</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,19.5 11.1,20.0 20.1,8.3 29.2,2.6 38.3,4.9 47.3,2.9 56.4,6.3 65.5,12.1 74.5,13.3 83.6,19.1 92.7,4.6 101.7,6.7 110.8,9.0 119.9,11.3 128.9,2.0 138.0,4.3" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="4.3" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='volatilityasinfrastructure.com monetary_infrastructure other'><td><span class='dot r-green'></span></td><td><a href='https://volatilityasinfrastructure.com/' target='_blank' rel='noopener noreferrer'>volatilityasinfrastructure.com</a></td><td>monetary_infrastructure</td><td>背景</td><td><small>0.00</small></td><td><b>3.758</b></td><td><span class='delta down'>↓ -0.691</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,20.0 11.1,19.2 20.1,19.8 29.2,3.4 38.3,5.1 47.3,6.7 56.4,5.3 65.5,10.8 74.5,12.2 83.6,13.5 92.7,6.1 101.7,2.0 110.8,3.7 119.9,5.4 128.9,3.4 138.0,7.1" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="7.1" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
+</tr>
+<tr data-risk='事件' data-level='L3' data-chain='0' data-text='humanintelligenceisirreplaceable.com human_manifesto config_scan'><td><span class='dot r-red'></span></td><td><a href='https://humanintelligenceisirreplaceable.com/' target='_blank' rel='noopener noreferrer'>humanintelligenceisirreplaceable.com</a></td><td>human_manifesto</td><td>事件 <span class='badge'>L3</span></td><td><small>39.44</small></td><td><b>3.727</b></td><td><span class='delta up'>↑ +2.178</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,5.0 11.1,2.0 20.1,3.7 29.2,6.4 38.3,8.0 47.3,2.4 56.4,4.1 65.5,5.8 74.5,7.4 83.6,20.0 92.7,19.8 101.7,19.8 110.8,19.9 119.9,19.1 128.9,18.6 138.0,7.1" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="7.1" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[&quot;baseline_root&quot;, &quot;env_secret&quot;]</div></td><td><span class='badge'>config_scan</span></td>
+</tr>
+<tr data-risk='事件' data-level='L3' data-chain='0' data-text='algorithmicsovereignty.com algorithmic_governance config_scan'><td><span class='dot r-red'></span></td><td><a href='https://algorithmicsovereignty.com/' target='_blank' rel='noopener noreferrer'>algorithmicsovereignty.com</a></td><td>algorithmic_governance</td><td>事件 <span class='badge'>L3</span></td><td><small>36.22</small></td><td><b>3.703</b></td><td><span class='delta up'>↑ +0.619</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,4.7 11.1,4.6 20.1,6.6 29.2,7.0 38.3,4.1 47.3,5.5 56.4,11.4 65.5,11.2 74.5,10.3 83.6,15.9 92.7,20.0 101.7,2.0 110.8,8.3 119.9,13.1 128.9,15.5 138.0,6.1" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="6.1" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[&quot;baseline_root&quot;, &quot;env_secret&quot;]</div></td><td><span class='badge'>config_scan</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='algorithmicallocation.com algorithmic_governance other'><td><span class='dot r-green'></span></td><td><a href='https://algorithmicallocation.com/' target='_blank' rel='noopener noreferrer'>algorithmicallocation.com</a></td><td>algorithmic_governance</td><td>背景</td><td><small>0.18</small></td><td><b>3.688</b></td><td><span class='delta up'>↑ +0.136</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,6.5 11.1,9.3 20.1,11.2 29.2,16.8 38.3,20.0 47.3,3.4 56.4,5.3 65.5,2.0 74.5,4.0 83.6,8.7 92.7,4.5 101.7,2.8 110.8,4.7 119.9,6.6 128.9,6.8 138.0,5.9" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="5.9" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='algorithmicreserves.com monetary_infrastructure other'><td><span class='dot r-green'></span></td><td><a href='https://algorithmicreserves.com/' target='_blank' rel='noopener noreferrer'>algorithmicreserves.com</a></td><td>monetary_infrastructure</td><td>背景</td><td><small>-0.08</small></td><td><b>3.583</b></td><td><span class='delta down'>↓ -0.244</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,6.1 11.1,6.8 20.1,10.3 29.2,15.2 38.3,16.6 47.3,7.9 56.4,4.9 65.5,6.9 74.5,8.7 83.6,12.6 92.7,19.9 101.7,20.0 110.8,2.0 119.9,3.8 128.9,5.6 138.0,7.2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="7.2" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
+</tr>
+<tr data-risk='事件' data-level='L2' data-chain='0' data-text='algorithmicenforcement.com algorithmic_governance wp_scan'><td><span class='dot r-red'></span></td><td><a href='https://algorithmicenforcement.com/' target='_blank' rel='noopener noreferrer'>algorithmicenforcement.com</a></td><td>algorithmic_governance</td><td>事件</td><td><small>3.38</small></td><td><b>3.572</b></td><td><span class='delta down'>↓ -0.442</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,20.0 11.1,3.1 20.1,5.2 29.2,2.3 38.3,3.0 47.3,7.6 56.4,2.0 65.5,3.2 74.5,4.2 83.6,6.2 92.7,12.2 101.7,7.7 110.8,10.4 119.9,5.3 128.9,4.4 138.0,7.2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="7.2" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[&quot;baseline_root&quot;, &quot;wp_probe&quot;]</div></td><td><span class='badge'>wp_scan</span></td>
+</tr>
+<tr data-risk='事件' data-level='L3' data-chain='0' data-text='civilizationprotocols.com civilization_resilience config_scan'><td><span class='dot r-red'></span></td><td><a href='https://civilizationprotocols.com/' target='_blank' rel='noopener noreferrer'>civilizationprotocols.com</a></td><td>civilization_resilience</td><td>事件 <span class='badge'>L3</span></td><td><small>4.48</small></td><td><b>3.325</b></td><td><span class='delta flat'>→ -0.091</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,17.3 11.1,2.5 20.1,2.0 29.2,3.7 38.3,5.5 47.3,12.2 56.4,20.0 65.5,9.8 74.5,11.4 83.6,12.8 92.7,10.4 101.7,13.7 110.8,8.9 119.9,6.1 128.9,8.3 138.0,8.8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="8.8" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[&quot;baseline_root&quot;, &quot;env_secret&quot;]</div></td><td><span class='badge'>config_scan</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='offworldsovereignty.com offworld_expansion baseline'><td><span class='dot r-green'></span></td><td><a href='https://offworldsovereignty.com/' target='_blank' rel='noopener noreferrer'>offworldsovereignty.com</a></td><td>offworld_expansion</td><td>背景</td><td><small>-0.16</small></td><td><b>3.266</b></td><td><span class='delta down'>↓ -0.299</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,19.4 11.1,19.9 20.1,2.0 29.2,4.1 38.3,6.1 47.3,8.1 56.4,5.2 65.5,7.0 74.5,8.8 83.6,10.7 92.7,19.5 101.7,20.0 110.8,19.4 119.9,19.5 128.9,4.0 138.0,6.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="6.0" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='strategicresourceresilience.com civilization_resilience baseline'><td><span class='dot r-green'></span></td><td><a href='https://strategicresourceresilience.com/' target='_blank' rel='noopener noreferrer'>strategicresourceresilience.com</a></td><td>civilization_resilience</td><td>背景</td><td><small>-0.93</small></td><td><b>3.172</b></td><td><span class='delta down'>↓ -0.296</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,18.6 11.1,18.9 20.1,19.2 29.2,16.9 38.3,8.5 47.3,10.4 56.4,12.0 65.5,13.8 74.5,20.0 83.6,17.6 92.7,5.5 101.7,7.5 110.8,2.6 119.9,2.0 128.9,5.5 138.0,7.6" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="7.6" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='sovereigndigitalarchitecture.com synthetic_systems baseline'><td><span class='dot r-green'></span></td><td><a href='https://sovereigndigitalarchitecture.com/' target='_blank' rel='noopener noreferrer'>sovereigndigitalarchitecture.com</a></td><td>synthetic_systems</td><td>背景</td><td><small>-0.55</small></td><td><b>3.050</b></td><td><span class='delta down'>↓ -0.256</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,17.9 11.1,18.5 20.1,19.0 29.2,19.0 38.3,20.0 47.3,18.6 56.4,18.5 65.5,19.0 74.5,2.0 83.6,4.1 92.7,6.1 101.7,8.1 110.8,19.7 119.9,2.8 128.9,4.9 138.0,6.7" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="6.7" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='algorithmicmartiallaw.com algorithmic_governance baseline'><td><span class='dot r-green'></span></td><td><a href='https://algorithmicmartiallaw.com/' target='_blank' rel='noopener noreferrer'>algorithmicmartiallaw.com</a></td><td>algorithmic_governance</td><td>背景</td><td><small>0.63</small></td><td><b>2.950</b></td><td><span class='delta down'>↓ -0.275</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,2.1 11.1,3.8 20.1,8.8 29.2,10.3 38.3,19.5 47.3,19.7 56.4,19.9 65.5,19.8 74.5,19.8 83.6,20.0 92.7,2.0 101.7,3.7 110.8,5.5 119.9,7.1 128.9,9.6 138.0,11.1" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="11.1" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='energyjurisdiction.com monetary_infrastructure baseline'><td><span class='dot r-green'></span></td><td><a href='https://energyjurisdiction.com/' target='_blank' rel='noopener noreferrer'>energyjurisdiction.com</a></td><td>monetary_infrastructure</td><td>背景</td><td><small>-0.49</small></td><td><b>2.937</b></td><td><span class='delta down'>↓ -0.299</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,3.8 11.1,7.0 20.1,8.4 29.2,6.2 38.3,8.8 47.3,11.0 56.4,13.8 65.5,20.0 74.5,2.0 83.6,4.8 92.7,5.7 101.7,8.1 110.8,18.8 119.9,19.8 128.9,6.9 138.0,9.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="9.5" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='thefutureisalreadyhereitisjustnotevenlydistributed.com human_manifesto baseline'><td><span class='dot r-green'></span></td><td><a href='https://thefutureisalreadyhereitisjustnotevenlydistributed.com/' target='_blank' rel='noopener noreferrer'>thefutureisalreadyhereitisjustnotevenlydistributed.com</a></td><td>human_manifesto</td><td>背景</td><td><small>-1.33</small></td><td><b>2.498</b></td><td><span class='delta down'>↓ -0.224</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,20.0 11.1,19.4 20.1,19.4 29.2,2.7 38.3,5.1 47.3,7.4 56.4,2.0 65.5,7.0 74.5,9.2 83.6,11.2 92.7,19.1 101.7,19.9 110.8,4.8 119.9,7.1 128.9,9.4 138.0,11.2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="11.2" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='computationalscarcity.com monetary_infrastructure other'><td><span class='dot r-green'></span></td><td><a href='https://computationalscarcity.com/' target='_blank' rel='noopener noreferrer'>computationalscarcity.com</a></td><td>monetary_infrastructure</td><td>背景</td><td><small>0.91</small></td><td><b>2.007</b></td><td><span class='delta up'>↑ +0.738</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,2.5 11.1,4.0 20.1,5.4 29.2,3.9 38.3,5.5 47.3,7.5 56.4,5.7 65.5,2.9 74.5,2.0 83.6,4.0 92.7,6.8 101.7,12.3 110.8,19.7 119.9,20.0 128.9,19.8 138.0,15.2" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="15.2" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='biometricliability.com identity_data other'><td><span class='dot r-green'></span></td><td><a href='https://biometricliability.com/' target='_blank' rel='noopener noreferrer'>biometricliability.com</a></td><td>identity_data</td><td>背景</td><td><small>-0.66</small></td><td><b>2.004</b></td><td><span class='delta down'>↓ -1.264</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,12.4 11.1,14.6 20.1,18.1 29.2,2.6 38.3,4.9 47.3,3.0 56.4,4.1 65.5,6.6 74.5,5.2 83.6,9.3 92.7,5.1 101.7,2.0 110.8,4.9 119.9,6.1 128.9,10.5 138.0,20.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
       <circle cx="138.0" cy="20.0" r="2" fill="currentColor"/>
     </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[&quot;baseline_root&quot;, &quot;env_secret&quot;]</div></td><td><span class='badge'>config_scan</span></td>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
 </tr>
-<tr data-risk='可疑' data-level='L1' data-chain='0' data-text='strategicresourceresilience.com civilization_resilience baseline'><td><span class='dot r-yellow'></span></td><td><a href='https://strategicresourceresilience.com/' target='_blank' rel='noopener noreferrer'>strategicresourceresilience.com</a></td><td>civilization_resilience</td><td class='lv L1'>L1</td><td><b>1.773</b></td><td><span class='delta down'>↓ -0.172</span></td><td class='spark'>
+<tr data-risk='事件' data-level='L1' data-chain='0' data-text='organicdatarights.com identity_data other'><td><span class='dot r-red'></span></td><td><a href='https://organicdatarights.com/' target='_blank' rel='noopener noreferrer'>organicdatarights.com</a></td><td>identity_data</td><td>事件</td><td><small>4.04</small></td><td><b>1.505</b></td><td><span class='delta flat'>→ -0.036</span></td><td class='spark'>
     <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,20.0 11.1,19.5 20.1,19.6 29.2,17.1 38.3,9.7 47.3,11.8 56.4,13.5 65.5,15.1 74.5,18.9 83.6,18.0 92.7,10.2 101.7,12.5 110.8,4.5 119.9,2.0 128.9,7.0 138.0,10.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="10.0" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='可疑' data-level='L1' data-chain='0' data-text='offworldsovereignty.com offworld_expansion baseline'><td><span class='dot r-yellow'></span></td><td><a href='https://offworldsovereignty.com/' target='_blank' rel='noopener noreferrer'>offworldsovereignty.com</a></td><td>offworld_expansion</td><td class='lv L1'>L1</td><td><b>1.758</b></td><td><span class='delta down'>↓ -0.164</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,18.6 11.1,19.1 20.1,2.5 29.2,5.8 38.3,9.0 47.3,11.9 56.4,8.4 65.5,10.7 74.5,12.4 83.6,15.0 92.7,19.3 101.7,20.0 110.8,19.6 119.9,19.8 128.9,2.0 138.0,5.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="5.5" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='警戒' data-level='L3' data-chain='0' data-text='invisibledetermination.com algorithmic_governance config_scan'><td><span class='dot r-orange'></span></td><td><a href='https://invisibledetermination.com/' target='_blank' rel='noopener noreferrer'>invisibledetermination.com</a></td><td>algorithmic_governance</td><td class='lv L3'>L3</td><td><b>1.724</b></td><td><span class='delta up'>↑ +0.295</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,5.7 11.1,4.0 20.1,7.0 29.2,11.2 38.3,13.5 47.3,20.0 56.4,4.9 65.5,7.5 74.5,2.0 83.6,5.3 92.7,11.7 101.7,4.4 110.8,10.4 119.9,12.4 128.9,13.5 138.0,8.4" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="8.4" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[&quot;baseline_root&quot;, &quot;env_secret&quot;]</div></td><td><span class='badge'>config_scan</span></td>
-</tr>
-<tr data-risk='警戒' data-level='L3' data-chain='0' data-text='humanintelligenceisirreplaceable.com human_manifesto config_scan'><td><span class='dot r-orange'></span></td><td><a href='https://humanintelligenceisirreplaceable.com/' target='_blank' rel='noopener noreferrer'>humanintelligenceisirreplaceable.com</a></td><td>human_manifesto</td><td class='lv L3'>L3</td><td><b>1.724</b></td><td><span class='delta up'>↑ +0.495</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,3.1 11.1,3.7 20.1,7.1 29.2,11.2 38.3,13.0 47.3,2.0 56.4,5.7 65.5,9.0 74.5,11.3 83.6,19.8 92.7,19.7 101.7,19.4 110.8,20.0 119.9,19.6 128.9,19.1 138.0,8.1" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="8.1" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[&quot;baseline_root&quot;, &quot;env_secret&quot;]</div></td><td><span class='badge'>config_scan</span></td>
-</tr>
-<tr data-risk='可疑' data-level='L1' data-chain='0' data-text='algorithmicmartiallaw.com algorithmic_governance baseline'><td><span class='dot r-yellow'></span></td><td><a href='https://algorithmicmartiallaw.com/' target='_blank' rel='noopener noreferrer'>algorithmicmartiallaw.com</a></td><td>algorithmic_governance</td><td class='lv L1'>L1</td><td><b>1.594</b></td><td><span class='delta down'>↓ -0.111</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,2.0 11.1,5.3 20.1,12.5 29.2,13.3 38.3,18.3 47.3,18.6 56.4,19.1 65.5,19.3 74.5,19.3 83.6,20.0 92.7,8.8 101.7,10.7 110.8,13.1 119.9,14.8 128.9,10.9 138.0,12.8" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="12.8" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='可疑' data-level='L1' data-chain='0' data-text='energyjurisdiction.com monetary_infrastructure baseline'><td><span class='dot r-yellow'></span></td><td><a href='https://energyjurisdiction.com/' target='_blank' rel='noopener noreferrer'>energyjurisdiction.com</a></td><td>monetary_infrastructure</td><td class='lv L1'>L1</td><td><b>1.580</b></td><td><span class='delta down'>↓ -0.161</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,6.4 11.1,12.4 20.1,13.1 29.2,8.8 38.3,12.2 47.3,14.0 56.4,17.3 65.5,20.0 74.5,2.0 83.6,6.5 92.7,5.5 101.7,8.1 110.8,17.0 119.9,17.8 128.9,10.8 138.0,14.1" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="14.1" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='可疑' data-level='L1' data-chain='0' data-text='sovereigndigitalarchitecture.com synthetic_systems baseline'><td><span class='dot r-yellow'></span></td><td><a href='https://sovereigndigitalarchitecture.com/' target='_blank' rel='noopener noreferrer'>sovereigndigitalarchitecture.com</a></td><td>synthetic_systems</td><td class='lv L1'>L1</td><td><b>1.544</b></td><td><span class='delta flat'>→ -0.078</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,17.9 11.1,18.4 20.1,18.9 29.2,18.2 38.3,19.4 47.3,18.3 56.4,18.4 65.5,18.9 74.5,2.0 83.6,5.7 92.7,8.9 101.7,11.7 110.8,20.0 119.9,2.5 128.9,6.3 138.0,8.3" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="8.3" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='可疑' data-level='L1' data-chain='0' data-text='biometricliability.com identity_data other'><td><span class='dot r-yellow'></span></td><td><a href='https://biometricliability.com/' target='_blank' rel='noopener noreferrer'>biometricliability.com</a></td><td>identity_data</td><td class='lv L1'>L1</td><td><b>1.512</b></td><td><span class='delta down'>↓ -0.459</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,13.3 11.1,16.0 20.1,20.0 29.2,6.4 38.3,9.4 47.3,2.9 56.4,3.3 65.5,4.8 74.5,3.5 83.6,9.8 92.7,6.0 101.7,2.0 110.8,6.4 119.9,5.9 128.9,10.4 138.0,17.4" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="17.4" r="2" fill="currentColor"/>
+      <polyline points="2.0,18.8 11.1,18.9 20.1,18.3 29.2,2.0 38.3,3.8 47.3,5.5 56.4,7.3 65.5,19.3 74.5,19.3 83.6,20.0 92.7,18.9 101.7,15.8 110.8,16.7 119.9,16.8 128.9,17.4 138.0,17.6" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="17.6" r="2" fill="currentColor"/>
     </svg>
     </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
 </tr>
-<tr data-risk='可疑' data-level='L1' data-chain='0' data-text='thefutureisalreadyhereitisjustnotevenlydistributed.com human_manifesto baseline'><td><span class='dot r-yellow'></span></td><td><a href='https://thefutureisalreadyhereitisjustnotevenlydistributed.com/' target='_blank' rel='noopener noreferrer'>thefutureisalreadyhereitisjustnotevenlydistributed.com</a></td><td>human_manifesto</td><td class='lv L1'>L1</td><td><b>1.477</b></td><td><span class='delta flat'>→ -0.029</span></td><td class='spark'>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='biologicaldatacenter.com identity_data other'><td><span class='dot r-green'></span></td><td><a href='https://biologicaldatacenter.com/' target='_blank' rel='noopener noreferrer'>biologicaldatacenter.com</a></td><td>identity_data</td><td>背景</td><td><small>0.57</small></td><td><b>1.474</b></td><td><span class='delta up'>↑ +0.115</span></td><td class='spark'>
     <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,19.4 11.1,19.5 20.1,19.4 29.2,3.6 38.3,7.4 47.3,10.9 56.4,2.0 65.5,9.7 74.5,12.5 83.6,15.0 92.7,19.4 101.7,20.0 110.8,6.8 119.9,9.8 128.9,12.4 138.0,13.3" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="13.3" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='可疑' data-level='L1' data-chain='0' data-text='emotionalquantification.com identity_data baseline'><td><span class='dot r-yellow'></span></td><td><a href='https://emotionalquantification.com/' target='_blank' rel='noopener noreferrer'>emotionalquantification.com</a></td><td>identity_data</td><td class='lv L1'>L1</td><td><b>1.375</b></td><td><span class='delta flat'>→ -0.077</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,11.7 11.1,8.6 20.1,11.0 29.2,13.1 38.3,2.0 47.3,7.0 56.4,9.4 65.5,11.9 74.5,19.3 83.6,19.5 92.7,20.0 101.7,18.6 110.8,10.0 119.9,12.5 128.9,14.2 138.0,15.3" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="15.3" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='可疑' data-level='L1' data-chain='0' data-text='computationalscarcity.com monetary_infrastructure other'><td><span class='dot r-yellow'></span></td><td><a href='https://computationalscarcity.com/' target='_blank' rel='noopener noreferrer'>computationalscarcity.com</a></td><td>monetary_infrastructure</td><td class='lv L1'>L1</td><td><b>1.350</b></td><td><span class='delta up'>↑ +0.177</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,6.5 11.1,7.8 20.1,8.3 29.2,8.3 38.3,10.1 47.3,12.3 56.4,11.1 65.5,6.5 74.5,2.0 83.6,4.8 92.7,7.3 101.7,12.0 110.8,18.4 119.9,19.0 128.9,20.0 138.0,17.8" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="17.8" r="2" fill="currentColor"/>
+      <polyline points="2.0,5.4 11.1,6.9 20.1,8.3 29.2,9.7 38.3,19.8 47.3,19.4 56.4,19.7 65.5,19.4 74.5,2.0 83.6,3.5 92.7,2.8 101.7,4.3 110.8,10.0 119.9,11.3 128.9,20.0 138.0,19.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="19.5" r="2" fill="currentColor"/>
     </svg>
     </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
 </tr>
-<tr data-risk='可疑' data-level='L1' data-chain='0' data-text='biologicaldatacenter.com identity_data other'><td><span class='dot r-yellow'></span></td><td><a href='https://biologicaldatacenter.com/' target='_blank' rel='noopener noreferrer'>biologicaldatacenter.com</a></td><td>identity_data</td><td class='lv L1'>L1</td><td><b>1.271</b></td><td><span class='delta flat'>→ +0.049</span></td><td class='spark'>
+<tr data-risk='可疑' data-level='L1' data-chain='0' data-text='thefirstmarscitizen.com offworld_expansion other'><td><span class='dot r-yellow'></span></td><td><a href='https://thefirstmarscitizen.com/' target='_blank' rel='noopener noreferrer'>thefirstmarscitizen.com</a></td><td>offworld_expansion</td><td>可疑</td><td><small>1.65</small></td><td><b>1.444</b></td><td><span class='delta down'>↓ -2.115</span></td><td class='spark'>
     <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,9.6 11.1,11.7 20.1,13.9 29.2,15.1 38.3,19.4 47.3,19.2 56.4,19.0 65.5,18.9 74.5,9.0 83.6,11.9 92.7,2.0 101.7,5.5 110.8,10.8 119.9,12.7 128.9,20.0 138.0,19.2" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="19.2" r="2" fill="currentColor"/>
+      <polyline points="2.0,10.2 11.1,11.8 20.1,19.9 29.2,19.9 38.3,20.0 47.3,4.2 56.4,5.8 65.5,2.0 74.5,3.6 83.6,7.1 92.7,8.6 101.7,4.0 110.8,5.6 119.9,7.2 128.9,8.7 138.0,19.4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="19.4" r="2" fill="currentColor"/>
     </svg>
     </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
 </tr>
-<tr data-risk='可疑' data-level='L1' data-chain='0' data-text='thefirstmarscitizen.com offworld_expansion other'><td><span class='dot r-yellow'></span></td><td><a href='https://thefirstmarscitizen.com/' target='_blank' rel='noopener noreferrer'>thefirstmarscitizen.com</a></td><td>offworld_expansion</td><td class='lv L1'>L1</td><td><b>1.254</b></td><td><span class='delta down'>↓ -0.594</span></td><td class='spark'>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='syntheticjurisdiction.com synthetic_systems baseline'><td><span class='dot r-green'></span></td><td><a href='https://syntheticjurisdiction.com/' target='_blank' rel='noopener noreferrer'>syntheticjurisdiction.com</a></td><td>synthetic_systems</td><td>背景</td><td><small>0.46</small></td><td><b>1.406</b></td><td><span class='delta up'>↑ +0.117</span></td><td class='spark'>
     <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,15.4 11.1,16.9 20.1,20.0 29.2,19.3 38.3,19.5 47.3,10.8 56.4,13.2 65.5,4.0 74.5,6.9 83.6,11.4 92.7,13.3 101.7,2.0 110.8,5.6 119.9,8.7 128.9,11.0 138.0,19.8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <polyline points="2.0,6.8 11.1,11.3 20.1,20.0 29.2,19.6 38.3,2.0 47.3,3.9 56.4,3.7 65.5,5.5 74.5,12.9 83.6,14.4 92.7,2.4 101.7,4.2 110.8,6.1 119.9,7.8 128.9,19.3 138.0,18.6" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="18.6" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='syntheticliability.com synthetic_systems other'><td><span class='dot r-green'></span></td><td><a href='https://syntheticliability.com/' target='_blank' rel='noopener noreferrer'>syntheticliability.com</a></td><td>synthetic_systems</td><td>背景</td><td><small>-0.10</small></td><td><b>1.346</b></td><td><span class='delta down'>↓ -1.082</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,20.0 11.1,8.2 20.1,9.0 29.2,7.0 38.3,7.9 47.3,11.3 56.4,13.1 65.5,5.6 74.5,7.3 83.6,3.6 92.7,2.0 101.7,3.3 110.8,4.9 119.9,8.4 128.9,14.2 138.0,19.8" fill="none" stroke="currentColor" stroke-width="1.6"/>
       <circle cx="138.0" cy="19.8" r="2" fill="currentColor"/>
     </svg>
     </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
 </tr>
-<tr data-risk='可疑' data-level='L1' data-chain='0' data-text='modelautophagy.com synthetic_systems other'><td><span class='dot r-yellow'></span></td><td><a href='https://modelautophagy.com/' target='_blank' rel='noopener noreferrer'>modelautophagy.com</a></td><td>synthetic_systems</td><td class='lv L1'>L1</td><td><b>1.221</b></td><td><span class='delta flat'>→ -0.025</span></td><td class='spark'>
+<tr data-risk='警戒' data-level='L1' data-chain='0' data-text='algorithmiclegitimacy.com algorithmic_governance other'><td><span class='dot r-orange'></span></td><td><a href='https://algorithmiclegitimacy.com/' target='_blank' rel='noopener noreferrer'>algorithmiclegitimacy.com</a></td><td>algorithmic_governance</td><td>警戒</td><td><small>2.23</small></td><td><b>1.346</b></td><td><span class='delta down'>↓ -1.603</span></td><td class='spark'>
     <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,19.5 11.1,19.3 20.1,19.7 29.2,18.7 38.3,19.0 47.3,19.3 56.4,19.3 65.5,19.1 74.5,18.4 83.6,18.6 92.7,2.0 101.7,5.3 110.8,8.4 119.9,11.1 128.9,19.6 138.0,20.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="20.0" r="2" fill="currentColor"/>
+      <polyline points="2.0,19.2 11.1,4.9 20.1,7.2 29.2,8.9 38.3,10.7 47.3,19.3 56.4,20.0 65.5,5.9 74.5,7.7 83.6,2.8 92.7,4.7 101.7,2.0 110.8,4.0 119.9,8.0 128.9,9.9 138.0,19.8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="19.8" r="2" fill="currentColor"/>
     </svg>
     </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
 </tr>
-<tr data-risk='可疑' data-level='L1' data-chain='0' data-text='syntheticliability.com synthetic_systems other'><td><span class='dot r-yellow'></span></td><td><a href='https://syntheticliability.com/' target='_blank' rel='noopener noreferrer'>syntheticliability.com</a></td><td>synthetic_systems</td><td class='lv L1'>L1</td><td><b>1.215</b></td><td><span class='delta down'>↓ -0.433</span></td><td class='spark'>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='aurumreserveprotocol.com monetary_infrastructure baseline'><td><span class='dot r-green'></span></td><td><a href='https://aurumreserveprotocol.com/' target='_blank' rel='noopener noreferrer'>aurumreserveprotocol.com</a></td><td>monetary_infrastructure</td><td>背景</td><td><small>0.58</small></td><td><b>1.345</b></td><td><span class='delta flat'>→ +0.001</span></td><td class='spark'>
     <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,20.0 11.1,10.3 20.1,10.8 29.2,3.7 38.3,2.4 47.3,6.4 56.4,9.3 65.5,9.1 74.5,13.2 83.6,8.6 92.7,4.0 101.7,2.0 110.8,5.2 119.9,9.1 128.9,14.2 138.0,19.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="19.5" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
-</tr>
-<tr data-risk='背景' data-level='L1' data-chain='0' data-text='syntheticjurisdiction.com synthetic_systems baseline'><td><span class='dot r-green'></span></td><td><a href='https://syntheticjurisdiction.com/' target='_blank' rel='noopener noreferrer'>syntheticjurisdiction.com</a></td><td>synthetic_systems</td><td class='lv L1'>L1</td><td><b>1.175</b></td><td><span class='delta flat'>→ +0.060</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,8.7 11.1,13.2 20.1,20.0 29.2,19.1 38.3,2.0 47.3,5.4 56.4,3.0 65.5,6.5 74.5,14.6 83.6,16.8 92.7,8.2 101.7,10.4 110.8,12.8 119.9,14.4 128.9,19.4 138.0,18.4" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="18.4" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='背景' data-level='L1' data-chain='0' data-text='organicdatarights.com identity_data other'><td><span class='dot r-green'></span></td><td><a href='https://organicdatarights.com/' target='_blank' rel='noopener noreferrer'>organicdatarights.com</a></td><td>identity_data</td><td class='lv L1'>L1</td><td><b>1.159</b></td><td><span class='delta flat'>→ -0.012</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,18.6 11.1,18.4 20.1,17.9 29.2,2.0 38.3,5.0 47.3,7.7 56.4,10.5 65.5,18.0 74.5,18.4 83.6,20.0 92.7,18.7 101.7,15.8 110.8,16.9 119.9,16.6 128.9,16.8 138.0,17.1" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="17.1" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
-</tr>
-<tr data-risk='背景' data-level='L1' data-chain='0' data-text='unannouncedsovereignty.com algorithmic_governance other'><td><span class='dot r-green'></span></td><td><a href='https://unannouncedsovereignty.com/' target='_blank' rel='noopener noreferrer'>unannouncedsovereignty.com</a></td><td>algorithmic_governance</td><td class='lv L1'>L1</td><td><b>1.147</b></td><td><span class='delta down'>↓ -0.269</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,5.6 11.1,11.4 20.1,2.0 29.2,5.2 38.3,10.5 47.3,12.5 56.4,20.0 65.5,10.6 74.5,12.9 83.6,14.9 92.7,15.9 101.7,7.5 110.8,10.1 119.9,11.9 128.9,14.4 138.0,19.2" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="19.2" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
-</tr>
-<tr data-risk='背景' data-level='L1' data-chain='0' data-text='posthumousidentity.com identity_data other'><td><span class='dot r-green'></span></td><td><a href='https://posthumousidentity.com/' target='_blank' rel='noopener noreferrer'>posthumousidentity.com</a></td><td>identity_data</td><td class='lv L1'>L1</td><td><b>1.136</b></td><td><span class='delta flat'>→ -0.021</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,13.2 11.1,14.0 20.1,2.0 29.2,4.8 38.3,8.4 47.3,10.9 56.4,19.0 65.5,19.2 74.5,19.6 83.6,20.0 92.7,19.4 101.7,19.0 110.8,18.9 119.9,19.3 128.9,18.6 138.0,18.9" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <polyline points="2.0,3.6 11.1,6.3 20.1,10.9 29.2,4.1 38.3,2.0 47.3,3.6 56.4,5.2 65.5,5.3 74.5,9.3 83.6,10.7 92.7,12.1 101.7,19.1 110.8,20.0 119.9,19.9 128.9,18.9 138.0,18.9" fill="none" stroke="currentColor" stroke-width="1.6"/>
       <circle cx="138.0" cy="18.9" r="2" fill="currentColor"/>
     </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='automatedjurisprudence.com algorithmic_governance baseline'><td><span class='dot r-green'></span></td><td><a href='https://automatedjurisprudence.com/' target='_blank' rel='noopener noreferrer'>automatedjurisprudence.com</a></td><td>algorithmic_governance</td><td>背景</td><td><small>-0.25</small></td><td><b>1.342</b></td><td><span class='delta flat'>→ +0.024</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,2.0 11.1,19.1 20.1,19.8 29.2,19.3 38.3,20.0 47.3,19.5 56.4,17.7 65.5,15.0 74.5,16.6 83.6,17.3 92.7,17.3 101.7,19.7 110.8,18.4 119.9,18.7 128.9,17.7 138.0,17.3" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="17.3" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='unannouncedsovereignty.com algorithmic_governance other'><td><span class='dot r-green'></span></td><td><a href='https://unannouncedsovereignty.com/' target='_blank' rel='noopener noreferrer'>unannouncedsovereignty.com</a></td><td>algorithmic_governance</td><td>背景</td><td><small>0.65</small></td><td><b>1.341</b></td><td><span class='delta down'>↓ -2.001</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,4.3 11.1,7.1 20.1,2.1 29.2,3.9 38.3,7.4 47.3,9.1 56.4,20.0 65.5,6.1 74.5,7.8 83.6,9.3 92.7,10.7 101.7,2.0 110.8,3.8 119.9,5.5 128.9,7.3 138.0,19.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="19.0" r="2" fill="currentColor"/>
+    </svg>
     </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
 </tr>
-<tr data-risk='背景' data-level='L1' data-chain='0' data-text='thepowerofdefault.com algorithmic_governance baseline'><td><span class='dot r-green'></span></td><td><a href='https://thepowerofdefault.com/' target='_blank' rel='noopener noreferrer'>thepowerofdefault.com</a></td><td>algorithmic_governance</td><td class='lv L1'>L1</td><td><b>1.135</b></td><td><span class='delta flat'>→ -0.005</span></td><td class='spark'>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='defaultpower.com algorithmic_governance baseline'><td><span class='dot r-green'></span></td><td><a href='https://defaultpower.com/' target='_blank' rel='noopener noreferrer'>defaultpower.com</a></td><td>algorithmic_governance</td><td>背景</td><td><small>-0.15</small></td><td><b>1.325</b></td><td><span class='delta flat'>→ -0.007</span></td><td class='spark'>
     <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,12.3 11.1,14.3 20.1,5.8 29.2,2.0 38.3,4.9 47.3,8.0 56.4,13.4 65.5,18.8 74.5,19.2 83.6,19.7 92.7,20.0 101.7,19.8 110.8,19.8 119.9,18.9 128.9,18.4 138.0,18.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="18.5" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='背景' data-level='L1' data-chain='0' data-text='automatedjurisprudence.com algorithmic_governance baseline'><td><span class='dot r-green'></span></td><td><a href='https://automatedjurisprudence.com/' target='_blank' rel='noopener noreferrer'>automatedjurisprudence.com</a></td><td>algorithmic_governance</td><td class='lv L1'>L1</td><td><b>1.133</b></td><td><span class='delta flat'>→ +0.032</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,2.0 11.1,17.2 20.1,18.1 29.2,16.1 38.3,17.3 47.3,18.5 56.4,18.4 65.5,17.1 74.5,18.1 83.6,18.7 92.7,18.1 101.7,19.8 110.8,20.0 119.9,19.9 128.9,18.5 138.0,16.9" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="16.9" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='背景' data-level='L1' data-chain='0' data-text='defaultpower.com algorithmic_governance baseline'><td><span class='dot r-green'></span></td><td><a href='https://defaultpower.com/' target='_blank' rel='noopener noreferrer'>defaultpower.com</a></td><td>algorithmic_governance</td><td class='lv L1'>L1</td><td><b>1.129</b></td><td><span class='delta flat'>→ +0.001</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,3.6 11.1,6.7 20.1,12.1 29.2,12.9 38.3,16.9 47.3,16.9 56.4,17.2 65.5,17.2 74.5,2.0 83.6,6.2 92.7,8.9 101.7,11.5 110.8,20.0 119.9,19.1 128.9,18.2 138.0,18.2" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="18.2" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='背景' data-level='L1' data-chain='0' data-text='aurumreserveprotocol.com monetary_infrastructure baseline'><td><span class='dot r-green'></span></td><td><a href='https://aurumreserveprotocol.com/' target='_blank' rel='noopener noreferrer'>aurumreserveprotocol.com</a></td><td>monetary_infrastructure</td><td class='lv L1'>L1</td><td><b>1.125</b></td><td><span class='delta flat'>→ +0.006</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,4.5 11.1,8.8 20.1,12.9 29.2,5.8 38.3,2.0 47.3,4.9 56.4,7.7 65.5,5.5 74.5,10.5 83.6,12.5 92.7,14.1 101.7,18.8 110.8,19.9 119.9,20.0 128.9,19.3 138.0,19.2" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="19.2" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='背景' data-level='L1' data-chain='0' data-text='lunarresourceprotocol.com offworld_expansion baseline'><td><span class='dot r-green'></span></td><td><a href='https://lunarresourceprotocol.com/' target='_blank' rel='noopener noreferrer'>lunarresourceprotocol.com</a></td><td>offworld_expansion</td><td class='lv L1'>L1</td><td><b>1.110</b></td><td><span class='delta flat'>→ +0.017</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,19.7 11.1,19.3 20.1,7.3 29.2,9.7 38.3,11.8 47.3,2.0 56.4,7.9 65.5,10.8 74.5,13.0 83.6,20.0 92.7,19.3 101.7,18.6 110.8,19.3 119.9,19.6 128.9,19.8 138.0,19.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="19.5" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='背景' data-level='L1' data-chain='0' data-text='posttruthresilience.com civilization_resilience baseline'><td><span class='dot r-green'></span></td><td><a href='https://posttruthresilience.com/' target='_blank' rel='noopener noreferrer'>posttruthresilience.com</a></td><td>civilization_resilience</td><td class='lv L1'>L1</td><td><b>1.096</b></td><td><span class='delta flat'>→ -0.021</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,6.2 11.1,8.9 20.1,11.2 29.2,2.0 38.3,7.6 47.3,9.8 56.4,12.1 65.5,18.7 74.5,18.8 83.6,19.2 92.7,18.7 101.7,18.9 110.8,19.8 119.9,20.0 128.9,19.4 138.0,19.7" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="19.7" r="2" fill="currentColor"/>
-    </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
-</tr>
-<tr data-risk='背景' data-level='L1' data-chain='0' data-text='civilizationcaching.com civilization_resilience baseline'><td><span class='dot r-green'></span></td><td><a href='https://civilizationcaching.com/' target='_blank' rel='noopener noreferrer'>civilizationcaching.com</a></td><td>civilization_resilience</td><td class='lv L1'>L1</td><td><b>1.085</b></td><td><span class='delta flat'>→ +0.022</span></td><td class='spark'>
-    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,10.7 11.1,11.6 20.1,17.4 29.2,2.0 38.3,5.7 47.3,9.7 56.4,11.7 65.5,19.1 74.5,19.1 83.6,19.6 92.7,19.2 101.7,19.5 110.8,20.0 119.9,18.9 128.9,19.8 138.0,19.3" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <polyline points="2.0,2.0 11.1,3.7 20.1,10.4 29.2,11.7 38.3,18.7 47.3,18.7 56.4,18.9 65.5,19.0 74.5,4.1 83.6,5.9 92.7,7.5 101.7,9.2 110.8,20.0 119.9,19.6 128.9,19.2 138.0,19.3" fill="none" stroke="currentColor" stroke-width="1.6"/>
       <circle cx="138.0" cy="19.3" r="2" fill="currentColor"/>
     </svg>
     </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
 </tr>
-<tr data-risk='背景' data-level='L1' data-chain='0' data-text='biometricsovereignty.com identity_data other'><td><span class='dot r-green'></span></td><td><a href='https://biometricsovereignty.com/' target='_blank' rel='noopener noreferrer'>biometricsovereignty.com</a></td><td>identity_data</td><td class='lv L1'>L1</td><td><b>1.068</b></td><td><span class='delta flat'>→ +0.022</span></td><td class='spark'>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='thepowerofdefault.com algorithmic_governance baseline'><td><span class='dot r-green'></span></td><td><a href='https://thepowerofdefault.com/' target='_blank' rel='noopener noreferrer'>thepowerofdefault.com</a></td><td>algorithmic_governance</td><td>背景</td><td><small>-0.71</small></td><td><b>1.317</b></td><td><span class='delta flat'>→ -0.055</span></td><td class='spark'>
     <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,18.5 11.1,19.0 20.1,18.5 29.2,18.7 38.3,8.8 47.3,11.1 56.4,2.0 65.5,5.3 74.5,10.3 83.6,12.8 92.7,19.3 101.7,19.7 110.8,19.6 119.9,19.7 128.9,20.0 138.0,19.7" fill="none" stroke="currentColor" stroke-width="1.6"/>
-      <circle cx="138.0" cy="19.7" r="2" fill="currentColor"/>
+      <polyline points="2.0,12.8 11.1,13.9 20.1,4.5 29.2,2.0 38.3,3.4 47.3,4.8 56.4,8.1 65.5,19.2 74.5,19.7 83.6,19.9 92.7,20.0 101.7,19.9 110.8,19.8 119.9,19.1 128.9,19.1 138.0,19.3" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="19.3" r="2" fill="currentColor"/>
     </svg>
-    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
 </tr>
-<tr data-risk='背景' data-level='L1' data-chain='0' data-text='algorithmiclegitimacy.com algorithmic_governance other'><td><span class='dot r-green'></span></td><td><a href='https://algorithmiclegitimacy.com/' target='_blank' rel='noopener noreferrer'>algorithmiclegitimacy.com</a></td><td>algorithmic_governance</td><td class='lv L1'>L1</td><td><b>1.067</b></td><td><span class='delta down'>↓ -0.570</span></td><td class='spark'>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='modelautophagy.com synthetic_systems other'><td><span class='dot r-green'></span></td><td><a href='https://modelautophagy.com/' target='_blank' rel='noopener noreferrer'>modelautophagy.com</a></td><td>synthetic_systems</td><td>背景</td><td><small>-0.39</small></td><td><b>1.308</b></td><td><span class='delta flat'>→ -0.054</span></td><td class='spark'>
     <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
-      <polyline points="2.0,18.9 11.1,11.2 20.1,13.3 29.2,14.3 38.3,15.8 47.3,18.8 56.4,19.3 65.5,9.6 74.5,11.7 83.6,5.7 92.7,8.2 101.7,2.0 110.8,5.2 119.9,10.1 128.9,12.6 138.0,20.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <polyline points="2.0,18.7 11.1,18.8 20.1,19.4 29.2,18.7 38.3,19.2 47.3,19.4 56.4,19.2 65.5,19.2 74.5,17.5 83.6,17.8 92.7,2.0 101.7,3.7 110.8,5.5 119.9,7.2 128.9,19.7 138.0,20.0" fill="none" stroke="currentColor" stroke-width="1.6"/>
       <circle cx="138.0" cy="20.0" r="2" fill="currentColor"/>
     </svg>
     </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='posttruthresilience.com civilization_resilience baseline'><td><span class='dot r-green'></span></td><td><a href='https://posttruthresilience.com/' target='_blank' rel='noopener noreferrer'>posttruthresilience.com</a></td><td>civilization_resilience</td><td>背景</td><td><small>0.62</small></td><td><b>1.302</b></td><td><span class='delta flat'>→ -0.049</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,3.9 11.1,5.8 20.1,7.7 29.2,2.0 38.3,5.7 47.3,7.5 56.4,9.3 65.5,20.0 74.5,17.4 83.6,17.9 92.7,17.2 101.7,18.0 110.8,19.7 119.9,19.9 128.9,19.1 138.0,19.4" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="19.4" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='civilizationcaching.com civilization_resilience baseline'><td><span class='dot r-green'></span></td><td><a href='https://civilizationcaching.com/' target='_blank' rel='noopener noreferrer'>civilizationcaching.com</a></td><td>civilization_resilience</td><td>背景</td><td><small>0.78</small></td><td><b>1.289</b></td><td><span class='delta flat'>→ +0.037</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,2.0 11.1,4.0 20.1,17.5 29.2,3.7 38.3,5.9 47.3,8.1 56.4,9.8 65.5,19.1 74.5,18.8 83.6,18.8 92.7,18.9 101.7,19.5 110.8,20.0 119.9,18.3 128.9,19.1 138.0,18.9" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="18.9" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='posthumousidentity.com identity_data other'><td><span class='dot r-green'></span></td><td><a href='https://posthumousidentity.com/' target='_blank' rel='noopener noreferrer'>posthumousidentity.com</a></td><td>identity_data</td><td>背景</td><td><small>0.00</small></td><td><b>1.246</b></td><td><span class='delta down'>↓ -0.107</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,6.1 11.1,7.4 20.1,2.0 29.2,3.7 38.3,6.5 47.3,8.2 56.4,19.5 65.5,19.6 74.5,19.9 83.6,20.0 92.7,18.7 101.7,18.3 110.8,18.3 119.9,18.8 128.9,18.7 138.0,19.3" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="19.3" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='biometricsovereignty.com identity_data other'><td><span class='dot r-green'></span></td><td><a href='https://biometricsovereignty.com/' target='_blank' rel='noopener noreferrer'>biometricsovereignty.com</a></td><td>identity_data</td><td>背景</td><td><small>0.98</small></td><td><b>1.243</b></td><td><span class='delta up'>↑ +0.107</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,18.7 11.1,19.1 20.1,18.4 29.2,18.9 38.3,6.2 47.3,7.6 56.4,2.0 65.5,3.5 74.5,5.9 83.6,7.4 92.7,18.7 101.7,19.2 110.8,19.1 119.9,19.4 128.9,20.0 138.0,19.5" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="19.5" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>other</span></td>
+</tr>
+<tr data-risk='背景' data-level='L1' data-chain='0' data-text='lunarresourceprotocol.com offworld_expansion baseline'><td><span class='dot r-green'></span></td><td><a href='https://lunarresourceprotocol.com/' target='_blank' rel='noopener noreferrer'>lunarresourceprotocol.com</a></td><td>offworld_expansion</td><td>背景</td><td><small>0.00</small></td><td><b>1.239</b></td><td><span class='delta down'>↓ -0.102</span></td><td class='spark'>
+    <svg width="140" height="22" viewBox="0 0 140 22" aria-label="W sparkline">
+      <polyline points="2.0,20.0 11.1,18.6 20.1,4.4 29.2,6.1 38.3,7.9 47.3,2.0 56.4,5.2 65.5,6.9 74.5,8.6 83.6,19.4 92.7,18.9 101.7,17.7 110.8,18.5 119.9,19.0 128.9,19.2 138.0,19.8" fill="none" stroke="currentColor" stroke-width="1.6"/>
+      <circle cx="138.0" cy="19.8" r="2" fill="currentColor"/>
+    </svg>
+    </td><td><span class='match'>展開</span><div class='matchbox'>[]</div></td><td><span class='badge'>baseline</span></td>
 </tr>
 </tbody></table></div>
 <div class='card right'>
@@ -439,180 +439,194 @@ a:hover{text-decoration:underline}
 </div>
 
 <table><thead><tr><th>Series</th><th>W_avg</th><th>W_proj</th><th>狀態</th><th>Chain</th><th>Top src</th><th>share</th><th>push</th><th>domains</th><th>L3</th><th>Top-3</th></tr></thead><tbody>
-<tr class='series-row' data-chain='YES' data-push='0.1659'>
+<tr class='series-row' data-chain='no' data-push='0.4077'>
 <td><b>monetary_infrastructure</b></td>
 <td>1.888</td>
-<td><b>2.168</b></td>
+<td><b>3.227</b></td>
 <td><span class='status'><span class='sdot on'></span>持續中</span></td>
-<td><span class='badge black'>YES</span></td>
-<td><span class='badge'>civilization_resilience</span></td>
-<td>0.72</td>
-<td>0.1659</td>
+<td><span class='muted'>no</span></td>
+<td><span class='badge'>human_manifesto</span></td>
+<td>0.52</td>
+<td>0.4077</td>
 <td>9</td>
 <td>0</td>
 <td><button class='top3-btn' data-target='top3_monetary_infrastructure'>Top-3</button></td>
 </tr>
 <tr class='top3-row' id='top3_monetary_infrastructure'><td colspan='11'>
 <div class='top3-box'><table class='top3-table'>
-<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
-<tr><td>civilization_resilience</td><td>0.7202</td><td>0.1659</td><td>1</td><td>—</td></tr>
-<tr><td>offworld_expansion</td><td>0.4257</td><td>0.0615</td><td>1</td><td>—</td></tr>
-<tr><td>human_manifesto</td><td>0.5236</td><td>0.0464</td><td>1</td><td>—</td></tr>
+<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
+<tr><td>human_manifesto</td><td>0.5243</td><td>0.4077</td><td>0.7168</td><td>1</td><td>—</td></tr>
+<tr><td>civilization_resilience</td><td>0.5822</td><td>0.3646</td><td>0.4303</td><td>1</td><td>—</td></tr>
+<tr><td>offworld_expansion</td><td>0.5194</td><td>0.3120</td><td>0.5553</td><td>1</td><td>—</td></tr>
 </tbody></table></div>
 </td></tr>
-<tr class='series-row' data-chain='YES' data-push='0.1528'>
-<td><b>human_manifesto</b></td>
-<td>1.731</td>
-<td><b>1.923</b></td>
-<td><span class='status'><span class='sdot on'></span>持續中</span></td>
-<td><span class='badge black'>YES</span></td>
-<td><span class='badge'>civilization_resilience</span></td>
-<td>0.66</td>
-<td>0.1528</td>
-<td>3</td>
-<td>1</td>
-<td><button class='top3-btn' data-target='top3_human_manifesto'>Top-3</button></td>
-</tr>
-<tr class='top3-row' id='top3_human_manifesto'><td colspan='11'>
-<div class='top3-box'><table class='top3-table'>
-<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
-<tr><td>civilization_resilience</td><td>0.6630</td><td>0.1528</td><td>1</td><td>—</td></tr>
-<tr><td>offworld_expansion</td><td>0.2706</td><td>0.0391</td><td>1</td><td>—</td></tr>
-</tbody></table></div>
-</td></tr>
-<tr class='series-row' data-chain='YES' data-push='0.1267'>
-<td><b>offworld_expansion</b></td>
-<td>1.707</td>
-<td><b>1.915</b></td>
-<td><span class='status'><span class='sdot on'></span>持續中</span></td>
-<td><span class='badge black'>YES</span></td>
-<td><span class='badge'>civilization_resilience</span></td>
-<td>0.55</td>
-<td>0.1267</td>
-<td>5</td>
-<td>2</td>
-<td><button class='top3-btn' data-target='top3_offworld_expansion'>Top-3</button></td>
-</tr>
-<tr class='top3-row' id='top3_offworld_expansion'><td colspan='11'>
-<div class='top3-box'><table class='top3-table'>
-<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
-<tr><td>civilization_resilience</td><td>0.5498</td><td>0.1267</td><td>1</td><td>—</td></tr>
-<tr><td>human_manifesto</td><td>0.7222</td><td>0.0639</td><td>1</td><td>—</td></tr>
-<tr><td>synthetic_systems</td><td>0.2784</td><td>0.0182</td><td>1</td><td>—</td></tr>
-</tbody></table></div>
-</td></tr>
-<tr class='series-row' data-chain='YES' data-push='0.0388'>
+<tr class='series-row' data-chain='no' data-push='0.4279'>
 <td><b>civilization_resilience</b></td>
 <td>1.834</td>
-<td><b>1.911</b></td>
+<td><b>3.128</b></td>
 <td><span class='status'><span class='sdot on'></span>持續中</span></td>
-<td><span class='badge black'>YES</span></td>
+<td><span class='muted'>no</span></td>
 <td><span class='badge'>human_manifesto</span></td>
-<td>0.44</td>
-<td>0.0388</td>
+<td>0.63</td>
+<td>0.4279</td>
 <td>8</td>
 <td>2</td>
 <td><button class='top3-btn' data-target='top3_civilization_resilience'>Top-3</button></td>
 </tr>
 <tr class='top3-row' id='top3_civilization_resilience'><td colspan='11'>
 <div class='top3-box'><table class='top3-table'>
-<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
-<tr><td>human_manifesto</td><td>0.4382</td><td>0.0388</td><td>1</td><td>—</td></tr>
-<tr><td>offworld_expansion</td><td>0.2136</td><td>0.0309</td><td>1</td><td>—</td></tr>
-<tr><td>synthetic_systems</td><td>0.1212</td><td>0.0079</td><td>1</td><td>—</td></tr>
+<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
+<tr><td>human_manifesto</td><td>0.6287</td><td>0.4279</td><td>1.5421</td><td>1</td><td>—</td></tr>
+<tr><td>offworld_expansion</td><td>0.6067</td><td>0.3330</td><td>1.3766</td><td>1</td><td>—</td></tr>
+<tr><td>identity_data</td><td>0.6918</td><td>0.2165</td><td>0.8370</td><td>1</td><td>—</td></tr>
 </tbody></table></div>
 </td></tr>
-<tr class='series-row' data-chain='YES' data-push='0.0485'>
-<td><b>synthetic_systems</b></td>
-<td>1.845</td>
-<td><b>1.906</b></td>
+<tr class='series-row' data-chain='no' data-push='0.5030'>
+<td><b>offworld_expansion</b></td>
+<td>1.707</td>
+<td><b>3.049</b></td>
 <td><span class='status'><span class='sdot on'></span>持續中</span></td>
-<td><span class='badge black'>YES</span></td>
-<td><span class='badge'>civilization_resilience</span></td>
-<td>0.21</td>
-<td>0.0485</td>
-<td>9</td>
-<td>0</td>
-<td><button class='top3-btn' data-target='top3_synthetic_systems'>Top-3</button></td>
-</tr>
-<tr class='top3-row' id='top3_synthetic_systems'><td colspan='11'>
-<div class='top3-box'><table class='top3-table'>
-<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
-<tr><td>civilization_resilience</td><td>0.2106</td><td>0.0485</td><td>1</td><td>—</td></tr>
-<tr><td>offworld_expansion</td><td>0.0832</td><td>0.0120</td><td>1</td><td>—</td></tr>
-</tbody></table></div>
-</td></tr>
-<tr class='series-row' data-chain='no' data-push='0.0003'>
-<td><b>algorithmic_governance</b></td>
-<td>1.515</td>
-<td><b>1.515</b></td>
-<td><span class='status'><span class='sdot'></span>平穩</span></td>
 <td><span class='muted'>no</span></td>
 <td><span class='badge'>human_manifesto</span></td>
-<td>0.00</td>
-<td>0.0003</td>
-<td>10</td>
+<td>0.74</td>
+<td>0.5030</td>
+<td>5</td>
 <td>2</td>
-<td><button class='top3-btn' data-target='top3_algorithmic_governance'>Top-3</button></td>
+<td><button class='top3-btn' data-target='top3_offworld_expansion'>Top-3</button></td>
 </tr>
-<tr class='top3-row' id='top3_algorithmic_governance'><td colspan='11'>
+<tr class='top3-row' id='top3_offworld_expansion'><td colspan='11'>
 <div class='top3-box'><table class='top3-table'>
-<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
-<tr><td>human_manifesto</td><td>0.0037</td><td>0.0003</td><td>1</td><td>—</td></tr>
+<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
+<tr><td>human_manifesto</td><td>0.7445</td><td>0.5030</td><td>1.6135</td><td>1</td><td>—</td></tr>
+<tr><td>civilization_resilience</td><td>0.5972</td><td>0.2905</td><td>0.9040</td><td>1</td><td>—</td></tr>
+<tr><td>identity_data</td><td>0.6031</td><td>0.1688</td><td>0.7187</td><td>1</td><td>—</td></tr>
 </tbody></table></div>
 </td></tr>
-<tr class='series-row' data-chain='no' data-push='0.0946'>
+<tr class='series-row' data-chain='no' data-push='0.5049'>
 <td><b>identity_data</b></td>
 <td>1.253</td>
-<td><b>1.491</b></td>
-<td><span class='status'><span class='sdot on'></span>平穩</span></td>
+<td><b>2.978</b></td>
+<td><span class='status'><span class='sdot on'></span>持續中</span></td>
 <td><span class='muted'>no</span></td>
-<td><span class='badge'>offworld_expansion</span></td>
-<td>0.65</td>
-<td>0.0946</td>
+<td><span class='badge'>human_manifesto</span></td>
+<td>0.73</td>
+<td>0.5049</td>
 <td>6</td>
 <td>0</td>
 <td><button class='top3-btn' data-target='top3_identity_data'>Top-3</button></td>
 </tr>
 <tr class='top3-row' id='top3_identity_data'><td colspan='11'>
 <div class='top3-box'><table class='top3-table'>
-<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
-<tr><td>offworld_expansion</td><td>0.6550</td><td>0.0946</td><td>1</td><td>—</td></tr>
-<tr><td>civilization_resilience</td><td>0.3963</td><td>0.0913</td><td>1</td><td>—</td></tr>
-<tr><td>human_manifesto</td><td>0.5851</td><td>0.0518</td><td>1</td><td>—</td></tr>
+<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
+<tr><td>human_manifesto</td><td>0.7332</td><td>0.5049</td><td>1.5422</td><td>1</td><td>—</td></tr>
+<tr><td>offworld_expansion</td><td>0.6858</td><td>0.4961</td><td>1.5185</td><td>1</td><td>—</td></tr>
+<tr><td>civilization_resilience</td><td>0.5920</td><td>0.3531</td><td>1.0126</td><td>1</td><td>—</td></tr>
 </tbody></table></div>
 </td></tr>
-<tr class='series-row' data-chain='no' data-push='0.0000'>
+<tr class='series-row' data-chain='no' data-push='0.4309'>
+<td><b>human_manifesto</b></td>
+<td>1.731</td>
+<td><b>2.949</b></td>
+<td><span class='status'><span class='sdot on'></span>持續中</span></td>
+<td><span class='muted'>no</span></td>
+<td><span class='badge'>civilization_resilience</span></td>
+<td>0.73</td>
+<td>0.4309</td>
+<td>3</td>
+<td>1</td>
+<td><button class='top3-btn' data-target='top3_human_manifesto'>Top-3</button></td>
+</tr>
+<tr class='top3-row' id='top3_human_manifesto'><td colspan='11'>
+<div class='top3-box'><table class='top3-table'>
+<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
+<tr><td>civilization_resilience</td><td>0.7301</td><td>0.4309</td><td>1.0586</td><td>1</td><td>—</td></tr>
+<tr><td>offworld_expansion</td><td>0.6233</td><td>0.3374</td><td>1.3726</td><td>1</td><td>—</td></tr>
+<tr><td>algorithmic_governance</td><td>0.5329</td><td>0.1711</td><td>0.8866</td><td>1</td><td>—</td></tr>
+</tbody></table></div>
+</td></tr>
+<tr class='series-row' data-chain='no' data-push='0.1776'>
+<td><b>synthetic_systems</b></td>
+<td>1.845</td>
+<td><b>2.400</b></td>
+<td><span class='status'><span class='sdot on'></span>持續中</span></td>
+<td><span class='muted'>no</span></td>
+<td><span class='badge'>offworld_expansion</span></td>
+<td>0.36</td>
+<td>0.1776</td>
+<td>9</td>
+<td>0</td>
+<td><button class='top3-btn' data-target='top3_synthetic_systems'>Top-3</button></td>
+</tr>
+<tr class='top3-row' id='top3_synthetic_systems'><td colspan='11'>
+<div class='top3-box'><table class='top3-table'>
+<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
+<tr><td>offworld_expansion</td><td>0.3591</td><td>0.1776</td><td>0.3475</td><td>1</td><td>—</td></tr>
+<tr><td>identity_data</td><td>0.5549</td><td>0.1552</td><td>4.1751</td><td>1</td><td>—</td></tr>
+<tr><td>monetary_infrastructure</td><td>0.5999</td><td>0.1188</td><td>4.1532</td><td>1</td><td>—</td></tr>
+</tbody></table></div>
+</td></tr>
+<tr class='series-row' data-chain='YES' data-push='0.3489'>
+<td><b>algorithmic_governance</b></td>
+<td>1.515</td>
+<td><b>2.184</b></td>
+<td><span class='status'><span class='sdot on'></span>持續中</span></td>
+<td><span class='badge black'>YES</span></td>
+<td><span class='badge'>human_manifesto</span></td>
+<td>0.61</td>
+<td>0.3489</td>
+<td>10</td>
+<td>2</td>
+<td><button class='top3-btn' data-target='top3_algorithmic_governance'>Top-3</button></td>
+</tr>
+<tr class='top3-row' id='top3_algorithmic_governance'><td colspan='11'>
+<div class='top3-box'><table class='top3-table'>
+<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
+<tr><td>human_manifesto</td><td>0.6113</td><td>0.3489</td><td>1.6631</td><td>1</td><td>—</td></tr>
+<tr><td>offworld_expansion</td><td>0.7059</td><td>0.1171</td><td>0.9364</td><td>1</td><td>—</td></tr>
+<tr><td>civilization_resilience</td><td>0.7752</td><td>0.0796</td><td>0.6345</td><td>1</td><td>—</td></tr>
+</tbody></table></div>
+</td></tr>
+<tr class='series-row' data-chain='no' data-push='0.1225'>
 <td><b>civilization</b></td>
 <td>0.000</td>
-<td><b>0.000</b></td>
-<td><span class='status'><span class='sdot'></span>平穩</span></td>
+<td><b>0.248</b></td>
+<td><span class='status'><span class='sdot on'></span>平穩</span></td>
 <td><span class='muted'>no</span></td>
-<td><span class='badge'>—</span></td>
-<td>0.00</td>
-<td>0.0000</td>
+<td><span class='badge'>monetary_infrastructure</span></td>
+<td>0.52</td>
+<td>0.1225</td>
 <td>0</td>
 <td>0</td>
 <td><button class='top3-btn' data-target='top3_civilization'>Top-3</button></td>
 </tr>
 <tr class='top3-row' id='top3_civilization'><td colspan='11'>
-<div class='top3-box'><span class='muted'>無 Top-3 edges</span></div>
+<div class='top3-box'><table class='top3-table'>
+<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
+<tr><td>monetary_infrastructure</td><td>0.5240</td><td>0.1225</td><td>3.5443</td><td>1</td><td>—</td></tr>
+<tr><td>synthetic_systems</td><td>0.6318</td><td>0.1210</td><td>2.9235</td><td>1</td><td>—</td></tr>
+<tr><td>identity_data</td><td>0.5151</td><td>0.0042</td><td>1.9052</td><td>1</td><td>—</td></tr>
+</tbody></table></div>
 </td></tr>
-<tr class='series-row' data-chain='no' data-push='0.0000'>
+<tr class='series-row' data-chain='YES' data-push='0.0963'>
 <td><b>governance</b></td>
 <td>0.000</td>
-<td><b>0.000</b></td>
-<td><span class='status'><span class='sdot'></span>平穩</span></td>
-<td><span class='muted'>no</span></td>
-<td><span class='badge'>—</span></td>
-<td>0.00</td>
-<td>0.0000</td>
+<td><b>0.191</b></td>
+<td><span class='status'><span class='sdot on'></span>平穩</span></td>
+<td><span class='badge black'>YES</span></td>
+<td><span class='badge'>synthetic_systems</span></td>
+<td>0.60</td>
+<td>0.0963</td>
 <td>0</td>
 <td>0</td>
 <td><button class='top3-btn' data-target='top3_governance'>Top-3</button></td>
 </tr>
 <tr class='top3-row' id='top3_governance'><td colspan='11'>
-<div class='top3-box'><span class='muted'>無 Top-3 edges</span></div>
+<div class='top3-box'><table class='top3-table'>
+<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
+<tr><td>synthetic_systems</td><td>0.6002</td><td>0.0963</td><td>1.8707</td><td>1</td><td>—</td></tr>
+<tr><td>monetary_infrastructure</td><td>0.5509</td><td>0.0927</td><td>4.1095</td><td>1</td><td>—</td></tr>
+<tr><td>identity_data</td><td>0.6299</td><td>0.0017</td><td>3.1108</td><td>1</td><td>—</td></tr>
+</tbody></table></div>
 </td></tr>
 </tbody></table>
 

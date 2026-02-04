@@ -13,6 +13,7 @@ ALPHA = 0.8   # A 放大係數
 BETA = 1.2    # D 放大係數
 K = 16        # W 回看 slot 數（16*30m=8小時）
 DECAY = 0.92  # 指數衰減：越近權重越大
+A_WINDOW = 16  # A per-domain rolling window (slots)
 
 LEVEL_RANK = {"L1": 1, "L2": 2, "L3": 3}
 
@@ -119,9 +120,6 @@ def main():
         if level_max == "L3":
             by_slot_domains_L3[ts].add(domain)
 
-    # baseline：用全期間中位數（v0.2 demo 先這樣，之後可改 rolling 7d）
-    baseline = {d: (median(hs) if hs else 0.0) for d, hs in by_domain_heat.items()}
-
     # slot active domains
     slot_active = defaultdict(set)
     for ts, domain, *_ in tmp:
@@ -153,23 +151,46 @@ def main():
         )
     """)
 
-    # 逐筆算 A/D/Hstar，收集成 per-domain 序列，最後再算 W
+    # 逐筆收集 per-domain 序列，最後再算 A/D/Hstar/W
     per_domain_seq = defaultdict(list)
 
     for ts, domain, series, req, sig, notes, level_max, heat, matched_json in tmp:
-        base = baseline.get(domain, 0.0)
-        A = math.log((heat + EPS) / (base + EPS))
-        D = float(slot_D.get(ts, 0.0))
-        Hstar = heat * (1.0 + ALPHA * max(A, 0.0)) * (1.0 + BETA * D)
-
-        per_domain_seq[domain].append((ts, domain, series, req, sig, level_max, heat, A, D, Hstar, matched_json))
+        per_domain_seq[domain].append((ts, domain, series, req, sig, level_max, heat, matched_json))
 
     inserts = []
     for domain, seq in per_domain_seq.items():
         seq.sort(key=lambda x: x[0])  # ts ISO 字串可直接排序
-        hstars = [x[9] for x in seq]
+        heats = [x[6] for x in seq]
+        hstars = []
+        computed = []
 
         for i, item in enumerate(seq):
+            ts, domain, series, req, sig, level_max, heat, matched_json = item
+            start = max(0, i - A_WINDOW + 1)
+            window = heats[start:i + 1]
+            if window:
+                med = median(window)
+                mad = median([abs(x - med) for x in window])
+                scale = 1.4826 * mad
+                if scale < EPS:
+                    mean = sum(window) / len(window)
+                    var = sum((x - mean) ** 2 for x in window) / max(1, len(window))
+                    scale = math.sqrt(var)
+                    center = mean
+                else:
+                    center = med
+            else:
+                center = 0.0
+                scale = 0.0
+
+            A = (heat - center) / (scale + EPS)
+            D = float(slot_D.get(ts, 0.0))
+            Hstar = heat * (1.0 + ALPHA * max(A, 0.0)) * (1.0 + BETA * D)
+
+            computed.append((ts, domain, series, req, sig, level_max, heat, A, D, Hstar, matched_json))
+            hstars.append(Hstar)
+
+        for i, item in enumerate(computed):
             ts, domain, series, req, sig, level_max, heat, A, D, Hstar, matched_json = item
 
             w = 0.0

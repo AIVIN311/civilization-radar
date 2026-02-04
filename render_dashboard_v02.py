@@ -6,9 +6,13 @@ DB_PATH = "radar.db"
 OUT_HTML = "dashboard_v02.html"
 
 # ======= thresholds (v0.3) =======
-TH_BG = 1.20     # 背景/可疑
-TH_SUS = 1.80    # 可疑/警戒
-TH_ALR = 2.30    # 警戒/事件
+TH_BG = 1.20     # 背景/可疑 (W for series status)
+TH_SUS = 1.80    # 可疑/警戒 (W for series status)
+TH_ALR = 2.30    # 警戒/事件 (W for series status)
+
+A_BG = 1.0
+A_SUS = 2.0
+A_ALR = 3.0
 
 SPARK_K = 16
 
@@ -28,16 +32,13 @@ def columns_of(cur, table_name: str):
     return [c[1] for c in cols]
 
 
-def risk_bucket(W, level):
-    w = float(W or 0.0)
-    if (level or "") == "L3":
-        w += 0.08  # L3 微偏置
-
-    if w >= TH_ALR:
+def risk_bucket(A):
+    a = float(A or 0.0)
+    if a >= A_ALR:
         return "r-red", "事件"
-    if w >= TH_SUS:
+    if a >= A_SUS:
         return "r-orange", "警戒"
-    if w >= TH_BG:
+    if a >= A_BG:
         return "r-yellow", "可疑"
     return "r-green", "背景"
 
@@ -102,10 +103,12 @@ def fetch_topk_edges_latest(cur, topk: int = 3):
 
     share_col = "share" if "share" in cols else ("corr" if "corr" in cols else None)
     push_col = "push" if "push" in cols else None
+    push_raw_col = "push_raw" if "push_raw" in cols else None
     domain_col = "domain" if "domain" in cols else None
 
     share_expr = share_col if share_col else "0.0"
     push_expr = push_col if push_col else "0.0"
+    push_raw_expr = push_raw_col if push_raw_col else "0.0"
     domain_expr = domain_col if domain_col else "''"
 
     sql = f"""
@@ -115,6 +118,7 @@ def fetch_topk_edges_latest(cur, topk: int = 3):
         src_series,
         SUM({share_expr}) AS share_sum,
         SUM({push_expr}) AS push_sum,
+        SUM({push_raw_expr}) AS push_raw_sum,
         COUNT(*) AS edge_n,
         GROUP_CONCAT({domain_expr}, ', ') AS domains_csv
       FROM v03_chain_edges_latest
@@ -122,11 +126,11 @@ def fetch_topk_edges_latest(cur, topk: int = 3):
     ),
     ranked AS (
       SELECT
-        dst_series, src_series, share_sum, push_sum, edge_n, domains_csv,
+        dst_series, src_series, share_sum, push_sum, push_raw_sum, edge_n, domains_csv,
         ROW_NUMBER() OVER (PARTITION BY dst_series ORDER BY push_sum DESC) AS rn
       FROM agg
     )
-    SELECT dst_series, src_series, share_sum, push_sum, edge_n, COALESCE(domains_csv, '') AS domains_csv
+    SELECT dst_series, src_series, share_sum, push_sum, push_raw_sum, edge_n, COALESCE(domains_csv, '') AS domains_csv
     FROM ranked
     WHERE rn <= ?
     ORDER BY dst_series, rn
@@ -134,12 +138,13 @@ def fetch_topk_edges_latest(cur, topk: int = 3):
 
     rows = cur.execute(sql, (topk,)).fetchall()
     out = {}
-    for dst, src, share_sum, push_sum, edge_n, domains_csv in rows:
+    for dst, src, share_sum, push_sum, push_raw_sum, edge_n, domains_csv in rows:
         out.setdefault(dst, []).append(
             {
                 "src_series": src,
                 "share_sum": float(share_sum or 0.0),
                 "push_sum": float(push_sum or 0.0),
+                "push_raw": float(push_raw_sum or 0.0) if push_raw_col else None,
                 "edge_n": int(edge_n or 0),
                 "domains_csv": domains_csv or "",
             }
@@ -238,7 +243,7 @@ def main():
         # series, W_avg, W_proj, status, chain_flag, top_src, share, push, domains, L3_domains, ts
         scol = columns_of(cur, chosen)
         # build select defensively
-        want = ["series", "W_avg", "W_proj", "status", "chain_flag", "top_src", "share", "push", "domains", "L3_domains"]
+        want = ["series", "W_avg", "W_proj", "status", "chain_flag", "top_src", "share", "push", "push_raw", "domains", "L3_domains"]
         got = [c for c in want if c in scol]
 
         # filter by latest ts if exists
@@ -348,7 +353,7 @@ a:hover{text-decoration:underline}
     html.append(
         f"<div class=meta>"
         f"最新時段：{escape(str(latest))} · sparkline 回看 {SPARK_K} slots<br>"
-        f"門檻：背景&lt;{TH_BG:.2f}，可疑≥{TH_BG:.2f}，警戒≥{TH_SUS:.2f}，事件≥{TH_ALR:.2f}（L3 微偏置）<br>"
+        f"門檻（A 自適應）：背景&lt;{A_BG:.1f}，可疑≥{A_BG:.1f}，警戒≥{A_SUS:.1f}，事件≥{A_ALR:.1f}<br>"
         f"鏈式資料：{'已載入' if chain_loaded else '未載入（目前使用 v02_series_latest）'}"
         f"</div>"
     )
@@ -371,7 +376,7 @@ a:hover{text-decoration:underline}
     html.append("<div class='card left'>")
     html.append("<h3 style='margin:4px 0 10px'>領域預警榜</h3>")
     html.append("<table id=domainTable><thead><tr>")
-    html.append("<th></th><th>Domain</th><th>Series</th><th>Level</th><th>W</th><th>Δ</th><th>Spark</th><th>Matched</th><th>Sig</th>")
+    html.append("<th></th><th>Domain</th><th>Series</th><th>Level</th><th>A</th><th>W</th><th>Δ</th><th>Spark</th><th>Matched</th><th>Sig</th>")
     if projected_col:
         html.append("<th>Projected</th>")
     html.append("</tr></thead><tbody>")
@@ -403,7 +408,8 @@ a:hover{text-decoration:underline}
         dw = Wv - prevw
         arr, cls = arrow(dw)
 
-        color, label = risk_bucket(Wv, (lv or "L1"))
+        Av = float(A or 0.0)
+        color, label = risk_bucket(Av)
         sp = svg_spark(spark.get(domain, []))
 
         # chain badge rendering (domain-level)
@@ -420,13 +426,15 @@ a:hover{text-decoration:underline}
         sig_esc = escape(str(sig or "—"))
         m_esc = escape(str(matched or ""))
 
+        l3_badge = " <span class='badge'>L3</span>" if str(lv or "").upper() == "L3" else ""
         html.append(
             f"<tr data-risk='{escape(label)}' data-level='{escape(str(lv or 'L1'))}' data-chain='{1 if chain_yes else 0}' "
             f"data-text='{escape(str(domain))} {escape(str(series or ''))} {escape(str(sig or ''))}'>"
             f"<td><span class='dot {color}'></span></td>"
             f"<td><a href='https://{d_esc}/' target='_blank' rel='noopener noreferrer'>{d_esc}</a></td>"
             f"<td>{s_esc}{chain_badge}</td>"
-            f"<td class='lv {escape(str(lv or 'L1'))}'>{escape(str(lv or 'L1'))}</td>"
+            f"<td>{escape(label)}{l3_badge}</td>"
+            f"<td><small>{Av:.2f}</small></td>"
             f"<td><b>{Wv:.3f}</b></td>"
             f"<td><span class='delta {cls}'>{arr} {dw:+.3f}</span></td>"
             f"<td class='spark'>{sp}</td>"
@@ -461,20 +469,18 @@ a:hover{text-decoration:underline}
                     "</tr></thead><tbody>")
 
         for r in series_rows:
-            # columns may vary; map by position via got list
-            # but we selected in fixed order in query
-            # expected order:
-            # series, W_avg, W_proj, status, chain_flag, top_src, share, push, domains, L3_domains
-            series = r[0] if len(r) > 0 else "—"
-            W_avg = r[1] if len(r) > 1 else 0.0
-            W_proj = r[2] if len(r) > 2 else W_avg
-            status = r[3] if len(r) > 3 else ""
-            chain_flag = r[4] if len(r) > 4 else 0
-            top_src = r[5] if len(r) > 5 else "—"
-            share = r[6] if len(r) > 6 else 0.0
-            push = r[7] if len(r) > 7 else 0.0
-            doms = r[8] if len(r) > 8 else 0
-            l3 = r[9] if len(r) > 9 else 0
+            idx = {name: i for i, name in enumerate(got)}
+            series = r[idx["series"]] if "series" in idx else "—"
+            W_avg = r[idx["W_avg"]] if "W_avg" in idx else 0.0
+            W_proj = r[idx["W_proj"]] if "W_proj" in idx else W_avg
+            status = r[idx["status"]] if "status" in idx else ""
+            chain_flag = r[idx["chain_flag"]] if "chain_flag" in idx else 0
+            top_src = r[idx["top_src"]] if "top_src" in idx else "—"
+            share = r[idx["share"]] if "share" in idx else 0.0
+            push = r[idx["push"]] if "push" in idx else 0.0
+            push_raw = r[idx["push_raw"]] if "push_raw" in idx else None
+            doms = r[idx["domains"]] if "domains" in idx else 0
+            l3 = r[idx["L3_domains"]] if "L3_domains" in idx else 0
 
             # status fallback
             try:
@@ -513,17 +519,33 @@ a:hover{text-decoration:underline}
             html.append(f"<tr class='top3-row' id='{top3_id}'><td colspan='11'>")
             if edges:
                 html.append("<div class='top3-box'><table class='top3-table'>")
-                html.append("<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>edge_n</th><th>domains</th></tr></thead><tbody>")
+                has_raw = any(e.get("push_raw") is not None for e in edges)
+                if has_raw:
+                    html.append("<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>")
+                else:
+                    html.append("<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>edge_n</th><th>domains</th></tr></thead><tbody>")
                 for e in edges:
-                    html.append(
-                        "<tr>"
-                        f"<td>{escape(str(e.get('src_series') or '—'))}</td>"
-                        f"<td>{float(e.get('share_sum') or 0.0):.4f}</td>"
-                        f"<td>{float(e.get('push_sum') or 0.0):.4f}</td>"
-                        f"<td>{int(e.get('edge_n') or 0)}</td>"
-                        f"<td>{escape(preview_domains(e.get('domains_csv') or ''))}</td>"
-                        "</tr>"
-                    )
+                    if has_raw:
+                        html.append(
+                            "<tr>"
+                            f"<td>{escape(str(e.get('src_series') or '—'))}</td>"
+                            f"<td>{float(e.get('share_sum') or 0.0):.4f}</td>"
+                            f"<td>{float(e.get('push_sum') or 0.0):.4f}</td>"
+                            f"<td>{float(e.get('push_raw') or 0.0):.4f}</td>"
+                            f"<td>{int(e.get('edge_n') or 0)}</td>"
+                            f"<td>{escape(preview_domains(e.get('domains_csv') or ''))}</td>"
+                            "</tr>"
+                        )
+                    else:
+                        html.append(
+                            "<tr>"
+                            f"<td>{escape(str(e.get('src_series') or '—'))}</td>"
+                            f"<td>{float(e.get('share_sum') or 0.0):.4f}</td>"
+                            f"<td>{float(e.get('push_sum') or 0.0):.4f}</td>"
+                            f"<td>{int(e.get('edge_n') or 0)}</td>"
+                            f"<td>{escape(preview_domains(e.get('domains_csv') or ''))}</td>"
+                            "</tr>"
+                        )
                 html.append("</tbody></table></div>")
             else:
                 html.append("<div class='top3-box'><span class='muted'>無 Top-3 edges</span></div>")
