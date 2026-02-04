@@ -1,0 +1,49 @@
+{
+  "version": "v1.0",
+  "slot_minutes": 30,
+  "series_nodes": [
+    "algorithmic_governance",
+    "monetary_infrastructure",
+    "identity_data",
+    "civilization_resilience",
+    "offworld_expansion",
+    "synthetic_systems",
+    "human_manifesto"
+  ],
+  "thresholds": {
+    "bg": 1.20,
+    "sus": 1.80,
+    "alr": 2.30
+  },
+  "push_model": {
+    "use_delta_w": true,
+    "delta_mode": "diff",
+    "eps": 1e-09,
+    "source_activation": "over_bg",
+    "decay": 0.85,
+    "min_share_to_call_chain": 0.55
+  },
+  "edges": [
+    { "src": "synthetic_systems", "dst": "monetary_infrastructure", "w": 0.85, "lag": 1 },
+    { "src": "synthetic_systems", "dst": "algorithmic_governance", "w": 0.75, "lag": 1 },
+    { "src": "synthetic_systems", "dst": "identity_data", "w": 0.70, "lag": 1 },
+
+    { "src": "monetary_infrastructure", "dst": "algorithmic_governance", "w": 0.70, "lag": 1 },
+    { "src": "monetary_infrastructure", "dst": "civilization_resilience", "w": 0.60, "lag": 1 },
+
+    { "src": "algorithmic_governance", "dst": "identity_data", "w": 0.65, "lag": 1 },
+    { "src": "algorithmic_governance", "dst": "human_manifesto", "w": 0.55, "lag": 1 },
+
+    { "src": "identity_data", "dst": "human_manifesto", "w": 0.55, "lag": 1 },
+    { "src": "identity_data", "dst": "civilization_resilience", "w": 0.55, "lag": 1 },
+
+    { "src": "civilization_resilience", "dst": "algorithmic_governance", "w": 0.45, "lag": 1 },
+    { "src": "civilization_resilience", "dst": "offworld_expansion", "w": 0.50, "lag": 2 },
+
+    { "src": "offworld_expansion", "dst": "monetary_infrastructure", "w": 0.50, "lag": 2 },
+    { "src": "offworld_expansion", "dst": "algorithmic_governance", "w": 0.45, "lag": 2 },
+
+    { "src": "human_manifesto", "dst": "algorithmic_governance", "w": 0.35, "lag": 1 },
+    { "src": "human_manifesto", "dst": "civilization_resilience", "w": 0.40, "lag": 1 }
+  ]
+}

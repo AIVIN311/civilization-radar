@@ -1,0 +1,110 @@
+{
+  "version": "v1.0",
+  "ts": "2026-02-04T06:00:00+08:00",
+  "prev_ts": "2026-02-04T05:30:00+08:00",
+  "thresholds": {
+    "bg": 1.2,
+    "sus": 1.8,
+    "alr": 2.3
+  },
+  "series": {
+    "algorithmic_governance": {
+      "W_base": 1.515095,
+      "dW": -0.056011,
+      "push_in": 0.146749,
+      "push_in_decay": 0.124737,
+      "W_projected": 1.639831,
+      "top_src": "civilization_resilience",
+      "top_src_share": 0.447838,
+      "is_chain_driven": false,
+      "contributors": {
+        "civilization_resilience": 0.06572,
+        "offworld_expansion": 0.032937,
+        "synthetic_systems": 0.031642,
+        "human_manifesto": 0.01645,
+        "monetary_infrastructure": 0.0
+      }
+    },
+    "monetary_infrastructure": {
+      "W_base": 1.887914,
+      "dW": -0.047172,
+      "push_in": 0.072458,
+      "push_in_decay": 0.061589,
+      "W_projected": 1.949503,
+      "top_src": "offworld_expansion",
+      "top_src_share": 0.505076,
+      "is_chain_driven": false,
+      "contributors": {
+        "offworld_expansion": 0.036597,
+        "synthetic_systems": 0.035861
+      }
+    },
+    "identity_data": {
+      "W_base": 1.253427,
+      "dW": -0.082926,
+      "push_in": 0.029533,
+      "push_in_decay": 0.025103,
+      "W_projected": 1.27853,
+      "top_src": "synthetic_systems",
+      "top_src_share": 1.0,
+      "is_chain_driven": true,
+      "contributors": {
+        "synthetic_systems": 0.029533,
+        "algorithmic_governance": 0.0
+      }
+    },
+    "civilization_resilience": {
+      "W_base": 1.833874,
+      "dW": 0.230399,
+      "push_in": 0.0188,
+      "push_in_decay": 0.01598,
+      "W_projected": 1.849854,
+      "top_src": "human_manifesto",
+      "top_src_share": 1.0,
+      "is_chain_driven": true,
+      "contributors": {
+        "human_manifesto": 0.0188,
+        "monetary_infrastructure": 0.0,
+        "identity_data": 0.0
+      }
+    },
+    "offworld_expansion": {
+      "W_base": 1.706654,
+      "dW": 0.144464,
+      "push_in": 0.073022,
+      "push_in_decay": 0.062069,
+      "W_projected": 1.768722,
+      "top_src": "civilization_resilience",
+      "top_src_share": 1.0,
+      "is_chain_driven": true,
+      "contributors": {
+        "civilization_resilience": 0.073022
+      }
+    },
+    "synthetic_systems": {
+      "W_base": 1.844981,
+      "dW": 0.065412,
+      "push_in": 0.0,
+      "push_in_decay": 0.0,
+      "W_projected": 1.844981,
+      "top_src": null,
+      "top_src_share": 0.0,
+      "is_chain_driven": false,
+      "contributors": {}
+    },
+    "human_manifesto": {
+      "W_base": 1.730894,
+      "dW": 0.08853,
+      "push_in": 0.0,
+      "push_in_decay": 0.0,
+      "W_projected": 1.730894,
+      "top_src": null,
+      "top_src_share": 0.0,
+      "is_chain_driven": false,
+      "contributors": {
+        "algorithmic_governance": 0.0,
+        "identity_data": 0.0
+      }
+    }
+  }
+}

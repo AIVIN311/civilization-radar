@@ -1,0 +1,89 @@
+{
+  "ts": "2026-02-04T06:00:00+08:00",
+  "events": {
+    "algorithmic_governance": {
+      "base_bucket": "suspect",
+      "proj_bucket": "suspect",
+      "status": "steady",
+      "is_chain_event": false,
+      "top_src": "civilization_resilience",
+      "top_src_share": 0.447838,
+      "dW": -0.056011,
+      "push_in": 0.146749,
+      "W_base": 1.515095,
+      "W_projected": 1.639831
+    },
+    "monetary_infrastructure": {
+      "base_bucket": "alert",
+      "proj_bucket": "alert",
+      "status": "ongoing",
+      "is_chain_event": false,
+      "top_src": "offworld_expansion",
+      "top_src_share": 0.505076,
+      "dW": -0.047172,
+      "push_in": 0.072458,
+      "W_base": 1.887914,
+      "W_projected": 1.949503
+    },
+    "identity_data": {
+      "base_bucket": "suspect",
+      "proj_bucket": "suspect",
+      "status": "steady",
+      "is_chain_event": false,
+      "top_src": "synthetic_systems",
+      "top_src_share": 1.0,
+      "dW": -0.082926,
+      "push_in": 0.029533,
+      "W_base": 1.253427,
+      "W_projected": 1.27853
+    },
+    "civilization_resilience": {
+      "base_bucket": "alert",
+      "proj_bucket": "alert",
+      "status": "ongoing",
+      "is_chain_event": true,
+      "top_src": "human_manifesto",
+      "top_src_share": 1.0,
+      "dW": 0.230399,
+      "push_in": 0.0188,
+      "W_base": 1.833874,
+      "W_projected": 1.849854
+    },
+    "offworld_expansion": {
+      "base_bucket": "suspect",
+      "proj_bucket": "suspect",
+      "status": "steady",
+      "is_chain_event": false,
+      "top_src": "civilization_resilience",
+      "top_src_share": 1.0,
+      "dW": 0.144464,
+      "push_in": 0.073022,
+      "W_base": 1.706654,
+      "W_projected": 1.768722
+    },
+    "synthetic_systems": {
+      "base_bucket": "alert",
+      "proj_bucket": "alert",
+      "status": "ongoing",
+      "is_chain_event": false,
+      "top_src": null,
+      "top_src_share": 0.0,
+      "dW": 0.065412,
+      "push_in": 0.0,
+      "W_base": 1.844981,
+      "W_projected": 1.844981
+    },
+    "human_manifesto": {
+      "base_bucket": "suspect",
+      "proj_bucket": "suspect",
+      "status": "steady",
+      "is_chain_event": false,
+      "top_src": null,
+      "top_src_share": 0.0,
+      "dW": 0.08853,
+      "push_in": 0.0,
+      "W_base": 1.730894,
+      "W_projected": 1.730894
+    }
+  }
+}
