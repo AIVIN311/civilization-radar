@@ -199,7 +199,7 @@ def main():
 
             inc_sum = sum(float(r[2] or 0.0) for r in incoming)
             W_proj = W + inc_sum
-            slot_key = ts_now
+            slot_key = ts_now[:13]
             forcing = float(E_DECAY.get(slot_key, {}).get(dst, 0.0))
             if DEBUG_EVENT_FORCING and forcing > 0:
                 print("FORCING HIT", slot_key, dst, forcing)
@@ -278,7 +278,7 @@ def main():
 
             inc_sum = sum(float(r[2] or 0.0) for r in incoming)
             W_proj = W + inc_sum
-            slot_key = latest_ts
+            slot_key = latest_ts[:13]
             forcing = float(E_DECAY.get(slot_key, {}).get(dst, 0.0))
             if DEBUG_EVENT_FORCING and forcing > 0:
                 print("FORCING HIT", slot_key, dst, forcing)
