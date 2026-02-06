@@ -1,7 +1,7 @@
 import os
 import requests
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -20,30 +20,47 @@ def graphql(query, variables={}):
         "variables": variables
     })
     r.raise_for_status()
-    return r.json()
+    j = r.json()
+
+    # ✅ 這行是關鍵：Cloudflare 有 errors 時，data 會是 null
+    if j.get("errors"):
+        print("❌ Cloudflare GraphQL errors:")
+        print(json.dumps(j["errors"], ensure_ascii=False, indent=2))
+        raise SystemExit("GraphQL query failed (see errors above).")
+
+    if j.get("data") is None:
+        print("❌ GraphQL returned data=None, raw response:")
+        print(json.dumps(j, ensure_ascii=False, indent=2))
+        raise SystemExit("GraphQL returned no data.")
+
+    return j["data"]
 
 def get_zones():
-    url = "https://api.cloudflare.com/client/v4/zones"
-    r = requests.get(url, headers=HEADERS)
-    r.raise_for_status()
-    return r.json()["result"]
-
-def fetch_daily(zone_id, since):
     query = """
-    query($zone: String!, $since: DateTime!) {
+    query {
       viewer {
-        zones(filter: {zoneTag: $zone}) {
-          httpRequests1dGroups(limit: 30, filter: {date_geq: $since}) {
-            dimensions { date }
-            sum {
-              requests
-              cachedRequests
-              uncachedRequests
-            }
-          }
+        zones {
+          zoneTag
+          name
         }
       }
     }
+    """
+    result = graphql(query)  # 這裡回的是 data
+    return result["viewer"]["zones"]
+
+def fetch_daily(zone_id, since):
+    query = """
+    query($zone: String!, $since: Date!) {
+  viewer {
+    zones(filter: {zoneTag: $zone}) {
+      httpRequests1dGroups(limit: 30, filter: {date_geq: $since}) {
+        dimensions { date }
+        sum { requests cachedRequests uncachedRequests }
+      }
+    }
+  }
+}
     """
     return graphql(query, {
         "zone": zone_id,
@@ -51,18 +68,18 @@ def fetch_daily(zone_id, since):
     })
 
 def main(days=7, out="daily_snapshots.jsonl"):
-    since = (datetime.utcnow() - timedelta(days=days)).strftime("%Y-%m-%d")
+    since = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
 
     zones = get_zones()
 
     with open(out, "w", encoding="utf-8") as f:
         for z in zones:
             name = z["name"]
-            zid = z["id"]
+            zid = z["zoneTag"]
 
             data = fetch_daily(zid, since)
 
-            groups = data["data"]["viewer"]["zones"][0]["httpRequests1dGroups"]
+            groups = data["viewer"]["zones"][0]["httpRequests1dGroups"]
 
             for g in groups:
                 row = {
