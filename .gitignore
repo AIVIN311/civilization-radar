@@ -1,9 +1,59 @@
+# =========================
+# Environment variables
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Node.js
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
 # Python
+# =========================
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+ENV/
+env/
 
-# Local database / generated
-*.db
+# =========================
+# Build / Output
+# =========================
+dist/
+build/
+out/
+output/
+coverage/
 
-# Generated HTML snapshots (optional)
-dashboard.html
+# =========================
+# Logs & runtime
+# =========================
+*.log
+*.pid
+*.seed
+
+# =========================
+# OS / Editor junk
+# =========================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# =========================
+# Temporary / cache
+# =========================
+.cache/
+.tmp/
+temp/
