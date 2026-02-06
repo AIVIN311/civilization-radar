@@ -13,6 +13,9 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 
 import matplotlib.pyplot as plt
+import matplotlib as mpl
+mpl.rcParams["font.sans-serif"] = ["Microsoft JhengHei", "SimHei", "Noto Sans CJK TC", "Arial Unicode MS", "DejaVu Sans"]
+mpl.rcParams["axes.unicode_minus"] = False
 from matplotlib.ticker import FuncFormatter
 
 
@@ -57,19 +60,26 @@ def clamp(v, lo, hi):
 def size_scale(score, max_score, mode="sqrt"):
     """
     Bubble size scaling for better "pressure terrain" readability.
-    - sqrt: good default
-    - log : stronger separation near small signals
+    mode:
+      - sqrt: default, good general
+      - log : log on raw score (VERY effective for lifting small signals)
     """
     if max_score <= 0:
         return 30
-    x = score / max_score
-    x = clamp(x, 0.0, 1.0)
+
+    score = max(0.0, float(score))
+    max_score = max(1.0, float(max_score))
 
     if mode == "log":
-        # log1p gives better separation near 0
-        return 30 + 970 * (math.log1p(9 * x) / math.log1p(9))
+        # ✅ key: log on score, not on normalized ratio
+        # This lifts small signals substantially.
+        x = math.log1p(score) / math.log1p(max_score)
+        x = clamp(x, 0.0, 1.0)
+        return 30 + 970 * x
 
-    # default sqrt
+    # default sqrt (on normalized)
+    x = score / max_score
+    x = clamp(x, 0.0, 1.0)
     return 30 + 970 * math.sqrt(x)
 
 
