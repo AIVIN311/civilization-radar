@@ -2,14 +2,18 @@
 # Read output/daily_snapshots.jsonl, aggregate by series_map.json, and render:
 # 1) pressure_heatcloud.png (文明壓力熱區雲)
 # 2) pulse_compare.png (全域 vs Top series 脈衝對比)
+# Also:
+# 3) unmapped_domains.txt (未映射網域清單，結構洞)
 
 import os
 import json
 import argparse
+import math
 from collections import defaultdict
 from datetime import datetime, timedelta
 
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 
 
 def load_jsonl(path: str) -> list[dict]:
@@ -50,6 +54,36 @@ def clamp(v, lo, hi):
     return max(lo, min(hi, v))
 
 
+def size_scale(score, max_score, mode="sqrt"):
+    """
+    Bubble size scaling for better "pressure terrain" readability.
+    - sqrt: good default
+    - log : stronger separation near small signals
+    """
+    if max_score <= 0:
+        return 30
+    x = score / max_score
+    x = clamp(x, 0.0, 1.0)
+
+    if mode == "log":
+        # log1p gives better separation near 0
+        return 30 + 970 * (math.log1p(9 * x) / math.log1p(9))
+
+    # default sqrt
+    return 30 + 970 * math.sqrt(x)
+
+
+def fmt_k(x, _):
+    """Format large numbers as 1.2k / 3.4M for axis."""
+    x = float(x)
+    ax = abs(x)
+    if ax >= 1_000_000:
+        return f"{x/1_000_000:.1f}M"
+    if ax >= 1_000:
+        return f"{x/1_000:.1f}k"
+    return f"{int(x)}"
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--in", dest="inp", default="output/daily_snapshots.jsonl", help="input jsonl")
@@ -57,6 +91,7 @@ def main():
     ap.add_argument("--outdir", default="output", help="output directory")
     ap.add_argument("--days", type=int, default=7, help="how many days to aggregate for heatcloud")
     ap.add_argument("--top", type=int, default=25, help="how many top domains to label")
+    ap.add_argument("--size-mode", choices=["sqrt", "log"], default="sqrt", help="bubble size scaling")
     args = ap.parse_args()
 
     os.makedirs(args.outdir, exist_ok=True)
@@ -93,7 +128,7 @@ def main():
     # pressure score:
     # - base = dns_total
     # - weight more if origin_served high (less cache / more "real hits" or more pressure on origin)
-    # score = dns_total * (1 + origin_ratio)
+    # score = dns_total * (1 + origin_ratio) * (0.7 + (1 - cache_ratio))
     scored = []
     for dom, s in dom_stat.items():
         dns_total = s["dns_total"]
@@ -102,47 +137,77 @@ def main():
         denom = max(1, dns_total)
         origin_ratio = origin / denom
         cache_ratio = cf / denom
+
         score = dns_total * (1.0 + origin_ratio) * (0.7 + (1 - cache_ratio))  # mild boost to non-cache
         series = smap.get(dom, "unmapped")
         scored.append((score, dom, series, dns_total, origin_ratio, cache_ratio))
 
     scored.sort(reverse=True, key=lambda x: x[0])
 
+    # ---- unmapped output (structure hole list) & exclude from heatcloud
+    unmapped = [t for t in scored if t[2] == "unmapped"]
+    if unmapped:
+        out_unmapped = os.path.join(args.outdir, "unmapped_domains.txt")
+        with open(out_unmapped, "w", encoding="utf-8") as f:
+            f.write(f"# unmapped domains (end={end.isoformat()}, window={args.days}d)\n")
+            for (score, dom, series, dns_total, origin_ratio, cache_ratio) in unmapped:
+                f.write(
+                    f"{dom}\tscore={score:.2f}\treq={dns_total}"
+                    f"\torigin%={origin_ratio:.2f}\tcache%={cache_ratio:.2f}\n"
+                )
+        print(f"✅ Wrote: {out_unmapped} (count={len(unmapped)})")
+
+    scored_plot = [t for t in scored if t[2] != "unmapped"]
+
     # ---- Figure 1: 文明壓力熱區雲 (scatter cloud)
-    # y-axis = series buckets
-    series_list = sorted({s for _, _, s, *_ in scored})
+    if not scored_plot:
+        raise SystemExit("No mapped domains to plot (all unmapped).")
+
+    series_list = sorted({s for _, _, s, *_ in scored_plot})
     y_index = {s: i for i, s in enumerate(series_list)}
 
-    xs = []
-    ys = []
-    sizes = []
-    labels = []
+    xs, ys, sizes = [], [], []
 
-    # normalize bubble sizes
-    if scored:
-        max_score = max(s[0] for s in scored) or 1.0
-    else:
-        max_score = 1.0
+    max_score = max(s[0] for s in scored_plot) or 1.0
 
-    for i, (score, dom, series, dns_total, origin_ratio, cache_ratio) in enumerate(scored):
+    for (score, dom, series, dns_total, origin_ratio, cache_ratio) in scored_plot:
         xs.append(score)
         ys.append(y_index[series])
-        # bubble size: scale with score
-        sz = 30 + 970 * (score / max_score)
-        sizes.append(sz)
-        labels.append(dom)
+        sizes.append(size_scale(score, max_score, mode=args.size_mode))
 
     plt.figure(figsize=(14, 8))
     plt.scatter(xs, ys, s=sizes, alpha=0.6)
+
     plt.yticks(range(len(series_list)), series_list)
     plt.xlabel(f"Pressure score (aggregate {args.days}d, end={end.isoformat()})")
     plt.title("文明壓力熱區雲 (Civilization Pressure Heatcloud)")
 
-    # annotate top N
-    for (score, dom, series, dns_total, origin_ratio, cache_ratio) in scored[: args.top]:
+    # Log scale for x-axis (visual improvement only)
+    plt.xscale("log")
+    plt.gca().xaxis.set_major_formatter(FuncFormatter(fmt_k))
+
+    # annotate:
+    # 1) global top N
+    top_global = scored_plot[: args.top]
+
+    # 2) ensure at least 1 label per series (best in series)
+    best_per_series = {}
+    for t in scored_plot:
+        s = t[2]
+        if s not in best_per_series:
+            best_per_series[s] = t
+
+    # merge picks (avoid duplicates)
+    pick = {t[1]: t for t in top_global}  # keyed by dom
+    for t in best_per_series.values():
+        pick.setdefault(t[1], t)
+
+    # small deterministic jitter to reduce overlap
+    for j, (score, dom, series, dns_total, origin_ratio, cache_ratio) in enumerate(pick.values()):
         y = y_index[series]
+        dy = ((j % 5) - 2) * 0.06  # -0.12 ~ +0.12
         txt = f"{dom}\nreq={dns_total}  origin%={origin_ratio:.2f}"
-        plt.text(score, y + 0.08, txt, fontsize=8)
+        plt.text(score, y + 0.12 + dy, txt, fontsize=8)
 
     out1 = os.path.join(args.outdir, "pressure_heatcloud.png")
     plt.tight_layout()
@@ -150,7 +215,6 @@ def main():
     plt.close()
 
     # ---- Figure 2: pulse compare (global vs top series)
-    # build daily totals for last max(args.days, 14) days to see rhythm
     pulse_days = max(args.days, 14)
     p_start = end - timedelta(days=pulse_days - 1)
 
@@ -203,6 +267,7 @@ def main():
     print(f" - {out2}")
     print(f"✅ Window for heatcloud: {start.isoformat()} ~ {end.isoformat()} ({args.days} days)")
     print(f"✅ Top series in pulse: {top_series}")
+    print("✅ Done.")
 
 
 if __name__ == "__main__":
