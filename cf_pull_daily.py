@@ -1,28 +1,38 @@
 import os
-import requests
 import json
+import requests
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 
+# ---------- Config ----------
 load_dotenv()
 TOKEN = os.getenv("CF_API_TOKEN")
+
+if not TOKEN:
+    raise SystemExit("❌ CF_API_TOKEN not found. Put it in .env as CF_API_TOKEN=xxxxx")
 
 HEADERS = {
     "Authorization": f"Bearer {TOKEN}",
     "Content-Type": "application/json"
 }
 
-API = "https://api.cloudflare.com/client/v4/graphql"
+API_GQL = "https://api.cloudflare.com/client/v4/graphql"
+API_ZONES = "https://api.cloudflare.com/client/v4/zones"
 
-def graphql(query, variables={}):
-    r = requests.post(API, headers=HEADERS, json={
-        "query": query,
-        "variables": variables
-    })
+
+# ---------- Helpers ----------
+def graphql(query: str, variables: dict | None = None) -> dict:
+    variables = variables or {}
+    r = requests.post(
+        API_GQL,
+        headers=HEADERS,
+        json={"query": query, "variables": variables},
+        timeout=60
+    )
     r.raise_for_status()
     j = r.json()
 
-    # ✅ 這行是關鍵：Cloudflare 有 errors 時，data 會是 null
+    # Cloudflare GraphQL: if errors exist, data can be null
     if j.get("errors"):
         print("❌ Cloudflare GraphQL errors:")
         print(json.dumps(j["errors"], ensure_ascii=False, indent=2))
@@ -35,71 +45,104 @@ def graphql(query, variables={}):
 
     return j["data"]
 
-def get_zones():
+
+def get_zones(per_page: int = 200) -> list[dict]:
+    # REST is the most stable way to list zones (works regardless of GraphQL schema differences)
+    url = f"{API_ZONES}?per_page={per_page}"
+    r = requests.get(url, headers=HEADERS, timeout=30)
+    r.raise_for_status()
+    j = r.json()
+
+    if not j.get("success"):
+        print("❌ REST /zones failed:")
+        print(json.dumps(j, ensure_ascii=False, indent=2))
+        raise SystemExit("REST zones failed.")
+
+    return j["result"]  # list of {id,name,...}
+
+
+def fetch_daily_http(zone_id: str, since_date: str) -> list[dict]:
+    """
+    Return list of daily groups:
+      [{ "date": "YYYY-MM-DD", "requests": int, "cachedRequests": int }, ...]
+    """
     query = """
-    query {
+    query($zone: String!, $since: Date!) {
       viewer {
-        zones {
-          zoneTag
-          name
+        zones(filter: {zoneTag: $zone}) {
+          httpRequests1dGroups(limit: 30, filter: {date_geq: $since}) {
+            dimensions { date }
+            sum {
+              requests
+              cachedRequests
+            }
+          }
         }
       }
     }
     """
-    result = graphql(query)  # 這裡回的是 data
-    return result["viewer"]["zones"]
+    data = graphql(query, {"zone": zone_id, "since": since_date})
 
-def fetch_daily(zone_id, since):
-    query = """
-    query($zone: String!, $since: Date!) {
-  viewer {
-    zones(filter: {zoneTag: $zone}) {
-      httpRequests1dGroups(limit: 30, filter: {date_geq: $since}) {
-        dimensions { date }
-        sum { requests cachedRequests uncachedRequests }
-      }
-    }
-  }
-}
-    """
-    return graphql(query, {
-        "zone": zone_id,
-        "since": since
-    })
+    zones = data.get("viewer", {}).get("zones", [])
+    if not zones:
+        return []
 
-def main(days=7, out="daily_snapshots.jsonl"):
+    groups = zones[0].get("httpRequests1dGroups", [])
+    out = []
+    for g in groups:
+        out.append({
+            "date": g["dimensions"]["date"],
+            "requests": g["sum"].get("requests", 0) or 0,
+            "cachedRequests": g["sum"].get("cachedRequests", 0) or 0
+        })
+    return out
+
+
+# ---------- Main ----------
+def main(days: int = 7, out: str = "daily_snapshots.jsonl"):
     since = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
 
     zones = get_zones()
+    if not zones:
+        raise SystemExit("❌ No zones returned. Check token permissions / resources scope.")
+
+    written = 0
 
     with open(out, "w", encoding="utf-8") as f:
         for z in zones:
-            name = z["name"]
-            zid = z["zoneTag"]
+            name = z.get("name")
+            zid = z.get("id")
+            if not name or not zid:
+                continue
 
-            data = fetch_daily(zid, since)
+            groups = fetch_daily_http(zid, since)
 
-            groups = data["viewer"]["zones"][0]["httpRequests1dGroups"]
-
+            # some zones may have no analytics data (new / empty / filtered)
             for g in groups:
+                req = g["requests"]
+                cf = g["cachedRequests"]
+                origin = req - cf
+                if origin < 0:
+                    origin = 0  # safety
+
                 row = {
-                    "date": g["dimensions"]["date"],
+                    "date": g["date"],
                     "domain": name,
-                    "dns_total": g["sum"]["requests"],
-                    "cf_served": g["sum"]["cachedRequests"],
-                    "origin_served": g["sum"]["uncachedRequests"],
+                    "dns_total": req,          # 你後面壓力場仍沿用這個 key
+                    "cf_served": cf,
+                    "origin_served": origin,
+                    "edge_origin_ratio": (round(cf / origin, 4) if origin > 0 else None),
                 }
 
-                if row["origin_served"] > 0:
-                    row["edge_origin_ratio"] = round(
-                        row["cf_served"] / row["origin_served"], 4
-                    )
-                else:
-                    row["edge_origin_ratio"] = None
-
                 f.write(json.dumps(row, ensure_ascii=False) + "\n")
+                written += 1
 
-    print("✅ daily_snapshots.jsonl generated")
+    print(f"✅ daily_snapshots.jsonl generated: {out}")
+    print(f"✅ rows written: {written}")
+    print(f"✅ zones scanned: {len(zones)}")
+    print(f"✅ since: {since} (UTC)")
+
 
 if __name__ == "__main__":
     main()
+
