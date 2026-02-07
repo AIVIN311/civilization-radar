@@ -1,5 +1,6 @@
 import re
 import sqlite3
+import math
 from html import escape
 import sys
 sys.path.append(".")
@@ -19,6 +20,20 @@ A_SUS = 2.0
 A_ALR = 3.0
 
 SPARK_K = 16
+
+
+def event_boost(max_strength: float) -> float:
+    """
+    strength(0~10) -> chain boost multiplier.
+    v1.1: 1 + log1p(s)/2  (caps naturally, ~2.3 at s=10)
+    """
+    try:
+        s = float(max_strength or 0.0)
+    except Exception:
+        s = 0.0
+    if s <= 0:
+        return 1.0
+    return 1.0 + math.log1p(s) / 2.0
 
 
 # ---------- helpers ----------
@@ -315,6 +330,22 @@ def main():
                 "strength": float(strength or 0.0),
             }
 
+    # latest events date: series -> max strength (for top-3 explainability)
+    event_strength_max = {}
+    try:
+        latest_event_date = cur.execute("SELECT MAX(date) FROM events_v01").fetchone()[0]
+        if latest_event_date:
+            rows_ev = cur.execute("""
+                SELECT series, MAX(strength) AS max_strength
+                FROM events_v01
+                WHERE date = ?
+                GROUP BY series
+            """, (latest_event_date,)).fetchall()
+            for s, mx in rows_ev:
+                event_strength_max[str(s)] = float(mx or 0.0)
+    except Exception:
+        event_strength_max = {}
+
     con.close()
 
     # ---------- render ----------
@@ -571,8 +602,17 @@ a:hover{text-decoration:underline}
 
             edges = topk_edges.get(series, [])
             html.append(f"<tr class='top3-row' id='{top3_id}'><td colspan='11'>")
+            mxs = float(event_strength_max.get(str(series), 0.0) or 0.0)
+            b = event_boost(mxs)
             if edges:
-                html.append("<div class='top3-box'><table class='top3-table'>")
+                html.append("<div class='top3-box'>")
+                html.append(
+                    f"<div class='muted' style='margin:2px 0 8px'>"
+                    f"event_boost = <b>x{b:.2f}</b> "
+                    f"(max_strength={mxs:.1f} on latest events date)"
+                    f"</div>"
+                )
+                html.append("<table class='top3-table'>")
                 has_raw = any(e.get("push_raw") is not None for e in edges)
                 if has_raw:
                     html.append("<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>")
