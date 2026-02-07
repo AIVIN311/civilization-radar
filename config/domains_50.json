@@ -1,7 +1,10 @@
 [
   {"domain":"algorithmicallocation.com","field":"algorithmic_governance","profile":"honeypot"},
+  {"domain":"algorithmicallocation.ai","field":"algorithmic_governance","profile":"honeypot"},
+  {"domain":"algorithmicallocation.systems","field":"algorithmic_governance","profile":"honeypot"},
   {"domain":"algorithmicenforcement.com","field":"algorithmic_governance","profile":"honeypot"},
   {"domain":"algorithmiclegitimacy.com","field":"algorithmic_governance","profile":"normal"},
+  {"domain":"algorithmiclegitimacy.ai","field":"algorithmic_governance","profile":"normal"},
   {"domain":"algorithmicmartiallaw.com","field":"algorithmic_governance","profile":"hot"},
   {"domain":"algorithmicreserves.com","field":"monetary_infrastructure","profile":"honeypot"},
   {"domain":"algorithmicsovereignty.com","field":"algorithmic_governance","profile":"honeypot"},
@@ -39,6 +42,7 @@
   {"domain":"syntheticpollution.com","field":"synthetic_systems","profile":"hot"},
   {"domain":"syntheticrealitycrisis.com","field":"synthetic_systems","profile":"hot"},
   {"domain":"syntheticsolvency.com","field":"monetary_infrastructure","profile":"honeypot"},
+  {"domain":"syntheticsolvency.ai","field":"monetary_infrastructure","profile":"honeypot"},
   {"domain":"technologicalpathdependency.com","field":"synthetic_systems","profile":"normal"},
   {"domain":"theageoffusion.com","field":"civilization_dynamics","profile":"hot"},
   {"domain":"theanswerisblowininthewind.com","field":"human_manifesto","profile":"normal"},

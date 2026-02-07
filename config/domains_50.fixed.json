@@ -5,12 +5,27 @@
     "profile": "honeypot"
   },
   {
+    "domain": "algorithmicallocation.ai",
+    "series": "algorithmic_governance",
+    "profile": "honeypot"
+  },
+  {
+    "domain": "algorithmicallocation.systems",
+    "series": "algorithmic_governance",
+    "profile": "honeypot"
+  },
+  {
     "domain": "algorithmicenforcement.com",
     "series": "algorithmic_governance",
     "profile": "honeypot"
   },
   {
     "domain": "algorithmiclegitimacy.com",
+    "series": "algorithmic_governance",
+    "profile": "normal"
+  },
+  {
+    "domain": "algorithmiclegitimacy.ai",
     "series": "algorithmic_governance",
     "profile": "normal"
   },
@@ -196,6 +211,11 @@
   },
   {
     "domain": "syntheticsolvency.com",
+    "series": "monetary_infrastructure",
+    "profile": "honeypot"
+  },
+  {
+    "domain": "syntheticsolvency.ai",
     "series": "monetary_infrastructure",
     "profile": "honeypot"
   },
