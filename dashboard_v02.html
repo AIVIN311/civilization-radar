@@ -438,7 +438,7 @@ a:hover{text-decoration:underline}
   <button id=stormToggle>風暴模式</button>
 </div>
 
-<table><thead><tr><th>Series</th><th>W_avg</th><th>W_proj</th><th>狀態</th><th>Chain</th><th>Top src</th><th>share</th><th>push</th><th>domains</th><th>L3</th><th>Top-3</th></tr></thead><tbody>
+<table><thead><tr><th>Series</th><th>W_avg</th><th>W_proj</th><th>狀態</th><th>Chain</th><th>Top src</th><th>share</th><th>base_score</th><th>boosted_score</th><th>domains</th><th>L3</th><th>Top-3</th></tr></thead><tbody>
 <tr class='series-row' data-chain='no' data-push='1.8574'>
 <td><b>offworld_expansion</b></td>
 <td>2.945</td>
@@ -448,6 +448,7 @@ a:hover{text-decoration:underline}
 <td><span class='badge'>human_manifesto</span></td>
 <td>0.73</td>
 <td>1.8574</td>
+<td>1.8574</td>
 <td>5</td>
 <td>2</td>
 <td><button class='top3-btn' data-target='top3_offworld_expansion'>Top-3</button></td>
@@ -456,10 +457,10 @@ a:hover{text-decoration:underline}
 <div class='top3-box'>
 <div class='muted' style='margin:2px 0 8px'>event_boost = <b>x1.00</b> (max_strength=0.0 on latest events date)</div>
 <table class='top3-table'>
-<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
-<tr><td>human_manifesto</td><td>0.7342</td><td>1.8574</td><td>4.7316</td><td>1</td><td>—</td></tr>
-<tr><td>identity_data</td><td>0.6719</td><td>0.7401</td><td>2.8034</td><td>1</td><td>—</td></tr>
-<tr><td>civilization_resilience</td><td>0.5802</td><td>0.5966</td><td>1.8988</td><td>1</td><td>—</td></tr>
+<thead><tr><th>src_series</th><th>share_sum</th><th>base_score</th><th>boosted_score</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
+<tr><td>human_manifesto<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.7342</td><td>1.8574</td><td>1.8574</td><td>4.7316</td><td>1</td><td>—</td></tr>
+<tr><td>identity_data<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.6719</td><td>0.7401</td><td>0.7401</td><td>2.8034</td><td>1</td><td>—</td></tr>
+<tr><td>civilization_resilience<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.5802</td><td>0.5966</td><td>0.5966</td><td>1.8988</td><td>1</td><td>—</td></tr>
 </tbody></table></div>
 </td></tr>
 <tr class='series-row' data-chain='no' data-push='1.6429'>
@@ -471,6 +472,7 @@ a:hover{text-decoration:underline}
 <td><span class='badge'>human_manifesto</span></td>
 <td>0.63</td>
 <td>1.6429</td>
+<td>1.6429</td>
 <td>9</td>
 <td>0</td>
 <td><button class='top3-btn' data-target='top3_monetary_infrastructure'>Top-3</button></td>
@@ -479,10 +481,10 @@ a:hover{text-decoration:underline}
 <div class='top3-box'>
 <div class='muted' style='margin:2px 0 8px'>event_boost = <b>x1.00</b> (max_strength=0.0 on latest events date)</div>
 <table class='top3-table'>
-<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
-<tr><td>human_manifesto</td><td>0.6253</td><td>1.6429</td><td>2.5709</td><td>1</td><td>—</td></tr>
-<tr><td>offworld_expansion</td><td>0.4496</td><td>0.7883</td><td>1.4648</td><td>1</td><td>—</td></tr>
-<tr><td>civilization_resilience</td><td>0.5197</td><td>0.7193</td><td>0.8239</td><td>1</td><td>—</td></tr>
+<thead><tr><th>src_series</th><th>share_sum</th><th>base_score</th><th>boosted_score</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
+<tr><td>human_manifesto<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.6253</td><td>1.6429</td><td>1.6429</td><td>2.5709</td><td>1</td><td>—</td></tr>
+<tr><td>offworld_expansion<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.4496</td><td>0.7883</td><td>0.7883</td><td>1.4648</td><td>1</td><td>—</td></tr>
+<tr><td>civilization_resilience<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.5197</td><td>0.7193</td><td>0.7193</td><td>0.8239</td><td>1</td><td>—</td></tr>
 </tbody></table></div>
 </td></tr>
 <tr class='series-row' data-chain='no' data-push='1.3733'>
@@ -494,6 +496,7 @@ a:hover{text-decoration:underline}
 <td><span class='badge'>human_manifesto</span></td>
 <td>0.71</td>
 <td>1.3733</td>
+<td>1.3733</td>
 <td>8</td>
 <td>2</td>
 <td><button class='top3-btn' data-target='top3_civilization_resilience'>Top-3</button></td>
@@ -502,10 +505,10 @@ a:hover{text-decoration:underline}
 <div class='top3-box'>
 <div class='muted' style='margin:2px 0 8px'>event_boost = <b>x1.00</b> (max_strength=0.0 on latest events date)</div>
 <table class='top3-table'>
-<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
-<tr><td>human_manifesto</td><td>0.7066</td><td>1.3733</td><td>4.2351</td><td>1</td><td>—</td></tr>
-<tr><td>offworld_expansion</td><td>0.5260</td><td>0.7126</td><td>3.3802</td><td>1</td><td>—</td></tr>
-<tr><td>identity_data</td><td>0.5911</td><td>0.5902</td><td>2.5701</td><td>1</td><td>—</td></tr>
+<thead><tr><th>src_series</th><th>share_sum</th><th>base_score</th><th>boosted_score</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
+<tr><td>human_manifesto<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.7066</td><td>1.3733</td><td>1.3733</td><td>4.2351</td><td>1</td><td>—</td></tr>
+<tr><td>offworld_expansion<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.5260</td><td>0.7126</td><td>0.7126</td><td>3.3802</td><td>1</td><td>—</td></tr>
+<tr><td>identity_data<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.5911</td><td>0.5902</td><td>0.5902</td><td>2.5701</td><td>1</td><td>—</td></tr>
 </tbody></table></div>
 </td></tr>
 <tr class='series-row' data-chain='no' data-push='0.9476'>
@@ -517,6 +520,7 @@ a:hover{text-decoration:underline}
 <td><span class='badge'>civilization_resilience</span></td>
 <td>0.74</td>
 <td>0.9476</td>
+<td>0.9476</td>
 <td>3</td>
 <td>1</td>
 <td><button class='top3-btn' data-target='top3_human_manifesto'>Top-3</button></td>
@@ -525,10 +529,10 @@ a:hover{text-decoration:underline}
 <div class='top3-box'>
 <div class='muted' style='margin:2px 0 8px'>event_boost = <b>x1.00</b> (max_strength=0.0 on latest events date)</div>
 <table class='top3-table'>
-<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
-<tr><td>civilization_resilience</td><td>0.7420</td><td>0.9476</td><td>2.2547</td><td>1</td><td>—</td></tr>
-<tr><td>offworld_expansion</td><td>0.5200</td><td>0.6718</td><td>3.2740</td><td>1</td><td>—</td></tr>
-<tr><td>monetary_infrastructure</td><td>0.4123</td><td>0.5137</td><td>0.8399</td><td>1</td><td>—</td></tr>
+<thead><tr><th>src_series</th><th>share_sum</th><th>base_score</th><th>boosted_score</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
+<tr><td>civilization_resilience<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.7420</td><td>0.9476</td><td>0.9476</td><td>2.2547</td><td>1</td><td>—</td></tr>
+<tr><td>offworld_expansion<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.5200</td><td>0.6718</td><td>0.6718</td><td>3.2740</td><td>1</td><td>—</td></tr>
+<tr><td>monetary_infrastructure<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.4123</td><td>0.5137</td><td>0.5137</td><td>0.8399</td><td>1</td><td>—</td></tr>
 </tbody></table></div>
 </td></tr>
 <tr class='series-row' data-chain='no' data-push='1.5652'>
@@ -540,6 +544,7 @@ a:hover{text-decoration:underline}
 <td><span class='badge'>human_manifesto</span></td>
 <td>0.66</td>
 <td>1.5652</td>
+<td>1.5652</td>
 <td>6</td>
 <td>0</td>
 <td><button class='top3-btn' data-target='top3_identity_data'>Top-3</button></td>
@@ -548,10 +553,10 @@ a:hover{text-decoration:underline}
 <div class='top3-box'>
 <div class='muted' style='margin:2px 0 8px'>event_boost = <b>x1.00</b> (max_strength=0.0 on latest events date)</div>
 <table class='top3-table'>
-<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
-<tr><td>human_manifesto</td><td>0.6560</td><td>1.5652</td><td>3.9981</td><td>1</td><td>—</td></tr>
-<tr><td>offworld_expansion</td><td>0.5920</td><td>0.7117</td><td>2.8618</td><td>1</td><td>—</td></tr>
-<tr><td>civilization_resilience</td><td>0.4445</td><td>0.5038</td><td>1.7203</td><td>1</td><td>—</td></tr>
+<thead><tr><th>src_series</th><th>share_sum</th><th>base_score</th><th>boosted_score</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
+<tr><td>human_manifesto<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.6560</td><td>1.5652</td><td>1.5652</td><td>3.9981</td><td>1</td><td>—</td></tr>
+<tr><td>offworld_expansion<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.5920</td><td>0.7117</td><td>0.7117</td><td>2.8618</td><td>1</td><td>—</td></tr>
+<tr><td>civilization_resilience<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.4445</td><td>0.5038</td><td>0.5038</td><td>1.7203</td><td>1</td><td>—</td></tr>
 </tbody></table></div>
 </td></tr>
 <tr class='series-row' data-chain='no' data-push='0.5261'>
@@ -563,6 +568,7 @@ a:hover{text-decoration:underline}
 <td><span class='badge'>offworld_expansion</span></td>
 <td>0.37</td>
 <td>0.5261</td>
+<td>0.5261</td>
 <td>9</td>
 <td>0</td>
 <td><button class='top3-btn' data-target='top3_synthetic_systems'>Top-3</button></td>
@@ -571,10 +577,10 @@ a:hover{text-decoration:underline}
 <div class='top3-box'>
 <div class='muted' style='margin:2px 0 8px'>event_boost = <b>x1.00</b> (max_strength=0.0 on latest events date)</div>
 <table class='top3-table'>
-<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
-<tr><td>offworld_expansion</td><td>0.3685</td><td>0.5261</td><td>1.0159</td><td>1</td><td>—</td></tr>
-<tr><td>identity_data</td><td>0.4989</td><td>0.4770</td><td>11.1081</td><td>1</td><td>—</td></tr>
-<tr><td>monetary_infrastructure</td><td>0.5970</td><td>0.2390</td><td>10.6793</td><td>1</td><td>—</td></tr>
+<thead><tr><th>src_series</th><th>share_sum</th><th>base_score</th><th>boosted_score</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
+<tr><td>offworld_expansion<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.3685</td><td>0.5261</td><td>0.5261</td><td>1.0159</td><td>1</td><td>—</td></tr>
+<tr><td>identity_data<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.4989</td><td>0.4770</td><td>0.4770</td><td>11.1081</td><td>1</td><td>—</td></tr>
+<tr><td>monetary_infrastructure<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.5970</td><td>0.2390</td><td>0.2390</td><td>10.6793</td><td>1</td><td>—</td></tr>
 </tbody></table></div>
 </td></tr>
 <tr class='series-row' data-chain='YES' data-push='1.0321'>
@@ -586,6 +592,7 @@ a:hover{text-decoration:underline}
 <td><span class='badge'>human_manifesto</span></td>
 <td>0.78</td>
 <td>1.0321</td>
+<td>1.0321</td>
 <td>10</td>
 <td>2</td>
 <td><button class='top3-btn' data-target='top3_algorithmic_governance'>Top-3</button></td>
@@ -594,10 +601,10 @@ a:hover{text-decoration:underline}
 <div class='top3-box'>
 <div class='muted' style='margin:2px 0 8px'>event_boost = <b>x1.00</b> (max_strength=0.0 on latest events date)</div>
 <table class='top3-table'>
-<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
-<tr><td>human_manifesto</td><td>0.7769</td><td>1.0321</td><td>4.9370</td><td>1</td><td>—</td></tr>
-<tr><td>offworld_expansion</td><td>0.8538</td><td>0.2975</td><td>2.4410</td><td>1</td><td>—</td></tr>
-<tr><td>monetary_infrastructure</td><td>0.5178</td><td>0.2088</td><td>0.5775</td><td>1</td><td>—</td></tr>
+<thead><tr><th>src_series</th><th>share_sum</th><th>base_score</th><th>boosted_score</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
+<tr><td>human_manifesto<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.7769</td><td>1.0321</td><td>1.0321</td><td>4.9370</td><td>1</td><td>—</td></tr>
+<tr><td>offworld_expansion<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.8538</td><td>0.2975</td><td>0.2975</td><td>2.4410</td><td>1</td><td>—</td></tr>
+<tr><td>monetary_infrastructure<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.5178</td><td>0.2088</td><td>0.2088</td><td>0.5775</td><td>1</td><td>—</td></tr>
 </tbody></table></div>
 </td></tr>
 <tr class='series-row' data-chain='YES' data-push='0.3572'>
@@ -609,6 +616,7 @@ a:hover{text-decoration:underline}
 <td><span class='badge'>synthetic_systems</span></td>
 <td>0.54</td>
 <td>0.3572</td>
+<td>0.3572</td>
 <td>0</td>
 <td>0</td>
 <td><button class='top3-btn' data-target='top3_civilization'>Top-3</button></td>
@@ -617,10 +625,10 @@ a:hover{text-decoration:underline}
 <div class='top3-box'>
 <div class='muted' style='margin:2px 0 8px'>event_boost = <b>x1.00</b> (max_strength=0.0 on latest events date)</div>
 <table class='top3-table'>
-<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
-<tr><td>synthetic_systems</td><td>0.5402</td><td>0.3572</td><td>8.9756</td><td>1</td><td>—</td></tr>
-<tr><td>monetary_infrastructure</td><td>0.4963</td><td>0.2857</td><td>7.4124</td><td>1</td><td>—</td></tr>
-<tr><td>identity_data</td><td>0.4429</td><td>0.0047</td><td>2.6801</td><td>1</td><td>—</td></tr>
+<thead><tr><th>src_series</th><th>share_sum</th><th>base_score</th><th>boosted_score</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
+<tr><td>synthetic_systems<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.5402</td><td>0.3572</td><td>0.3572</td><td>8.9756</td><td>1</td><td>—</td></tr>
+<tr><td>monetary_infrastructure<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.4963</td><td>0.2857</td><td>0.2857</td><td>7.4124</td><td>1</td><td>—</td></tr>
+<tr><td>identity_data<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.4429</td><td>0.0047</td><td>0.0047</td><td>2.6801</td><td>1</td><td>—</td></tr>
 </tbody></table></div>
 </td></tr>
 <tr class='series-row' data-chain='YES' data-push='0.3201'>
@@ -632,6 +640,7 @@ a:hover{text-decoration:underline}
 <td><span class='badge'>synthetic_systems</span></td>
 <td>0.54</td>
 <td>0.3201</td>
+<td>0.3201</td>
 <td>0</td>
 <td>0</td>
 <td><button class='top3-btn' data-target='top3_governance'>Top-3</button></td>
@@ -640,10 +649,10 @@ a:hover{text-decoration:underline}
 <div class='top3-box'>
 <div class='muted' style='margin:2px 0 8px'>event_boost = <b>x1.00</b> (max_strength=0.0 on latest events date)</div>
 <table class='top3-table'>
-<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
-<tr><td>synthetic_systems</td><td>0.5405</td><td>0.3201</td><td>5.5869</td><td>1</td><td>—</td></tr>
-<tr><td>monetary_infrastructure</td><td>0.5982</td><td>0.1955</td><td>12.0609</td><td>1</td><td>—</td></tr>
-<tr><td>civilization</td><td>0.4640</td><td>0.0421</td><td>6.1722</td><td>1</td><td>—</td></tr>
+<thead><tr><th>src_series</th><th>share_sum</th><th>base_score</th><th>boosted_score</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>
+<tr><td>synthetic_systems<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.5405</td><td>0.3201</td><td>0.3201</td><td>5.5869</td><td>1</td><td>—</td></tr>
+<tr><td>monetary_infrastructure<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.5982</td><td>0.1955</td><td>0.1955</td><td>12.0609</td><td>1</td><td>—</td></tr>
+<tr><td>civilization<div class='muted'>dst_boost_applied: x1.00</div></td><td>0.4640</td><td>0.0421</td><td>0.0421</td><td>6.1722</td><td>1</td><td>—</td></tr>
 </tbody></table></div>
 </td></tr>
 </tbody></table>

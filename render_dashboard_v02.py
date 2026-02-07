@@ -551,7 +551,7 @@ a:hover{text-decoration:underline}
 """)
         html.append("<table><thead><tr>"
                     "<th>Series</th><th>W_avg</th><th>W_proj</th><th>狀態</th><th>Chain</th><th>Top src</th>"
-                    "<th>share</th><th>push</th><th>domains</th><th>L3</th><th>Top-3</th>"
+                    "<th>share</th><th>base_score</th><th>boosted_score</th><th>domains</th><th>L3</th><th>Top-3</th>"
                     "</tr></thead><tbody>")
 
         for r in series_rows:
@@ -581,6 +581,8 @@ a:hover{text-decoration:underline}
 
             chain_badge = "<span class='badge black'>YES</span>" if chain_yes else "<span class='muted'>no</span>"
             push_val = float(push or 0.0)
+            dst_boost = event_boost(float(event_strength_max.get(str(series), 0.0) or 0.0))
+            base_score = (push_val / dst_boost) if dst_boost > 0 else push_val
             series_id = safe_id(series)
             top3_id = f"top3_{series_id}"
 
@@ -594,6 +596,7 @@ a:hover{text-decoration:underline}
             html.append(f"<td>{chain_badge}</td>")
             html.append(f"<td><span class='badge'>{escape(str(top_src or '—'))}</span></td>")
             html.append(f"<td>{float(share or 0.0):.2f}</td>")
+            html.append(f"<td>{base_score:.4f}</td>")
             html.append(f"<td>{push_val:.4f}</td>")
             html.append(f"<td>{int(doms or 0)}</td>")
             html.append(f"<td>{int(l3 or 0)}</td>")
@@ -615,16 +618,20 @@ a:hover{text-decoration:underline}
                 html.append("<table class='top3-table'>")
                 has_raw = any(e.get("push_raw") is not None for e in edges)
                 if has_raw:
-                    html.append("<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>")
+                    html.append("<thead><tr><th>src_series</th><th>share_sum</th><th>base_score</th><th>boosted_score</th><th>push_raw</th><th>edge_n</th><th>domains</th></tr></thead><tbody>")
                 else:
-                    html.append("<thead><tr><th>src_series</th><th>share_sum</th><th>push_sum</th><th>edge_n</th><th>domains</th></tr></thead><tbody>")
+                    html.append("<thead><tr><th>src_series</th><th>share_sum</th><th>base_score</th><th>boosted_score</th><th>edge_n</th><th>domains</th></tr></thead><tbody>")
                 for e in edges:
+                    boost_note = f"<div class='muted'>dst_boost_applied: x{b:.2f}</div>"
+                    boosted_score = float(e.get("push_sum") or 0.0)
+                    base_score = (boosted_score / b) if b > 0 else boosted_score
                     if has_raw:
                         html.append(
                             "<tr>"
-                            f"<td>{escape(str(e.get('src_series') or '—'))}</td>"
+                            f"<td>{escape(str(e.get('src_series') or '—'))}{boost_note}</td>"
                             f"<td>{float(e.get('share_sum') or 0.0):.4f}</td>"
-                            f"<td>{float(e.get('push_sum') or 0.0):.4f}</td>"
+                            f"<td>{base_score:.4f}</td>"
+                            f"<td>{boosted_score:.4f}</td>"
                             f"<td>{float(e.get('push_raw') or 0.0):.4f}</td>"
                             f"<td>{int(e.get('edge_n') or 0)}</td>"
                             f"<td>{escape(preview_domains(e.get('domains_csv') or ''))}</td>"
@@ -633,9 +640,10 @@ a:hover{text-decoration:underline}
                     else:
                         html.append(
                             "<tr>"
-                            f"<td>{escape(str(e.get('src_series') or '—'))}</td>"
+                            f"<td>{escape(str(e.get('src_series') or '—'))}{boost_note}</td>"
                             f"<td>{float(e.get('share_sum') or 0.0):.4f}</td>"
-                            f"<td>{float(e.get('push_sum') or 0.0):.4f}</td>"
+                            f"<td>{base_score:.4f}</td>"
+                            f"<td>{boosted_score:.4f}</td>"
                             f"<td>{int(e.get('edge_n') or 0)}</td>"
                             f"<td>{escape(preview_domains(e.get('domains_csv') or ''))}</td>"
                             "</tr>"
