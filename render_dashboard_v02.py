@@ -15,6 +15,19 @@ def table_exists(cur, name: str) -> bool:
     return bool(row)
 
 
+def parse_explain_payload(raw_value):
+    raw = str(raw_value or "").strip()
+    if not raw:
+        return {}, "{}", True
+    try:
+        payload = json.loads(raw)
+    except Exception:
+        fallback = f"Invalid explain JSON\n{raw}"
+        return {"error": "Invalid explain JSON", "raw": raw}, fallback, False
+    pretty = json.dumps(payload, ensure_ascii=False, indent=2)
+    return payload, pretty, True
+
+
 def fetch_domain_rows(cur):
     if not table_exists(cur, "v02_domain_latest"):
         return []
@@ -93,7 +106,7 @@ def fetch_chain_rows(cur):
         rows = cur.execute(
             """
             SELECT series,W_avg,W_proj,status,chain_flag,top_src,share,push,push_raw,base_push,boosted_push,delta_boost,
-                   geo_profile,geo_factor,tw_rank_score,domains,L3_domains,max_event_level
+                   geo_profile,geo_factor,tw_rank_score,geo_factor_explain_json,tw_rank_explain_json,domains,L3_domains,max_event_level
             FROM v03_series_chain_latest
             ORDER BY W_proj DESC, W_avg DESC
             """
@@ -108,29 +121,54 @@ def fetch_chain_rows(cur):
             """
         ).fetchall()
         has_geo = False
-    series_rows = [
-        {
-            "series": str(r[0]),
-            "W_avg": float(r[1] or 0.0),
-            "W_proj": float(r[2] or 0.0),
-            "status": str(r[3] or ""),
-            "chain_flag": int(r[4] or 0),
-            "top_src": str(r[5] or ""),
-            "share": float(r[6] or 0.0),
-            "push": float(r[7] or 0.0),
-            "push_raw": float(r[8] or 0.0),
-            "base_push": float(r[9] or 0.0),
-            "boosted_push": float(r[10] or 0.0),
-            "delta_boost": float(r[11] or 0.0),
-            "geo_profile": str(r[12] or "") if has_geo else "",
-            "geo_factor": float(r[13] or 0.0) if has_geo else 0.0,
-            "tw_rank_score": float(r[14] or 0.0) if has_geo else float(r[10] or 0.0),
-            "domains": int(r[15] or 0) if has_geo else int(r[12] or 0),
-            "L3_domains": int(r[16] or 0) if has_geo else int(r[13] or 0),
-            "max_event_level": str(r[17] or "L1") if has_geo else str(r[14] or "L1"),
-        }
-        for r in rows
-    ]
+    series_rows = []
+    for r in rows:
+        geo_profile = str(r[12] or "") if has_geo else ""
+        geo_factor = float(r[13] or 0.0) if has_geo else 0.0
+        tw_rank_score = float(r[14] or 0.0) if has_geo else float(r[10] or 0.0)
+        geo_raw = str(r[15] or "{}") if has_geo else "{}"
+        tw_raw = str(r[16] or "{}") if has_geo else "{}"
+        domains = int(r[17] or 0) if has_geo else int(r[12] or 0)
+        l3_domains = int(r[18] or 0) if has_geo else int(r[13] or 0)
+        max_event_level = str(r[19] or "L1") if has_geo else str(r[14] or "L1")
+
+        geo_obj, geo_text, _ = parse_explain_payload(geo_raw)
+        _, tw_text, _ = parse_explain_payload(tw_raw)
+        gate = "unknown"
+        if isinstance(geo_obj, dict):
+            gate_obj = geo_obj.get("gate")
+            if isinstance(gate_obj, dict):
+                passed = gate_obj.get("passed")
+                if passed is True:
+                    gate = "true"
+                elif passed is False:
+                    gate = "false"
+
+        series_rows.append(
+            {
+                "series": str(r[0]),
+                "W_avg": float(r[1] or 0.0),
+                "W_proj": float(r[2] or 0.0),
+                "status": str(r[3] or ""),
+                "chain_flag": int(r[4] or 0),
+                "top_src": str(r[5] or ""),
+                "share": float(r[6] or 0.0),
+                "push": float(r[7] or 0.0),
+                "push_raw": float(r[8] or 0.0),
+                "base_push": float(r[9] or 0.0),
+                "boosted_push": float(r[10] or 0.0),
+                "delta_boost": float(r[11] or 0.0),
+                "geo_profile": geo_profile,
+                "geo_factor": geo_factor,
+                "tw_rank_score": tw_rank_score,
+                "geo_gate": gate,
+                "geo_explain_text": geo_text,
+                "tw_explain_text": tw_text,
+                "domains": domains,
+                "L3_domains": l3_domains,
+                "max_event_level": max_event_level,
+            }
+        )
     edges = {}
     if table_exists(cur, "v03_chain_edges_latest"):
         top_rows = cur.execute(
@@ -182,6 +220,9 @@ main{max-width:1400px;margin:auto;padding:20px}
 h1{margin:0 0 6px}
 .meta{color:#666;font-size:13px;margin-bottom:14px}
 .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.chain-controls{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 12px}
+.chain-controls label{font-size:12px;color:#444;display:flex;align-items:center;gap:6px}
+.chain-controls select{padding:4px 8px;border:1px solid #ccc;border-radius:8px;background:#fff}
 button{padding:6px 10px;border:1px solid #ccc;background:#fff;border-radius:8px;cursor:pointer}
 button.active{background:#111;color:#fff;border-color:#111}
 .grid{display:grid;grid-template-columns:1fr;gap:14px}
@@ -195,6 +236,10 @@ th{color:#555}
 .muted{color:#888}
 .top3{display:none;background:#fafafa}
 .badge{display:inline-block;padding:2px 7px;border:1px solid #ddd;border-radius:999px;font-size:11px}
+.geo-col details{margin:4px 0}
+.geo-col summary{cursor:pointer;font-size:12px;color:#1f2937}
+.geo-col pre{max-height:180px;overflow:auto;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:8px;font-size:11px;line-height:1.35}
+body.geo-off .geo-col{display:none}
 </style>
 """
     )
@@ -255,32 +300,64 @@ th{color:#555}
         )
     html.append("</tbody></table></div>")
 
-    html.append("<div class='card'><h3>鏈式列表</h3><table id='chainTable'><thead><tr>")
+    profiles = sorted({str(c.get("geo_profile") or "").strip() for c in chains if str(c.get("geo_profile") or "").strip()})
+    profile_opts = ["<option value='all'>all</option>"]
+    profile_opts.extend(
+        [f"<option value='{escape(p.lower())}'>{escape(p)}</option>" for p in profiles]
+    )
+
+    html.append("<div class='card'><h3>鏈式列表</h3>")
+    html.append(
+        "<div class='chain-controls'>"
+        "<label><input id='geoColsToggle' type='checkbox' checked>Show geo columns</label>"
+        f"<label>Profile<select id='profileFilter'>{''.join(profile_opts)}</select></label>"
+        "<label>Gate<select id='gateFilter'><option value='all'>all</option><option value='true'>gate=true</option><option value='false'>gate=false</option></select></label>"
+        "<label><input id='geoPositiveOnly' type='checkbox'>Only geo_factor&gt;0</label>"
+        "<label>Sort<select id='chainSort'>"
+        "<option value='default'>default</option>"
+        "<option value='tw_rank_score_desc'>tw_rank_score desc</option>"
+        "<option value='geo_factor_desc'>geo_factor desc</option>"
+        "<option value='boosted_push_desc'>boosted_push desc</option>"
+        "</select></label>"
+        "</div>"
+    )
+    html.append("<table id='chainTable'><thead><tr>")
     html.append(
         "<th>series</th><th>W_avg</th><th>W_proj</th><th>base</th><th>boosted</th><th>delta</th>"
-        "<th>geo_factor</th><th>tw_rank</th><th>top_src</th><th>L3</th><th>Top-3</th>"
+        "<th class='geo-col'>geo_profile</th><th class='geo-col'>geo_factor</th><th class='geo-col'>tw_rank</th>"
+        "<th>top_src</th><th>L3</th><th class='geo-col'>explain</th><th>Top-3</th>"
     )
     html.append("</tr></thead><tbody>")
-    for c in chains:
+    for idx, c in enumerate(chains):
         sid = escape(c["series"])
         row_id = f"top3_{sid.replace('.', '_').replace('-', '_')}"
         lvl = escape(c["max_event_level"])
+        geo_profile = str(c.get("geo_profile") or "")
+        geo_gate = str(c.get("geo_gate") or "unknown")
         html.append(
-            f"<tr data-level='{lvl}'>"
+            f"<tr class='chain-main' data-level='{lvl}' data-default-index='{idx}' "
+            f"data-geo-profile='{escape(geo_profile.lower())}' data-geo-factor='{c['geo_factor']:.12f}' "
+            f"data-gate='{escape(geo_gate.lower())}' data-tw-rank='{c['tw_rank_score']:.12f}' "
+            f"data-boosted-push='{c['boosted_push']:.12f}' data-top3-id='{row_id}'>"
             f"<td>{sid}</td>"
             f"<td>{c['W_avg']:.3f}</td>"
             f"<td>{c['W_proj']:.3f}</td>"
             f"<td>{c['base_push']:.4f}</td>"
             f"<td>{c['boosted_push']:.4f}</td>"
             f"<td>{c['delta_boost']:.4f}</td>"
-            f"<td>{c['geo_factor']:.4f}</td>"
-            f"<td>{c['tw_rank_score']:.4f}</td>"
+            f"<td class='geo-col'>{escape(geo_profile or '-')}</td>"
+            f"<td class='geo-col'>{c['geo_factor']:.4f}</td>"
+            f"<td class='geo-col'>{c['tw_rank_score']:.4f}</td>"
             f"<td>{escape(c['top_src'])}</td>"
             f"<td>{c['L3_domains']}</td>"
+            f"<td class='geo-col'>"
+            f"<details><summary>Geo explain</summary><pre>{escape(c['geo_explain_text'])}</pre></details>"
+            f"<details><summary>TW explain</summary><pre>{escape(c['tw_explain_text'])}</pre></details>"
+            f"</td>"
             f"<td><button class='toggle' data-target='{row_id}'>Top-3</button></td>"
             "</tr>"
         )
-        html.append(f"<tr class='top3' id='{row_id}' data-level='{lvl}'><td colspan='11'>")
+        html.append(f"<tr class='top3' id='{row_id}' data-level='{lvl}'><td colspan='13'>")
         rows = top3.get(c["series"], [])
         if not rows:
             html.append("<span class='muted'>無 Top-3 edges</span>")
@@ -312,30 +389,135 @@ th{color:#555}
         """
 <script>
 const btns = [...document.querySelectorAll('.controls button')];
-const tables = ['domainTable','eventTable','chainTable'];
-function apply(mode){
+const tables = ['domainTable','eventTable'];
+const geoColsToggle = document.getElementById('geoColsToggle');
+const profileFilter = document.getElementById('profileFilter');
+const gateFilter = document.getElementById('gateFilter');
+const geoPositiveOnly = document.getElementById('geoPositiveOnly');
+const chainSort = document.getElementById('chainSort');
+let levelMode = 'all';
+
+function parseNum(value){
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+function toggleGeoColumns(){
+  if(!geoColsToggle) return;
+  document.body.classList.toggle('geo-off', !geoColsToggle.checked);
+}
+
+function applyNonChainTables(){
   tables.forEach(id=>{
     document.querySelectorAll(`#${id} tbody tr`).forEach(tr=>{
-      if(tr.classList.contains('top3')) return;
       const lvl = (tr.dataset.level || 'L1').toUpperCase();
-      tr.style.display = (mode==='l3' && lvl!=='L3') ? 'none' : '';
-      const next = tr.nextElementSibling;
-      if(next && next.classList.contains('top3') && tr.style.display==='none'){
-        next.style.display='none';
-      }
+      tr.style.display = (levelMode==='l3' && lvl!=='L3') ? 'none' : '';
     });
   });
 }
+
+function getChainRows(){
+  return [...document.querySelectorAll('#chainTable tbody tr.chain-main')];
+}
+
+function matchChainFilters(tr){
+  const lvl = (tr.dataset.level || 'L1').toUpperCase();
+  if(levelMode==='l3' && lvl!=='L3') return false;
+
+  const profile = (tr.dataset.geoProfile || '').toLowerCase();
+  const selectedProfile = ((profileFilter && profileFilter.value) || 'all').toLowerCase();
+  if(selectedProfile !== 'all' && profile !== selectedProfile) return false;
+
+  const gate = (tr.dataset.gate || 'unknown').toLowerCase();
+  const selectedGate = ((gateFilter && gateFilter.value) || 'all').toLowerCase();
+  if(selectedGate === 'true' && gate !== 'true') return false;
+  if(selectedGate === 'false' && gate !== 'false') return false;
+
+  if(geoPositiveOnly && geoPositiveOnly.checked){
+    const g = parseNum(tr.dataset.geoFactor);
+    if(!(g !== null && g > 0)) return false;
+  }
+  return true;
+}
+
+function byDefaultIndex(a,b){
+  return Number(a.dataset.defaultIndex || 0) - Number(b.dataset.defaultIndex || 0);
+}
+
+function sortVisibleRows(rows){
+  const mode = (chainSort && chainSort.value) || 'default';
+  if(mode === 'default') return [...rows].sort(byDefaultIndex);
+
+  const metricKey = {
+    tw_rank_score_desc: 'twRank',
+    geo_factor_desc: 'geoFactor',
+    boosted_push_desc: 'boostedPush'
+  }[mode];
+  if(!metricKey) return [...rows].sort(byDefaultIndex);
+
+  return [...rows].sort((a,b)=>{
+    const av = parseNum(a.dataset[metricKey]);
+    const bv = parseNum(b.dataset[metricKey]);
+    if(av === null && bv === null) return byDefaultIndex(a,b);
+    if(av === null) return 1;
+    if(bv === null) return -1;
+    if(av === bv) return byDefaultIndex(a,b);
+    return bv - av;
+  });
+}
+
+function applyChainView(){
+  const tbody = document.querySelector('#chainTable tbody');
+  if(!tbody) return;
+  const rows = getChainRows();
+  const visible = [];
+  const hidden = [];
+
+  rows.forEach(tr=>{
+    const show = matchChainFilters(tr);
+    tr.style.display = show ? '' : 'none';
+    if(show) visible.push(tr); else hidden.push(tr);
+    const top3 = document.getElementById(tr.dataset.top3Id || '');
+    if(top3 && !show) top3.style.display = 'none';
+  });
+
+  const visibleSorted = sortVisibleRows(visible);
+  const hiddenSorted = [...hidden].sort(byDefaultIndex);
+  [...visibleSorted, ...hiddenSorted].forEach(tr=>{
+    tbody.appendChild(tr);
+    const top3 = document.getElementById(tr.dataset.top3Id || '');
+    if(top3) tbody.appendChild(top3);
+  });
+}
+
+function applyAllViews(){
+  applyNonChainTables();
+  applyChainView();
+}
+
 btns.forEach(b=>b.addEventListener('click',()=>{
   btns.forEach(x=>x.classList.remove('active'));
   b.classList.add('active');
-  apply(b.dataset.mode);
+  levelMode = b.dataset.mode || 'all';
+  applyAllViews();
 }));
+if(geoColsToggle) geoColsToggle.addEventListener('change', ()=>{
+  toggleGeoColumns();
+  applyChainView();
+});
+if(profileFilter) profileFilter.addEventListener('change', applyChainView);
+if(gateFilter) gateFilter.addEventListener('change', applyChainView);
+if(geoPositiveOnly) geoPositiveOnly.addEventListener('change', applyChainView);
+if(chainSort) chainSort.addEventListener('change', applyChainView);
 document.querySelectorAll('.toggle').forEach(b=>b.addEventListener('click',()=>{
   const row = document.getElementById(b.dataset.target);
   if(!row) return;
+  const main = b.closest('tr.chain-main');
+  if(main && main.style.display === 'none') return;
   row.style.display = (row.style.display==='table-row') ? 'none' : 'table-row';
 }));
+toggleGeoColumns();
+applyAllViews();
 </script>
 """
     )
