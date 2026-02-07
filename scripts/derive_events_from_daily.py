@@ -9,6 +9,7 @@
 import json
 from pathlib import Path
 from collections import defaultdict
+from src.event_strength import event_strength
 
 INPUT = Path("output/daily_snapshots.jsonl")
 OUTPUT = Path("output/events_derived.jsonl")
