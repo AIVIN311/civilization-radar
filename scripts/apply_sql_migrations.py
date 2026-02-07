@@ -26,6 +26,14 @@ EVENTS_V04_COLUMNS = [
     ("strength_explain_json", "TEXT DEFAULT '{}'")
 ]
 
+CHAIN_GEO_COLUMNS = [
+    ("geo_profile", "TEXT NOT NULL DEFAULT 'tw'"),
+    ("geo_factor", "REAL NOT NULL DEFAULT 0.0"),
+    ("geo_factor_explain_json", "TEXT NOT NULL DEFAULT '{}'"),
+    ("tw_rank_score", "REAL NOT NULL DEFAULT 0.0"),
+    ("tw_rank_explain_json", "TEXT NOT NULL DEFAULT '{}'"),
+]
+
 def read_sql(path: str) -> str:
     p = Path(path)
     if not p.exists():
@@ -45,16 +53,25 @@ def table_columns(cur, table_name: str) -> set[str]:
     return {r[1] for r in cur.execute(f"PRAGMA table_info({table_name})").fetchall()}
 
 
-def ensure_events_v04_columns(cur):
-    if not table_exists(cur, "events_v01"):
+def ensure_table_columns(cur, table_name: str, columns: list[tuple[str, str]]):
+    if not table_exists(cur, table_name):
         return
-    cols = table_columns(cur, "events_v01")
-    for col, decl in EVENTS_V04_COLUMNS:
+    cols = table_columns(cur, table_name)
+    for col, decl in columns:
         if col in cols:
             print(f"INFO: column {col} already exists, skipping")
             continue
-        cur.execute(f"ALTER TABLE events_v01 ADD COLUMN {col} {decl}")
+        cur.execute(f"ALTER TABLE {table_name} ADD COLUMN {col} {decl}")
         cols.add(col)
+
+
+def ensure_events_v04_columns(cur):
+    ensure_table_columns(cur, "events_v01", EVENTS_V04_COLUMNS)
+
+
+def ensure_chain_geo_columns(cur):
+    ensure_table_columns(cur, "series_chain_v10", CHAIN_GEO_COLUMNS)
+    ensure_table_columns(cur, "series_chain_decay_latest", CHAIN_GEO_COLUMNS)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -78,6 +95,7 @@ def main():
             raise
 
     ensure_events_v04_columns(cur)
+    ensure_chain_geo_columns(cur)
     con.commit()
 
     # quick verify
