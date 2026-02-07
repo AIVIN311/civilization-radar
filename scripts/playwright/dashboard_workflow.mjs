@@ -1,6 +1,7 @@
 ﻿#!/usr/bin/env node
 import { chromium } from "playwright";
 import fs from "node:fs/promises";
+import fsSync from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -51,6 +52,44 @@ async function clickIfVisible(locator) {
   return true;
 }
 
+async function launchBrowser(opts) {
+  const common = {
+    headless: !opts.headed,
+    slowMo: opts.slowMo,
+  };
+
+  try {
+    const browser = await chromium.launch(common);
+    return { browser, launcher: "playwright-managed-chromium" };
+  } catch (err) {
+    const message = String(err?.message || "");
+    if (!message.includes("Executable doesn't exist")) {
+      throw err;
+    }
+  }
+
+  const candidates = [
+    "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+    "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
+    "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  ];
+
+  for (const executablePath of candidates) {
+    if (!fsSync.existsSync(executablePath)) continue;
+    try {
+      const browser = await chromium.launch({ ...common, executablePath });
+      return { browser, launcher: executablePath };
+    } catch {
+      // Try next installed browser binary.
+    }
+  }
+
+  throw new Error(
+    "No Playwright browser executable found. Run `npx playwright install chromium` or install Chrome/Edge.",
+  );
+}
+
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
   const dashboardPath = path.resolve(opts.dashboard);
@@ -58,10 +97,7 @@ async function main() {
 
   await fs.mkdir(outputDir, { recursive: true });
 
-  const browser = await chromium.launch({
-    headless: !opts.headed,
-    slowMo: opts.slowMo,
-  });
+  const { browser, launcher } = await launchBrowser(opts);
   const context = await browser.newContext({ viewport: { width: 1600, height: 1100 } });
   const page = await context.newPage();
   page.setDefaultTimeout(opts.timeoutMs);
@@ -69,6 +105,7 @@ async function main() {
   const summary = {
     dashboardPath,
     outputDir,
+    launcher,
     startedAt: new Date().toISOString(),
     checks: [],
     screenshots: [],
