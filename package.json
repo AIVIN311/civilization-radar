@@ -1,5 +1,12 @@
 {
+  "scripts": {
+    "playwright:dashboard": "node scripts/playwright/dashboard_workflow.mjs",
+    "playwright:dashboard:headed": "node scripts/playwright/dashboard_workflow.mjs --headed --slow-mo 80"
+  },
   "dependencies": {
     "dotenv": "^17.2.4"
+  },
+  "devDependencies": {
+    "playwright": "^1.52.0"
   }
 }
