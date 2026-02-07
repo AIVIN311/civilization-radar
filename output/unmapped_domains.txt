@@ -1,5 +1,0 @@
-# unmapped domains (end=2026-02-06, window=7d)
-algorithmicallocation.ai	score=771.80	req=227	origin%=1.00	cache%=0.00
-algorithmiclegitimacy.ai	score=710.60	req=209	origin%=1.00	cache%=0.00
-syntheticsolvency.ai	score=652.80	req=192	origin%=1.00	cache%=0.00
-algorithmicallocation.systems	score=438.60	req=129	origin%=1.00	cache%=0.00
