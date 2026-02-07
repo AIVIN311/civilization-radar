@@ -1,6 +1,10 @@
 import re
 import sqlite3
 from html import escape
+import sys
+sys.path.append(".")
+from src.load_events_derived import load_events_derived
+import json
 
 DB_PATH = "radar.db"
 OUT_HTML = "dashboard_v02.html"
@@ -153,6 +157,10 @@ def fetch_topk_edges_latest(cur, topk: int = 3):
 
 
 def main():
+    # ✅ load REAL derived events (from daily snapshots)
+    # domain_lower -> list[events]
+    events_real = load_events_derived("output/events_derived.jsonl")
+
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
 
@@ -222,8 +230,6 @@ def main():
     chain_loaded = False
     series_rows = []
 
-    # you can standardize your chain view name later;
-    # this renderer will try a few common candidates.
     series_candidates = [
         "v03_series_chain_latest",   # recommended for chain v1.0
         "v02_series_chain_latest",   # alternative
@@ -239,14 +245,10 @@ def main():
     topk_edges = {}
     if chosen in ("v03_series_chain_latest", "v02_series_chain_latest"):
         chain_loaded = True
-        # expected columns:
-        # series, W_avg, W_proj, status, chain_flag, top_src, share, push, domains, L3_domains, ts
         scol = columns_of(cur, chosen)
-        # build select defensively
         want = ["series", "W_avg", "W_proj", "status", "chain_flag", "top_src", "share", "push", "push_raw", "domains", "L3_domains"]
         got = [c for c in want if c in scol]
 
-        # filter by latest ts if exists
         if "ts" in scol:
             series_rows = cur.execute(
                 f"SELECT {','.join(got)} FROM {chosen} WHERE ts=? ORDER BY W_proj DESC, W_avg DESC",
@@ -260,10 +262,8 @@ def main():
         topk_edges = fetch_topk_edges_latest(cur, topk=3)
 
     else:
-        # fallback: v02_series_latest
         chosen = "v02_series_latest"
         scol = columns_of(cur, chosen)
-        # v02_series_latest columns: series, domains, L3_domains, heat_avg, A_avg, D_avg, W_avg, ts
         if "ts" in scol:
             series_rows = cur.execute("""
                 SELECT series, domains, L3_domains, W_avg
@@ -354,7 +354,8 @@ a:hover{text-decoration:underline}
         f"<div class=meta>"
         f"最新時段：{escape(str(latest))} · sparkline 回看 {SPARK_K} slots<br>"
         f"門檻（A 自適應）：背景&lt;{A_BG:.1f}，可疑≥{A_BG:.1f}，警戒≥{A_SUS:.1f}，事件≥{A_ALR:.1f}<br>"
-        f"鏈式資料：{'已載入' if chain_loaded else '未載入（目前使用 v02_series_latest）'}"
+        f"鏈式資料：{'已載入' if chain_loaded else '未載入（目前使用 v02_series_latest）'} · "
+        f"derived_events：{'已載入' if events_real else '未載入'}"
         f"</div>"
     )
 
@@ -382,7 +383,6 @@ a:hover{text-decoration:underline}
     html.append("</tr></thead><tbody>")
 
     for row in domains:
-        # unpack defensively
         idx = 0
         domain = row[idx]; idx += 1
         series = row[idx]; idx += 1
@@ -403,14 +403,26 @@ a:hover{text-decoration:underline}
         if projected_col:
             projected_val = row[idx]; idx += 1
 
+        # ---- Δ and spark (keep from DB)
         Wv = float(W or 0.0)
         prevw = float(prevW.get(domain, Wv))
         dw = Wv - prevw
         arr, cls = arrow(dw)
+        sp = svg_spark(spark.get(domain, []))
+
+        # ---- ✅ REAL derived events override (A / label / sig / matched)
+        dom_l = str(domain).lower()
+        real_list = events_real.get(dom_l, [])
 
         Av = float(A or 0.0)
+        if real_list:
+            last_ev = real_list[-1]
+            # ratio=1.0 means +100% vs baseline (2x)
+            Av = float(last_ev.get("ratio") or 0.0)
+            sig = "dns_spike(real)"
+            matched = json.dumps(["dns_spike"], ensure_ascii=False)
+
         color, label = risk_bucket(Av)
-        sp = svg_spark(spark.get(domain, []))
 
         # chain badge rendering (domain-level)
         chain_badge = ""
@@ -469,20 +481,19 @@ a:hover{text-decoration:underline}
                     "</tr></thead><tbody>")
 
         for r in series_rows:
-            idx = {name: i for i, name in enumerate(got)}
-            series = r[idx["series"]] if "series" in idx else "—"
-            W_avg = r[idx["W_avg"]] if "W_avg" in idx else 0.0
-            W_proj = r[idx["W_proj"]] if "W_proj" in idx else W_avg
-            status = r[idx["status"]] if "status" in idx else ""
-            chain_flag = r[idx["chain_flag"]] if "chain_flag" in idx else 0
-            top_src = r[idx["top_src"]] if "top_src" in idx else "—"
-            share = r[idx["share"]] if "share" in idx else 0.0
-            push = r[idx["push"]] if "push" in idx else 0.0
-            push_raw = r[idx["push_raw"]] if "push_raw" in idx else None
-            doms = r[idx["domains"]] if "domains" in idx else 0
-            l3 = r[idx["L3_domains"]] if "L3_domains" in idx else 0
+            idxm = {name: i for i, name in enumerate(got)}
+            series = r[idxm["series"]] if "series" in idxm else "—"
+            W_avg = r[idxm["W_avg"]] if "W_avg" in idxm else 0.0
+            W_proj = r[idxm["W_proj"]] if "W_proj" in idxm else W_avg
+            status = r[idxm["status"]] if "status" in idxm else ""
+            chain_flag = r[idxm["chain_flag"]] if "chain_flag" in idxm else 0
+            top_src = r[idxm["top_src"]] if "top_src" in idxm else "—"
+            share = r[idxm["share"]] if "share" in idxm else 0.0
+            push = r[idxm["push"]] if "push" in idxm else 0.0
+            push_raw = r[idxm["push_raw"]] if "push_raw" in idxm else None
+            doms = r[idxm["domains"]] if "domains" in idxm else 0
+            l3 = r[idxm["L3_domains"]] if "L3_domains" in idxm else 0
 
-            # status fallback
             try:
                 wa = float(W_avg or 0.0)
                 wp = float(W_proj or 0.0)
@@ -562,7 +573,6 @@ a:hover{text-decoration:underline}
 """)
 
     else:
-        # fallback simple series table
         html.append("<table><thead><tr>"
                     "<th>Series</th><th>domains</th><th>L3</th><th>W_avg</th>"
                     "</tr></thead><tbody>")
@@ -580,7 +590,6 @@ a:hover{text-decoration:underline}
     html.append("</div>")  # right card
     html.append("</div>")  # grid
 
-    # ===== JS filters =====
     html.append("""
 <script>
 const rows = [...document.querySelectorAll("#domainTable tbody tr")];
@@ -598,9 +607,9 @@ function apply(){
 
   rows.forEach(r=>{
     let ok = true;
-    const risk = r.dataset.risk;     // 背景/可疑/警戒/事件
-    const level = r.dataset.level;   // L1/L2/L3
-    const chain = r.dataset.chain;   // 0/1
+    const risk = r.dataset.risk;
+    const level = r.dataset.level;
+    const chain = r.dataset.chain;
     const text = (r.dataset.text || "").toLowerCase();
 
     if(mode==="event") ok = (risk==="事件");
@@ -671,8 +680,7 @@ document.querySelectorAll(".top3-btn").forEach(btn=>{
     with open(OUT_HTML, "w", encoding="utf-8") as f:
         f.write("\n".join(html))
 
-    print("Wrote", OUT_HTML, "(render_dashboard_v02.py upgraded)")
-
+    print("Wrote", OUT_HTML, "(render_dashboard_v02.py upgraded + derived_events)")
 
 if __name__ == "__main__":
     main()
