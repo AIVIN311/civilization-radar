@@ -1,7 +1,14 @@
 import json
 import sqlite3
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from src.series_resolver import resolve
 
 DB_PATH = "radar.db"
 IN_PATH = Path("output/events_derived.jsonl")
@@ -47,7 +54,6 @@ def main():
 
             date = ev.get("date")
             domain = ev.get("domain")
-            series = ev.get("series") or "unmapped"
             event_type = ev.get("type") or "unknown"
             req_key = ev.get("req_key") or "dns_total"
 
@@ -59,7 +65,8 @@ def main():
 
             origin_served = ev.get("origin_served")
             cf_served = ev.get("cf_served")
-            series_raw = ev.get("series_raw") or series
+            series_raw = ev.get("series_raw") or ev.get("series") or "unmapped"
+            series = resolve(domain, series_raw)
 
             if not date:
                 date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
