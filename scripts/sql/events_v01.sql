@@ -34,10 +34,4 @@ CREATE INDEX IF NOT EXISTS ix_events_v01_series ON events_v01(series);
 CREATE INDEX IF NOT EXISTS ix_events_v01_domain ON events_v01(domain);
 CREATE INDEX IF NOT EXISTS ix_events_v01_ratio ON events_v01(ratio);
 
-ALTER TABLE events_v01 ADD COLUMN strength REAL;
-ALTER TABLE events_v01 ADD COLUMN series_raw TEXT;
-ALTER TABLE events_v01 ADD COLUMN event_level TEXT DEFAULT 'L1';
-ALTER TABLE events_v01 ADD COLUMN matched_signals_json TEXT DEFAULT '[]';
-ALTER TABLE events_v01 ADD COLUMN strength_explain_json TEXT DEFAULT '{}';
-
 COMMIT;

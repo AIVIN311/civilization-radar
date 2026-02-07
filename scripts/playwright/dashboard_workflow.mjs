@@ -7,7 +7,7 @@ import { pathToFileURL } from "node:url";
 
 function parseArgs(argv) {
   const opts = {
-    dashboard: "output/dashboard_v04.html",
+    dashboard: "output/latest/dashboard_v04.html",
     outputDir: path.join("output", "playwright"),
     headed: false,
     slowMo: 0,

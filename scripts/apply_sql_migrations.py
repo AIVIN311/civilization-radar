@@ -18,11 +18,43 @@ SQL_FILES = [
     "scripts/sql/views_v03_series_chain_latest.sql",
 ]
 
+EVENTS_V04_COLUMNS = [
+    ("strength", "REAL"),
+    ("series_raw", "TEXT"),
+    ("event_level", "TEXT DEFAULT 'L1'"),
+    ("matched_signals_json", "TEXT DEFAULT '[]'"),
+    ("strength_explain_json", "TEXT DEFAULT '{}'")
+]
+
 def read_sql(path: str) -> str:
     p = Path(path)
     if not p.exists():
         raise FileNotFoundError(f"Missing SQL file: {path}")
     return p.read_text(encoding="utf-8")
+
+
+def table_exists(cur, table_name: str) -> bool:
+    row = cur.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name=? LIMIT 1",
+        (table_name,),
+    ).fetchone()
+    return bool(row)
+
+
+def table_columns(cur, table_name: str) -> set[str]:
+    return {r[1] for r in cur.execute(f"PRAGMA table_info({table_name})").fetchall()}
+
+
+def ensure_events_v04_columns(cur):
+    if not table_exists(cur, "events_v01"):
+        return
+    cols = table_columns(cur, "events_v01")
+    for col, decl in EVENTS_V04_COLUMNS:
+        if col in cols:
+            print(f"INFO: column {col} already exists, skipping")
+            continue
+        cur.execute(f"ALTER TABLE events_v01 ADD COLUMN {col} {decl}")
+        cols.add(col)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -41,17 +73,11 @@ def main():
         try:
             con.executescript(sql)
             print(f"✅ applied: {f}")
-        except sqlite3.OperationalError as e:
-            msg = str(e).lower()
-            if "duplicate column name" in msg:
-                print(f"⚠️ duplicate column ignored: {f} ({e})")
-                continue
-            print(f"❌ failed: {f}\n{e}")
-            raise
         except Exception as e:
             print(f"❌ failed: {f}\n{e}")
             raise
 
+    ensure_events_v04_columns(cur)
     con.commit()
 
     # quick verify

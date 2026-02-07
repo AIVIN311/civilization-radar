@@ -11,37 +11,36 @@
 - edge 帶 `src_event_*` 說明欄位，可追溯事件來源。
 - `half_life_days` 可由 CLI 或 ENV 調整。
 - `eval_quality` 變成 hard gate（critical 直接 non-zero）。
-- 生成物統一在 `output/`。
+- 生成物使用穩定結構，最新成功輸出固定在 `output/latest/`。
 
 ## 完整流程
-
-```bash
-python scripts/apply_sql_migrations.py --output-dir output
-python seed_from_snapshots.py --input input/snapshots.jsonl --output-dir output
-python upgrade_to_v02.py --output-dir output
-python scripts/derive_events_from_daily.py --input output/daily_snapshots.jsonl --output-dir output
-python scripts/load_events_into_db.py --output-dir output
-python build_chain_matrix_v10.py --half-life-days 7 --output-dir output
-python upgrade_to_v03_chain.py --output-dir output
-python render_dashboard_v02.py --half-life-days 7 --output-dir output
-python scripts/eval_quality.py --missing-ratio-threshold 0.0 --output-dir output
-```
-
-輸出：
-
-- `output/radar.db`
-- `output/dashboard_v04.html`
-- `output/reports/eval_quality.json`
-
-## 一鍵執行
 
 ```bash
 python run_pipeline_50.py --output-dir output --half-life-days 7 --input-snapshots input/snapshots.jsonl
 ```
 
+輸出：
+
+- `output/latest/radar.db`
+- `output/latest/dashboard_v04.html`
+- `output/reports/eval_quality_<run_id>.json`
+
+## 一鍵執行
+
+`run_pipeline_50.py` 會把每次完整輸出寫到：
+
+- `output/runs/<YYYYMMDDTHHMMSSZ>/`
+- 成功後 promote 到 `output/latest/`
+
 ## 固定回歸驗收
 
 - 固定樣本：`input/snapshots.sample.jsonl`
 - 驗收腳本：`python scripts/run_acceptance_v04.py`
+- latest 包裝器：`python scripts/run_acceptance_latest.py`
 
 驗收腳本會驗證 deterministic hash、alias 收斂、cf/origin 強度差、Top-3 explain、half-life 敏感度、L3 一致性、與 gate 失敗條件。
+
+輸出清理：
+
+- `python scripts/clean_output.py`
+- `python scripts/clean_output.py --nuke`
