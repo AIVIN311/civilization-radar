@@ -29,6 +29,13 @@ def main():
         try:
             con.executescript(sql)
             print(f"✅ applied: {f}")
+        except sqlite3.OperationalError as e:
+            msg = str(e).lower()
+            if "duplicate column name" in msg:
+                print(f"⚠️ duplicate column ignored: {f} ({e})")
+                continue
+            print(f"❌ failed: {f}\n{e}")
+            raise
         except Exception as e:
             print(f"❌ failed: {f}\n{e}")
             raise

@@ -1,18 +1,44 @@
-import json, sqlite3
+import json
+import sqlite3
 from datetime import datetime, timezone
+from pathlib import Path
 
 DB_PATH = "radar.db"
-IN_PATH = "output/events_derived.jsonl"
+IN_PATH = Path("output/events_derived.jsonl")
+
+
+def table_exists(cur, name: str) -> bool:
+    row = cur.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name=? LIMIT 1",
+        (name,),
+    ).fetchone()
+    return bool(row)
+
+
+def to_float(v, default=0.0):
+    try:
+        return float(v)
+    except Exception:
+        return float(default)
+
 
 def main():
+    if not IN_PATH.exists():
+        raise SystemExit(f"❌ missing input: {IN_PATH}")
+
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
 
-    # 確保表存在
-    cur.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='events_v01'")
+    if not table_exists(cur, "events_v01"):
+        raise SystemExit("❌ table events_v01 not found. Run: python scripts/apply_sql_migrations.py")
+
+    cols = {r[1] for r in cur.execute("PRAGMA table_info(events_v01)").fetchall()}
+    required = {"strength", "series_raw"}
+    if not required.issubset(cols):
+        raise SystemExit("❌ events_v01 missing columns strength/series_raw. Run: python scripts/apply_sql_migrations.py")
 
     n = 0
-    with open(IN_PATH, "r", encoding="utf-8") as f:
+    with IN_PATH.open("r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
             if not line:
@@ -25,38 +51,61 @@ def main():
             event_type = ev.get("type") or "unknown"
             req_key = ev.get("req_key") or "dns_total"
 
-            baseline_avg = float(ev.get("baseline_avg") or 0.0)
-            current = float(ev.get("current") or 0.0)
-            delta = float(ev.get("delta") or (current - baseline_avg))
-            ratio = float(ev.get("ratio") or (current / baseline_avg if baseline_avg else 0.0))
+            baseline_avg = to_float(ev.get("baseline_avg"), 0.0)
+            current = to_float(ev.get("current"), 0.0)
+            delta = to_float(ev.get("delta"), current - baseline_avg)
+            ratio = to_float(ev.get("ratio"), (current / baseline_avg if baseline_avg else 0.0))
+            strength = to_float(ev.get("strength"), 0.0)
 
             origin_served = ev.get("origin_served")
             cf_served = ev.get("cf_served")
-            dns_total = ev.get("dns_total")  # optional
-            strength = ev.get("strength") or ""
-            series_raw = ev.get("series_raw") or ""
+            series_raw = ev.get("series_raw") or series
 
-            # ts: 用 date 當天 00:00Z 也行
-            ts = ev.get("ts") or (date + "T00:00:00Z")
             if not date:
-                # fallback: now
                 date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-                ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            ts = ev.get("ts") or (date + "T00:00:00Z")
 
-            cur.execute("""
+            cur.execute(
+                """
                 INSERT INTO events_v01
                 (ts, date, domain, series, event_type, req_key, baseline_avg, current, delta, ratio,
-                origin_served, cf_served, strength, series_raw)
+                 origin_served, cf_served, strength, series_raw)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-            ts, date, domain, series, event_type, req_key, baseline_avg, current, delta, ratio,
-            origin_served, cf_served, strength, series_raw
-      ))
-
+                ON CONFLICT(date, domain, event_type, req_key) DO UPDATE SET
+                  ts=excluded.ts,
+                  series=excluded.series,
+                  baseline_avg=excluded.baseline_avg,
+                  current=excluded.current,
+                  delta=excluded.delta,
+                  ratio=excluded.ratio,
+                  origin_served=excluded.origin_served,
+                  cf_served=excluded.cf_served,
+                  strength=excluded.strength,
+                  series_raw=excluded.series_raw
+                """,
+                (
+                    ts,
+                    date,
+                    domain,
+                    series,
+                    event_type,
+                    req_key,
+                    baseline_avg,
+                    current,
+                    delta,
+                    ratio,
+                    origin_served,
+                    cf_served,
+                    strength,
+                    series_raw,
+                ),
+            )
+            n += cur.rowcount
 
     con.commit()
     con.close()
     print(f"✅ inserted events: {n}")
+
 
 if __name__ == "__main__":
     main()

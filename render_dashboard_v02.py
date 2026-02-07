@@ -278,6 +278,43 @@ def main():
                 ORDER BY W_avg DESC
             """).fetchall()
 
+    event_latest = {}
+    if table_or_view_exists(cur, "events_v01"):
+        erows = cur.execute("""
+            WITH latest AS (
+              SELECT domain, MAX(date) AS max_date
+              FROM events_v01
+              GROUP BY domain
+            ),
+            picked AS (
+              SELECT
+                e.domain,
+                e.event_type,
+                e.req_key,
+                e.strength,
+                ROW_NUMBER() OVER (
+                  PARTITION BY e.domain
+                  ORDER BY e.date DESC, e.id DESC
+                ) AS rn
+              FROM events_v01 e
+              JOIN latest l
+                ON l.domain = e.domain
+               AND l.max_date = e.date
+            )
+            SELECT domain, event_type, req_key, strength
+            FROM picked
+            WHERE rn = 1
+        """).fetchall()
+        for domain, event_type, req_key, strength in erows:
+            dk = str(domain or "").lower()
+            if not dk:
+                continue
+            event_latest[dk] = {
+                "event_type": str(event_type or "unknown"),
+                "req_key": str(req_key or "dns_total"),
+                "strength": float(strength or 0.0),
+            }
+
     con.close()
 
     # ---------- render ----------
@@ -377,7 +414,7 @@ a:hover{text-decoration:underline}
     html.append("<div class='card left'>")
     html.append("<h3 style='margin:4px 0 10px'>領域預警榜</h3>")
     html.append("<table id=domainTable><thead><tr>")
-    html.append("<th></th><th>Domain</th><th>Series</th><th>Level</th><th>A</th><th>W</th><th>Δ</th><th>Spark</th><th>Matched</th><th>Sig</th>")
+    html.append("<th></th><th>Domain</th><th>Series</th><th>Level</th><th>A</th><th>W</th><th>Δ</th><th>Spark</th><th>Event</th><th>Matched</th><th>Sig</th>")
     if projected_col:
         html.append("<th>Projected</th>")
     html.append("</tr></thead><tbody>")
@@ -423,6 +460,11 @@ a:hover{text-decoration:underline}
             matched = json.dumps(["dns_spike"], ensure_ascii=False)
 
         color, label = risk_bucket(Av)
+        latest_ev = event_latest.get(dom_l)
+        if latest_ev:
+            event_text = f"{latest_ev['event_type']} | s={latest_ev['strength']:.1f} | {latest_ev['req_key']}"
+        else:
+            event_text = "—"
 
         # chain badge rendering (domain-level)
         chain_badge = ""
@@ -441,7 +483,7 @@ a:hover{text-decoration:underline}
         l3_badge = " <span class='badge'>L3</span>" if str(lv or "").upper() == "L3" else ""
         html.append(
             f"<tr data-risk='{escape(label)}' data-level='{escape(str(lv or 'L1'))}' data-chain='{1 if chain_yes else 0}' "
-            f"data-text='{escape(str(domain))} {escape(str(series or ''))} {escape(str(sig or ''))}'>"
+            f"data-text='{escape(str(domain))} {escape(str(series or ''))} {escape(str(sig or ''))} {escape(event_text)}'>"
             f"<td><span class='dot {color}'></span></td>"
             f"<td><a href='https://{d_esc}/' target='_blank' rel='noopener noreferrer'>{d_esc}</a></td>"
             f"<td>{s_esc}{chain_badge}</td>"
@@ -450,6 +492,7 @@ a:hover{text-decoration:underline}
             f"<td><b>{Wv:.3f}</b></td>"
             f"<td><span class='delta {cls}'>{arr} {dw:+.3f}</span></td>"
             f"<td class='spark'>{sp}</td>"
+            f"<td><span class='badge'>{escape(event_text)}</span></td>"
             f"<td><span class='match'>展開</span><div class='matchbox'>{m_esc}</div></td>"
             f"<td><span class='badge'>{sig_esc}</span></td>"
         )

@@ -20,6 +20,8 @@ CREATE TABLE IF NOT EXISTS events_v01 (
   origin_served INTEGER,
   cf_served     INTEGER,
   dns_total     INTEGER,
+  strength      REAL,
+  series_raw    TEXT,
 
   -- optional: allow attaching matched signals / signatures later
   sig           TEXT,
@@ -39,5 +41,9 @@ CREATE INDEX IF NOT EXISTS ix_events_v01_date ON events_v01(date);
 CREATE INDEX IF NOT EXISTS ix_events_v01_series ON events_v01(series);
 CREATE INDEX IF NOT EXISTS ix_events_v01_domain ON events_v01(domain);
 CREATE INDEX IF NOT EXISTS ix_events_v01_ratio ON events_v01(ratio);
+
+-- upgrade path for existing dbs (idempotency handled by migration script)
+ALTER TABLE events_v01 ADD COLUMN strength REAL;
+ALTER TABLE events_v01 ADD COLUMN series_raw TEXT;
 
 COMMIT;

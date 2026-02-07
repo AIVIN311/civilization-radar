@@ -2,13 +2,19 @@
 # Derive "events" from REAL daily snapshots (jsonl).
 #
 # It auto-detects the request field among:
-#   dns_total, req, requests, request_count
+#   dns_total, req, requests (with safe per-row fallback)
 #
 # Output: output/events_derived.jsonl
 
 import json
+import sys
 from pathlib import Path
 from collections import defaultdict
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 from src.event_strength import event_strength
 
 INPUT = Path("output/daily_snapshots.jsonl")
@@ -30,20 +36,27 @@ def load_rows(path: Path):
     return rows
 
 
-def pick_req_key(sample_row: dict) -> str:
-    # Prefer common fields seen in your heatcloud code
-    candidates = ["dns_total", "req", "requests", "request_count"]
+def pick_req_key(rows) -> str:
+    # Prefer common fields seen in snapshots
+    candidates = ["dns_total", "req", "requests"]
     for k in candidates:
-        val = sample_row.get(k)
-        if k in sample_row and (isinstance(val, (int, float)) or (isinstance(val, str) and val.isdigit())):
-            return k
-    # fallback: find any numeric-looking key
-    for k, v in sample_row.items():
-        if isinstance(v, (int, float)):
-            return k
-        if isinstance(v, str) and v.isdigit():
-            return k
-    raise KeyError("No numeric request-like field found in snapshot row.")
+        for row in rows:
+            v = row.get(k)
+            if isinstance(v, (int, float)) or (isinstance(v, str) and v.isdigit()):
+                return k
+    return "dns_total"
+
+
+def req_value(row: dict, req_key: str) -> int:
+    v = row.get(req_key)
+    if v is None:
+        for k in ("dns_total", "req", "requests"):
+            if k == req_key:
+                continue
+            v = row.get(k)
+            if v is not None:
+                break
+    return to_int(v)
 
 
 def to_int(v):
@@ -61,8 +74,7 @@ def main():
     if not rows:
         raise SystemExit("❌ input is empty")
 
-    # auto-detect request field from first row
-    req_key = pick_req_key(rows[0])
+    req_key = pick_req_key(rows)
 
     by_domain = defaultdict(list)
     for r in rows:
@@ -81,8 +93,8 @@ def main():
         if len(items) <= WINDOW:
             continue
 
-        baseline_vals = [to_int(x.get(req_key)) for x in items[:-1]]
-        latest_val = to_int(items[-1].get(req_key))
+        baseline_vals = [req_value(x, req_key) for x in items[:-1]]
+        latest_val = req_value(items[-1], req_key)
 
         # baseline excludes latest day; use last WINDOW days if longer
         if len(baseline_vals) > WINDOW:
@@ -94,14 +106,18 @@ def main():
 
         # basic spike rule
         if ratio >= SPIKE_RATIO and latest_val >= 10:
-            series = items[-1].get("series")
-            if not isinstance(series, str):
-                series = "unmapped"
+            series_raw = items[-1].get("series")
+            if not isinstance(series_raw, str) or not series_raw.strip():
+                series_raw = "unmapped"
+            series = series_raw
+            origin_served = to_int(items[-1].get("origin_served"))
+            cf_served = to_int(items[-1].get("cf_served"))
 
             events.append({
                 "date": items[-1]["date"],
                 "domain": domain,
                 "series": series,
+                "series_raw": series_raw,
                 "type": "spike",
                 "req_key": req_key,
                 "baseline_avg": round(baseline_avg, 2),
@@ -109,8 +125,9 @@ def main():
                 "delta": round(delta, 2),
                 "ratio": round(ratio, 2),
                 # optionally attach origin/cf ratios if available
-                "origin_served": to_int(items[-1].get("origin_served")),
-                "cf_served": to_int(items[-1].get("cf_served")),
+                "origin_served": origin_served,
+                "cf_served": cf_served,
+                "strength": round(event_strength(baseline_avg, latest_val, origin_served, cf_served), 3),
             })
 
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
