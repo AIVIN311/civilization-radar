@@ -1,0 +1,8 @@
+{
+  "version": "v1",
+  "profiles": {
+    "tw": { "label": "Taiwan", "countries": ["TW"], "neighbors": ["JP","KR","PH","HK","CN"] },
+    "nearby": { "label": "Nearby", "countries": ["JP","KR","PH","HK","CN"] },
+    "none": { "label": "None", "countries": [] }
+  }
+}
