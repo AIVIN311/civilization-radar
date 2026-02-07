@@ -2,6 +2,7 @@ import os
 import json
 import sqlite3
 import math
+from src.chain_event_boost import event_boost
 
 DB_PATH = "radar.db"
 K = 16  # window size, align with dashboard sparkline
@@ -53,6 +54,22 @@ def main():
         raise SystemExit("FATAL: metrics_v02 empty. Run upgrade_to_v02.py first.")
 
     level_col = detect_level_col(cur)
+
+    # --- series event boost map: series -> boost(multiplier) ---
+    series_boost = {}
+    try:
+        rows = cur.execute("""
+            SELECT series, MAX(COALESCE(strength, 0.0)) AS max_strength
+            FROM events_v01
+            GROUP BY series
+        """).fetchall()
+        for s, max_strength in rows:
+            if not s:
+                continue
+            series_boost[str(s)] = float(event_boost(float(max_strength or 0.0)))
+    except sqlite3.OperationalError:
+        # events_v01 may not exist in fresh db
+        series_boost = {}
 
     # --- build series timeline: ts x series -> W_avg ---
     ts_list = [r[0] for r in cur.execute("SELECT DISTINCT ts FROM metrics_v02 ORDER BY ts").fetchall()]
@@ -177,7 +194,8 @@ def main():
                 corr = pearson(x, y)
                 if corr <= 0:
                     continue
-                push = corr * d_src
+                boost = series_boost.get(src, 1.0)
+                push = corr * d_src * boost
                 # tiny pushes are noise
                 if push < 1e-6:
                     continue
