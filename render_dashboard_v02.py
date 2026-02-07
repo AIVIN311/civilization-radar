@@ -1,6 +1,7 @@
 import re
 import sqlite3
 import math
+from datetime import date
 from html import escape
 import sys
 sys.path.append(".")
@@ -20,6 +21,8 @@ A_SUS = 2.0
 A_ALR = 3.0
 
 SPARK_K = 16
+EVENT_BOOST_HALF_LIFE_DAYS = 7.0
+EVENT_BOOST_DECAY_LAMBDA = math.log(2.0) / EVENT_BOOST_HALF_LIFE_DAYS
 
 
 def event_boost(max_strength: float) -> float:
@@ -34,6 +37,29 @@ def event_boost(max_strength: float) -> float:
     if s <= 0:
         return 1.0
     return 1.0 + math.log1p(s) / 2.0
+
+
+def parse_ymd(text):
+    if not text:
+        return None
+    try:
+        return date.fromisoformat(str(text)[:10])
+    except Exception:
+        return None
+
+
+def decayed_max_strength(events, asof_day):
+    if not asof_day or not events:
+        return 0.0
+    mx = 0.0
+    for ev_day, strength in events:
+        age_days = (asof_day - ev_day).days
+        if age_days < 0:
+            continue
+        val = float(strength or 0.0) * math.exp(-EVENT_BOOST_DECAY_LAMBDA * age_days)
+        if val > mx:
+            mx = val
+    return mx
 
 
 # ---------- helpers ----------
@@ -330,21 +356,25 @@ def main():
                 "strength": float(strength or 0.0),
             }
 
-    # latest events date: series -> max strength (for top-3 explainability)
-    event_strength_max = {}
+    # latest ts decayed event strength: series -> strength_now (for explainability)
+    event_strength_now = {}
     try:
-        latest_event_date = cur.execute("SELECT MAX(date) FROM events_v01").fetchone()[0]
-        if latest_event_date:
-            rows_ev = cur.execute("""
-                SELECT series, MAX(strength) AS max_strength
-                FROM events_v01
-                WHERE date = ?
-                GROUP BY series
-            """, (latest_event_date,)).fetchall()
-            for s, mx in rows_ev:
-                event_strength_max[str(s)] = float(mx or 0.0)
+        latest_day = parse_ymd(latest)
+        rows_ev = cur.execute("""
+            SELECT series, date, COALESCE(strength, 0.0) AS strength
+            FROM events_v01
+            WHERE series IS NOT NULL
+        """).fetchall()
+        by_series = {}
+        for s, d, strength in rows_ev:
+            ev_day = parse_ymd(d)
+            if not s or ev_day is None:
+                continue
+            by_series.setdefault(str(s), []).append((ev_day, float(strength or 0.0)))
+        for s, evs in by_series.items():
+            event_strength_now[s] = decayed_max_strength(evs, latest_day)
     except Exception:
-        event_strength_max = {}
+        event_strength_now = {}
 
     con.close()
 
@@ -581,7 +611,7 @@ a:hover{text-decoration:underline}
 
             chain_badge = "<span class='badge black'>YES</span>" if chain_yes else "<span class='muted'>no</span>"
             push_val = float(push or 0.0)
-            dst_boost = event_boost(float(event_strength_max.get(str(series), 0.0) or 0.0))
+            dst_boost = event_boost(float(event_strength_now.get(str(series), 0.0) or 0.0))
             base_score = (push_val / dst_boost) if dst_boost > 0 else push_val
             series_id = safe_id(series)
             top3_id = f"top3_{series_id}"
@@ -605,14 +635,14 @@ a:hover{text-decoration:underline}
 
             edges = topk_edges.get(series, [])
             html.append(f"<tr class='top3-row' id='{top3_id}'><td colspan='11'>")
-            mxs = float(event_strength_max.get(str(series), 0.0) or 0.0)
+            mxs = float(event_strength_now.get(str(series), 0.0) or 0.0)
             b = event_boost(mxs)
             if edges:
                 html.append("<div class='top3-box'>")
                 html.append(
                     f"<div class='muted' style='margin:2px 0 8px'>"
                     f"event_boost = <b>x{b:.2f}</b> "
-                    f"(max_strength={mxs:.1f} on latest events date)"
+                    f"(decayed_strength={mxs:.2f} at latest ts)"
                     f"</div>"
                 )
                 html.append("<table class='top3-table'>")

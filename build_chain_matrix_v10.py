@@ -2,6 +2,7 @@ import os
 import json
 import sqlite3
 import math
+from datetime import date
 from src.chain_event_boost import event_boost
 
 DB_PATH = "radar.db"
@@ -9,6 +10,8 @@ K = 16  # window size, align with dashboard sparkline
 TH_BG = 1.20
 TH_SUS = 1.80
 TAU = 12.0  # push decay time constant (slots)
+EVENT_BOOST_HALF_LIFE_DAYS = 7.0
+EVENT_BOOST_DECAY_LAMBDA = math.log(2.0) / EVENT_BOOST_HALF_LIFE_DAYS
 EVENT_FORCING_PATH = "event_forcing_v0.2.json"
 DEBUG_EVENT_FORCING = False
 
@@ -44,6 +47,29 @@ def detect_level_col(cur):
             return c
     return None
 
+
+def parse_ymd(text):
+    if not text:
+        return None
+    try:
+        return date.fromisoformat(str(text)[:10])
+    except Exception:
+        return None
+
+
+def decayed_max_strength(events, asof_day):
+    if not asof_day or not events:
+        return 0.0
+    mx = 0.0
+    for ev_day, strength in events:
+        age_days = (asof_day - ev_day).days
+        if age_days < 0:
+            continue
+        val = float(strength or 0.0) * math.exp(-EVENT_BOOST_DECAY_LAMBDA * age_days)
+        if val > mx:
+            mx = val
+    return mx
+
 def main():
     con = sqlite3.connect(DB_PATH)
     cur = con.cursor()
@@ -55,21 +81,24 @@ def main():
 
     level_col = detect_level_col(cur)
 
-    # --- series event boost map: series -> boost(multiplier) ---
-    series_boost = {}
+    # --- events by series: for time-decayed boost ---
+    events_by_series = {}
     try:
         rows = cur.execute("""
-            SELECT series, MAX(COALESCE(strength, 0.0)) AS max_strength
+            SELECT series, date, COALESCE(strength, 0.0) AS strength
             FROM events_v01
-            GROUP BY series
+            WHERE series IS NOT NULL
         """).fetchall()
-        for s, max_strength in rows:
-            if not s:
+        for s, d, strength in rows:
+            if not s or d is None:
                 continue
-            series_boost[str(s)] = float(event_boost(float(max_strength or 0.0)))
+            ev_day = parse_ymd(d)
+            if ev_day is None:
+                continue
+            events_by_series.setdefault(str(s), []).append((ev_day, float(strength or 0.0)))
     except sqlite3.OperationalError:
         # events_v01 may not exist in fresh db
-        series_boost = {}
+        events_by_series = {}
 
     # --- build series timeline: ts x series -> W_avg ---
     ts_list = [r[0] for r in cur.execute("SELECT DISTINCT ts FROM metrics_v02 ORDER BY ts").fetchall()]
@@ -174,6 +203,15 @@ def main():
 
     # --- build per-series time arrays aligned to ts_list ---
     series_ts_values = {s: [wavg.get((ts, s), 0.0) for ts in ts_list] for s in series_list}
+    ts_day = {ts: parse_ymd(ts) for ts in ts_list}
+
+    # --- per-ts per-series event boost (with time decay) ---
+    series_boost_at_ts = {}
+    for ts in ts_list:
+        asof_day = ts_day.get(ts)
+        for s in series_list:
+            mx = decayed_max_strength(events_by_series.get(s, []), asof_day)
+            series_boost_at_ts[(ts, s)] = float(event_boost(mx))
 
     # --- compute for each ts index i>=1 ---
     for i in range(1, len(ts_list)):
@@ -194,7 +232,7 @@ def main():
                 corr = pearson(x, y)
                 if corr <= 0:
                     continue
-                boost = series_boost.get(src, 1.0)
+                boost = series_boost_at_ts.get((ts_now, src), 1.0)
                 push = corr * d_src * boost
                 # tiny pushes are noise
                 if push < 1e-6:
