@@ -42,6 +42,7 @@ python scripts/derive_events_from_daily.py
 python scripts/load_events_into_db.py
 python build_chain_matrix_v10.py
 python render_dashboard_v02.py
+python scripts/eval_quality.py
 ```
 
 Outputs:
