@@ -112,6 +112,11 @@ def main():
         help="Output root directory that contains latest/runs/reports/tmp (default: output)",
     )
     parser.add_argument("--half-life-days", type=float, default=7.0)
+    parser.add_argument(
+        "--geo-profile",
+        default="tw",
+        help="Active geo profile name for geo_factor (default: tw)",
+    )
     parser.add_argument("--input-snapshots", default="input/snapshots.jsonl")
     parser.add_argument("--input-daily", default=None)
     args = parser.parse_args()
@@ -138,7 +143,17 @@ def main():
 
     run([py, "scripts/derive_events_from_daily.py", "--input", daily_input, *common])
     run([py, "scripts/load_events_into_db.py", *common])
-    run([py, "build_chain_matrix_v10.py", "--half-life-days", str(args.half_life_days), *common])
+    run(
+        [
+            py,
+            "build_chain_matrix_v10.py",
+            "--half-life-days",
+            str(args.half_life_days),
+            "--geo-profile",
+            str(args.geo_profile),
+            *common,
+        ]
+    )
     run([py, "upgrade_to_v03_chain.py", *common])
     run([py, "render_dashboard_v02.py", "--half-life-days", str(args.half_life_days), *common])
     run([py, "scripts/eval_quality.py", *common])

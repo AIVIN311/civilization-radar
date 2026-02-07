@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from datetime import date
 
 from src.chain_event_boost import event_boost
+from src.geo_factor import compute_geo_factor, compute_tw_rank, load_geo_profiles
 from src.series_registry import resolve_series
 from src.settings import add_common_args, from_args
 
@@ -50,6 +51,39 @@ def parse_ymd(text):
         return date.fromisoformat(str(text)[:10])
     except Exception:
         return None
+
+
+def parse_top_countries(value) -> dict:
+    if isinstance(value, dict):
+        payload = value
+    elif isinstance(value, str):
+        try:
+            payload = json.loads(value)
+        except Exception:
+            return {}
+    else:
+        return {}
+    if not isinstance(payload, dict):
+        return {}
+
+    out = {}
+    for country, count in payload.items():
+        code = str(country).strip().upper()
+        if not code:
+            continue
+        try:
+            num = float(count)
+        except Exception:
+            continue
+        if num <= 0:
+            continue
+        out[code] = out.get(code, 0.0) + num
+    return out
+
+
+def merge_top_countries(dst: dict, src: dict):
+    for country, count in src.items():
+        dst[country] = dst.get(country, 0.0) + float(count)
 
 
 @dataclass
@@ -169,6 +203,11 @@ def prepare_tables(cur):
       base_push REAL NOT NULL,
       boosted_push REAL NOT NULL,
       delta_boost REAL NOT NULL,
+      geo_profile TEXT NOT NULL,
+      geo_factor REAL NOT NULL,
+      geo_factor_explain_json TEXT NOT NULL,
+      tw_rank_score REAL NOT NULL,
+      tw_rank_explain_json TEXT NOT NULL,
       domains INTEGER NOT NULL,
       L3_domains INTEGER NOT NULL,
       max_event_level TEXT,
@@ -189,6 +228,11 @@ def prepare_tables(cur):
       base_push REAL NOT NULL,
       boosted_push REAL NOT NULL,
       delta_boost REAL NOT NULL,
+      geo_profile TEXT NOT NULL,
+      geo_factor REAL NOT NULL,
+      geo_factor_explain_json TEXT NOT NULL,
+      tw_rank_score REAL NOT NULL,
+      tw_rank_explain_json TEXT NOT NULL,
       domains INTEGER NOT NULL,
       L3_domains INTEGER NOT NULL,
       max_event_level TEXT,
@@ -208,8 +252,28 @@ def merge_level(a: str, b: str) -> str:
 def main():
     parser = argparse.ArgumentParser()
     add_common_args(parser, include_half_life=True)
+    parser.add_argument(
+        "--geo-profile",
+        default="tw",
+        help="Active geo profile name from geo profiles JSON (default: tw)",
+    )
+    parser.add_argument(
+        "--geo-profiles-path",
+        default="config/geo_profiles_v1.json",
+        help="Path to geo profiles JSON (default: config/geo_profiles_v1.json)",
+    )
     args = parser.parse_args()
     cfg = from_args(args)
+    active_geo_profile = str(args.geo_profile).strip()
+    try:
+        geo_profiles = load_geo_profiles(args.geo_profiles_path)
+    except Exception as e:
+        raise SystemExit(f"FATAL: failed to load geo profiles: {e}")
+    if active_geo_profile not in geo_profiles:
+        available = ", ".join(sorted(geo_profiles.keys()))
+        raise SystemExit(
+            f"FATAL: unknown --geo-profile '{active_geo_profile}'. Available: {available}"
+        )
 
     con = sqlite3.connect(cfg["db_path"])
     cur = con.cursor()
@@ -255,6 +319,21 @@ def main():
         for r in cur.execute("SELECT DISTINCT series FROM metrics_v02 ORDER BY series").fetchall()
     ]
     series_list = sorted(set(series_list))
+
+    series_top_countries = {}
+    try:
+        rows = cur.execute(
+            """
+            SELECT ts, series, top_countries
+            FROM snapshots_v01
+            """
+        ).fetchall()
+        for ts, series, top_countries_json in rows:
+            key = (str(ts), resolve_series(str(series or "")))
+            bucket = series_top_countries.setdefault(key, {})
+            merge_top_countries(bucket, parse_top_countries(top_countries_json))
+    except sqlite3.OperationalError:
+        series_top_countries = {}
 
     wavg = {}
     dom_count = {}
@@ -392,14 +471,21 @@ def main():
             uplift = W_proj - W
             chain_flag = 1 if (uplift >= 0.06 and top_push_boosted >= 0.5 * uplift) else 0
             status = "持續中" if (W_proj >= TH_SUS or W >= TH_SUS) else "平穩"
+            geo_factor, geo_explain = compute_geo_factor(
+                series_top_countries.get((ts_now, dst), {}),
+                active_geo_profile,
+                geo_profiles,
+            )
+            tw_rank_score, tw_rank_explain = compute_tw_rank(inc_boosted, geo_factor)
             doms = int(dom_count.get((ts_now, dst), 0))
             l3 = int(l3_count.get((ts_now, dst), 0))
 
             cur.execute(
                 """
                 INSERT OR REPLACE INTO series_chain_v10
-                (ts,series,W_avg,W_proj,status,chain_flag,top_src,share,push,push_raw,base_push,boosted_push,delta_boost,domains,L3_domains,max_event_level)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                (ts,series,W_avg,W_proj,status,chain_flag,top_src,share,push,push_raw,base_push,boosted_push,delta_boost,
+                 geo_profile,geo_factor,geo_factor_explain_json,tw_rank_score,tw_rank_explain_json,domains,L3_domains,max_event_level)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 """,
                 (
                     ts_now,
@@ -415,6 +501,11 @@ def main():
                     inc_base,
                     inc_boosted,
                     inc_delta,
+                    active_geo_profile,
+                    float(geo_factor),
+                    json.dumps(geo_explain, ensure_ascii=False),
+                    float(tw_rank_score),
+                    json.dumps(tw_rank_explain, ensure_ascii=False),
                     doms,
                     l3,
                     max_event_level,
@@ -521,13 +612,20 @@ def main():
             uplift = W_proj - W
             chain_flag = 1 if (uplift >= 0.06 and top_push_boosted >= 0.5 * uplift) else 0
             status = "持續中" if (W_proj >= TH_SUS or W >= TH_SUS) else "平穩"
+            geo_factor, geo_explain = compute_geo_factor(
+                series_top_countries.get((latest_ts, dst), {}),
+                active_geo_profile,
+                geo_profiles,
+            )
+            tw_rank_score, tw_rank_explain = compute_tw_rank(inc_boosted, geo_factor)
             doms = int(dom_count.get((latest_ts, dst), 0))
             l3 = int(l3_count.get((latest_ts, dst), 0))
             cur.execute(
                 """
                 INSERT OR REPLACE INTO series_chain_decay_latest
-                (ts,series,W_avg,W_proj,status,chain_flag,top_src,share,push,push_raw,base_push,boosted_push,delta_boost,domains,L3_domains,max_event_level)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                (ts,series,W_avg,W_proj,status,chain_flag,top_src,share,push,push_raw,base_push,boosted_push,delta_boost,
+                 geo_profile,geo_factor,geo_factor_explain_json,tw_rank_score,tw_rank_explain_json,domains,L3_domains,max_event_level)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 """,
                 (
                     latest_ts,
@@ -543,6 +641,11 @@ def main():
                     inc_base,
                     inc_boosted,
                     inc_delta,
+                    active_geo_profile,
+                    float(geo_factor),
+                    json.dumps(geo_explain, ensure_ascii=False),
+                    float(tw_rank_score),
+                    json.dumps(tw_rank_explain, ensure_ascii=False),
                     doms,
                     l3,
                     max_event_level,
@@ -553,7 +656,7 @@ def main():
     con.close()
     print(
         f"OK: built chain tables at {cfg['db_path']} "
-        f"(half_life_days={cfg['half_life_days']})"
+        f"(half_life_days={cfg['half_life_days']}, geo_profile={active_geo_profile})"
     )
 
 

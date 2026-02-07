@@ -89,13 +89,25 @@ def fetch_event_rows(cur):
 def fetch_chain_rows(cur):
     if not table_exists(cur, "v03_series_chain_latest"):
         return [], {}
-    rows = cur.execute(
-        """
-        SELECT series,W_avg,W_proj,status,chain_flag,top_src,share,push,push_raw,base_push,boosted_push,delta_boost,domains,L3_domains,max_event_level
-        FROM v03_series_chain_latest
-        ORDER BY W_proj DESC, W_avg DESC
-        """
-    ).fetchall()
+    try:
+        rows = cur.execute(
+            """
+            SELECT series,W_avg,W_proj,status,chain_flag,top_src,share,push,push_raw,base_push,boosted_push,delta_boost,
+                   geo_profile,geo_factor,tw_rank_score,domains,L3_domains,max_event_level
+            FROM v03_series_chain_latest
+            ORDER BY W_proj DESC, W_avg DESC
+            """
+        ).fetchall()
+        has_geo = True
+    except sqlite3.OperationalError:
+        rows = cur.execute(
+            """
+            SELECT series,W_avg,W_proj,status,chain_flag,top_src,share,push,push_raw,base_push,boosted_push,delta_boost,domains,L3_domains,max_event_level
+            FROM v03_series_chain_latest
+            ORDER BY W_proj DESC, W_avg DESC
+            """
+        ).fetchall()
+        has_geo = False
     series_rows = [
         {
             "series": str(r[0]),
@@ -110,9 +122,12 @@ def fetch_chain_rows(cur):
             "base_push": float(r[9] or 0.0),
             "boosted_push": float(r[10] or 0.0),
             "delta_boost": float(r[11] or 0.0),
-            "domains": int(r[12] or 0),
-            "L3_domains": int(r[13] or 0),
-            "max_event_level": str(r[14] or "L1"),
+            "geo_profile": str(r[12] or "") if has_geo else "",
+            "geo_factor": float(r[13] or 0.0) if has_geo else 0.0,
+            "tw_rank_score": float(r[14] or 0.0) if has_geo else float(r[10] or 0.0),
+            "domains": int(r[15] or 0) if has_geo else int(r[12] or 0),
+            "L3_domains": int(r[16] or 0) if has_geo else int(r[13] or 0),
+            "max_event_level": str(r[17] or "L1") if has_geo else str(r[14] or "L1"),
         }
         for r in rows
     ]
@@ -241,7 +256,10 @@ th{color:#555}
     html.append("</tbody></table></div>")
 
     html.append("<div class='card'><h3>鏈式列表</h3><table id='chainTable'><thead><tr>")
-    html.append("<th>series</th><th>W_avg</th><th>W_proj</th><th>base</th><th>boosted</th><th>delta</th><th>top_src</th><th>L3</th><th>Top-3</th>")
+    html.append(
+        "<th>series</th><th>W_avg</th><th>W_proj</th><th>base</th><th>boosted</th><th>delta</th>"
+        "<th>geo_factor</th><th>tw_rank</th><th>top_src</th><th>L3</th><th>Top-3</th>"
+    )
     html.append("</tr></thead><tbody>")
     for c in chains:
         sid = escape(c["series"])
@@ -255,12 +273,14 @@ th{color:#555}
             f"<td>{c['base_push']:.4f}</td>"
             f"<td>{c['boosted_push']:.4f}</td>"
             f"<td>{c['delta_boost']:.4f}</td>"
+            f"<td>{c['geo_factor']:.4f}</td>"
+            f"<td>{c['tw_rank_score']:.4f}</td>"
             f"<td>{escape(c['top_src'])}</td>"
             f"<td>{c['L3_domains']}</td>"
             f"<td><button class='toggle' data-target='{row_id}'>Top-3</button></td>"
             "</tr>"
         )
-        html.append(f"<tr class='top3' id='{row_id}' data-level='{lvl}'><td colspan='9'>")
+        html.append(f"<tr class='top3' id='{row_id}' data-level='{lvl}'><td colspan='11'>")
         rows = top3.get(c["series"], [])
         if not rows:
             html.append("<span class='muted'>無 Top-3 edges</span>")

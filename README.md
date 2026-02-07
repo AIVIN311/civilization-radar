@@ -1,7 +1,7 @@
-# Civilization Radar v0.4
+# Civilization Radar v0.5 (PR-2 in progress)
 
 Civilization Radar is an event-driven cross-series risk propagation radar.
-v0.4 focuses on deterministic outputs, explainability, and strict release gates.
+v0.4 is the stable base. v0.5 PR-2 adds geo_factor data-layer outputs without changing v0.4 core scoring semantics.
 
 ## What Is New In v0.4
 
@@ -13,6 +13,19 @@ v0.4 focuses on deterministic outputs, explainability, and strict release gates.
 - Half-life is configurable by CLI or env (`RADAR_EVENT_HALF_LIFE_DAYS`).
 - Strict quality gate (`scripts/eval_quality.py`) with non-zero exit on critical issues.
 - All generated artifacts now use a stabilized output layout with `output/latest/`.
+
+## v0.5 PR-2 (Geo Factor Data Layer)
+
+- SSOT path is fixed: `config/geo_profiles_v1.json`.
+- Active geo profile is single-select per run (`--geo-profile`, default `tw`).
+- New chain outputs (non-interfering):
+  - `geo_factor`
+  - `geo_factor_explain_json`
+  - `tw_rank_score`
+  - `tw_rank_explain_json`
+- `tw_rank_score` uses:
+  - `tw_rank_score = boosted_push * (1 + geo_factor)`
+  - `base_push / boosted_push / delta_boost` semantics remain unchanged.
 
 ## Environment
 
@@ -28,7 +41,7 @@ Key optional env vars:
 ## Full Pipeline (v0.4)
 
 ```bash
-python run_pipeline_50.py --output-dir output --half-life-days 7 --input-snapshots input/snapshots.jsonl
+python run_pipeline_50.py --output-dir output --half-life-days 7 --geo-profile tw --input-snapshots input/snapshots.jsonl
 ```
 
 Output:

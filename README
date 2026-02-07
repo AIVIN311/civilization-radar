@@ -1,6 +1,7 @@
-# Civilization Radar v0.4
+# Civilization Radar v0.5（PR-2 進行中）
 
 中文版快速說明。英文完整版請看 `README.md`。
+v0.4 為穩定底座；v0.5 PR-2 只新增 geo 資料層，不改 v0.4 核心分數語意。
 
 ## v0.4 重點
 
@@ -13,10 +14,20 @@
 - `eval_quality` 變成 hard gate（critical 直接 non-zero）。
 - 生成物使用穩定結構，最新成功輸出固定在 `output/latest/`。
 
+## v0.5 PR-2（Geo Factor 資料層）
+
+- SSOT 路徑固定：`config/geo_profiles_v1.json`。
+- 每次 run 單一 active profile：`--geo-profile`（預設 `tw`）。
+- 鏈式輸出新增欄位（不改 v0.4 base/boosted/delta）：
+  - `geo_factor`
+  - `geo_factor_explain_json`
+  - `tw_rank_score`
+  - `tw_rank_explain_json`
+
 ## 完整流程
 
 ```bash
-python run_pipeline_50.py --output-dir output --half-life-days 7 --input-snapshots input/snapshots.jsonl
+python run_pipeline_50.py --output-dir output --half-life-days 7 --geo-profile tw --input-snapshots input/snapshots.jsonl
 ```
 
 輸出：
