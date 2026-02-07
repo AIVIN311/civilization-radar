@@ -1,199 +1,134 @@
-import math
+import argparse
+import json
 import sqlite3
-from datetime import datetime, timedelta
-from statistics import mean
+import sys
+from pathlib import Path
 
-DB_PATH = "radar.db"
-TOP_K = 10
-ALERT_A = 2.0
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
-
-def parse_ts(ts_text):
-    try:
-        return datetime.fromisoformat(str(ts_text))
-    except Exception:
-        return None
+from src.settings import add_common_args, from_args
 
 
-def rank_map(values_desc):
-    # values_desc: [(item, value), ...] already sorted DESC
-    return {item: i + 1 for i, (item, _) in enumerate(values_desc)}
+def fetch_one(cur, sql, params=()):
+    return cur.execute(sql, params).fetchone()[0]
 
 
-def spearman_from_rank_maps(r1, r2):
-    common = sorted(set(r1.keys()) & set(r2.keys()))
-    n = len(common)
-    if n < 2:
-        return None
-    d2 = 0.0
-    for k in common:
-        d = float(r1[k] - r2[k])
-        d2 += d * d
-    return 1.0 - (6.0 * d2) / (n * (n * n - 1.0))
-
-
-def load_domain_rows(cur):
-    cols = {r[1] for r in cur.execute("PRAGMA table_info(metrics_v02)").fetchall()}
-    if "level_max" not in cols and "level" not in cols and "lvl" not in cols:
-        return []
-    level_col = "level_max" if "level_max" in cols else ("level" if "level" in cols else "lvl")
-    rows = cur.execute(
-        f"""
-        SELECT ts, domain, COALESCE(W,0.0) AS W, COALESCE(A,0.0) AS A, COALESCE({level_col}, '') AS level
-        FROM metrics_v02
+def check_ts_out_of_order(cur):
+    row = cur.execute(
         """
-    ).fetchall()
-    return rows
-
-
-def precision_at_k(cur, top_k=TOP_K):
-    rows = load_domain_rows(cur)
-    if not rows:
-        return None
-
-    by_ts = {}
-    for ts, domain, w, a, level in rows:
-        by_ts.setdefault(ts, []).append((domain, float(w or 0.0), float(a or 0.0), str(level or "")))
-
-    scores = []
-    for ts, items in by_ts.items():
-        items = sorted(items, key=lambda x: x[1], reverse=True)[:top_k]
-        if not items:
-            continue
-        hit = 0
-        for _, _, a, level in items:
-            if a >= ALERT_A or level in ("L2", "L3"):
-                hit += 1
-        scores.append(hit / float(len(items)))
-
-    if not scores:
-        return None
-    return {
-        "windows": len(scores),
-        "top_k": top_k,
-        "score": mean(scores),
-    }
-
-
-def event_hit_rate_24h(cur):
-    # event -> whether same domain has elevated state within next 24h
-    e_rows = cur.execute(
+        WITH ordered AS (
+          SELECT domain, ts, id,
+                 LAG(ts) OVER (PARTITION BY domain ORDER BY id) AS prev_ts
+          FROM snapshots_v01
+        )
+        SELECT COUNT(*)
+        FROM ordered
+        WHERE prev_ts IS NOT NULL AND ts < prev_ts
         """
-        SELECT domain, date
-        FROM events_v01
-        WHERE domain IS NOT NULL AND date IS NOT NULL
-        """
-    ).fetchall()
-    if not e_rows:
-        return None
-
-    m_rows = load_domain_rows(cur)
-    by_domain = {}
-    for ts, domain, _, a, level in m_rows:
-        t = parse_ts(ts)
-        if t is None:
-            continue
-        by_domain.setdefault(str(domain), []).append((t, float(a or 0.0), str(level or "")))
-    for d in by_domain:
-        by_domain[d].sort(key=lambda x: x[0])
-
-    total = 0
-    hit = 0
-    for domain, d in e_rows:
-        try:
-            start = datetime.fromisoformat(str(d) + "T00:00:00+00:00")
-        except Exception:
-            continue
-        end = start + timedelta(hours=24)
-        total += 1
-        found = False
-        for t, a, level in by_domain.get(str(domain), []):
-            if start <= t <= end and (a >= ALERT_A or level in ("L2", "L3")):
-                found = True
-                break
-        if found:
-            hit += 1
-
-    if total == 0:
-        return None
-    return {
-        "events": total,
-        "hits": hit,
-        "score": hit / float(total),
-    }
+    ).fetchone()
+    return int(row[0] if row else 0)
 
 
-def series_ranking_stability(cur):
-    rows = cur.execute(
-        """
-        SELECT ts, series, AVG(COALESCE(W,0.0)) AS w_avg
-        FROM metrics_v02
-        GROUP BY ts, series
-        """
-    ).fetchall()
-    if not rows:
-        return None
-
-    by_ts = {}
-    for ts, s, w in rows:
-        by_ts.setdefault(ts, []).append((str(s), float(w or 0.0)))
-
-    ts_sorted = sorted(by_ts.keys(), key=lambda x: parse_ts(x) or datetime.min)
-    if len(ts_sorted) < 2:
-        return None
-
-    rho_vals = []
-    for i in range(1, len(ts_sorted)):
-        prev_ts = ts_sorted[i - 1]
-        cur_ts = ts_sorted[i]
-        prev_rank = rank_map(sorted(by_ts[prev_ts], key=lambda x: x[1], reverse=True))
-        now_rank = rank_map(sorted(by_ts[cur_ts], key=lambda x: x[1], reverse=True))
-        rho = spearman_from_rank_maps(prev_rank, now_rank)
-        if rho is not None:
-            rho_vals.append(rho)
-
-    if not rho_vals:
-        return None
-    return {
-        "pairs": len(rho_vals),
-        "score": mean(rho_vals),
-    }
+def build_report(cur, missing_ratio_threshold: float):
+    checks = {}
+    checks["events_empty"] = int(fetch_one(cur, "SELECT COUNT(*)=0 FROM events_v01"))
+    checks["edges_empty"] = int(fetch_one(cur, "SELECT COUNT(*)=0 FROM v03_chain_edges_latest"))
+    checks["metrics_null"] = int(
+        fetch_one(
+            cur,
+            """
+            SELECT COUNT(*) FROM metrics_v02
+            WHERE ts IS NULL OR ts='' OR W IS NULL OR A IS NULL OR D IS NULL OR Hstar IS NULL
+               OR W!=W OR A!=A OR D!=D OR Hstar!=Hstar
+               OR ABS(W) > 1e308 OR ABS(A) > 1e308 OR ABS(D) > 1e308 OR ABS(Hstar) > 1e308
+            """,
+        )
+    )
+    checks["series_chain_null"] = int(
+        fetch_one(
+            cur,
+            """
+            SELECT COUNT(*) FROM v03_series_chain_latest
+            WHERE series IS NULL OR series='' OR W_avg IS NULL OR W_proj IS NULL
+            """,
+        )
+    )
+    checks["dup_metrics_pk"] = int(
+        fetch_one(
+            cur,
+            "SELECT COUNT(*) FROM (SELECT ts,domain,COUNT(*) c FROM metrics_v02 GROUP BY ts,domain HAVING c>1)",
+        )
+    )
+    checks["dup_events_key"] = int(
+        fetch_one(
+            cur,
+            "SELECT COUNT(*) FROM (SELECT date,domain,event_type,req_key,COUNT(*) c FROM events_v01 GROUP BY date,domain,event_type,req_key HAVING c>1)",
+        )
+    )
+    checks["missing_ts"] = int(
+        fetch_one(cur, "SELECT COUNT(*) FROM snapshots_v01 WHERE ts IS NULL OR ts=''")
+    )
+    checks["ts_out_of_order"] = int(check_ts_out_of_order(cur))
+    total = int(fetch_one(cur, "SELECT COUNT(*) FROM snapshots_v01"))
+    missing_rows = int(
+        fetch_one(
+            cur,
+            """
+            SELECT COUNT(*) FROM snapshots_v01
+            WHERE COALESCE(missing_fields_json,'[]') NOT IN ('[]','')
+            """,
+        )
+    )
+    ratio = (missing_rows / total) if total else 0.0
+    checks["missing_fields_rows"] = missing_rows
+    checks["missing_fields_ratio"] = ratio
+    checks["missing_fields_ratio_abnormal"] = int(ratio > missing_ratio_threshold)
+    return checks
 
 
 def main():
-    con = sqlite3.connect(DB_PATH)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--missing-ratio-threshold", type=float, default=0.0)
+    add_common_args(parser)
+    args = parser.parse_args()
+    cfg = from_args(args)
+
+    con = sqlite3.connect(cfg["db_path"])
     cur = con.cursor()
-
-    p_at_k = precision_at_k(cur, top_k=TOP_K)
-    hit_24h = event_hit_rate_24h(cur)
-    rank_stability = series_ranking_stability(cur)
-
+    report = build_report(cur, args.missing_ratio_threshold)
     con.close()
 
-    print("=== Quality Report ===")
-    if p_at_k is None:
-        print("precision@K: n/a")
-    else:
-        print(
-            f"precision@{p_at_k['top_k']}: {p_at_k['score']:.3f} "
-            f"(windows={p_at_k['windows']})"
-        )
+    critical = [
+        "events_empty",
+        "edges_empty",
+        "metrics_null",
+        "series_chain_null",
+        "dup_metrics_pk",
+        "dup_events_key",
+        "missing_ts",
+        "ts_out_of_order",
+        "missing_fields_ratio_abnormal",
+    ]
+    failed = [k for k in critical if report.get(k, 0) > 0]
+    report["critical_failed"] = failed
+    report["ok"] = len(failed) == 0
+    report["db_path"] = cfg["db_path"]
 
-    if hit_24h is None:
-        print("event_hit_rate_24h: n/a")
-    else:
-        print(
-            f"event_hit_rate_24h: {hit_24h['score']:.3f} "
-            f"(hits={hit_24h['hits']}/{hit_24h['events']})"
-        )
+    Path(cfg["report_dir"]).mkdir(parents=True, exist_ok=True)
+    out_path = Path(cfg["report_dir"]) / "eval_quality.json"
+    out_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 
-    if rank_stability is None:
-        print("series_ranking_stability: n/a")
-    else:
-        print(
-            f"series_ranking_stability: {rank_stability['score']:.3f} "
-            f"(pairs={rank_stability['pairs']})"
-        )
+    print("=== Quality Gate v0.4 ===")
+    for k in critical:
+        print(f"{k}: {report.get(k)}")
+    print(f"report: {out_path}")
+
+    if failed:
+        print("FAILED:", ", ".join(failed))
+        raise SystemExit(1)
+    print("PASS")
 
 
 if __name__ == "__main__":

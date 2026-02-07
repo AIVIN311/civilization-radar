@@ -32,8 +32,14 @@ env/
 dist/
 build/
 out/
-output/
+output/*
+!output/.gitkeep
 coverage/
+radar.db
+dashboard_v01.html
+dashboard_v02.html
+dashboard_v03.html
+dashboard_v04.html
 
 # =========================
 # Logs & runtime

@@ -2,10 +2,10 @@ import json
 import math
 import re
 import sqlite3
+import argparse
 from collections import defaultdict
 from statistics import median
 
-DB = "radar.db"
 SIGNALS = "signals.json"
 
 EPS = 1e-6
@@ -16,6 +16,9 @@ DECAY = 0.92  # 指數衰減：越近權重越大
 A_WINDOW = 16  # A per-domain rolling window (slots)
 
 LEVEL_RANK = {"L1": 1, "L2": 2, "L3": 3}
+
+from src.series_registry import resolve_series
+from src.settings import add_common_args, from_args
 
 
 def load_signals():
@@ -80,9 +83,14 @@ def score_one(req: int, sig: str, notes: str, levels, signals, hint_weights):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    add_common_args(parser)
+    args = parser.parse_args()
+    cfg = from_args(args)
+
     levels, signals, hint_weights = load_signals()
 
-    con = sqlite3.connect(DB)
+    con = sqlite3.connect(cfg["db_path"])
     con.row_factory = sqlite3.Row
     cur = con.cursor()
 
@@ -104,7 +112,7 @@ def main():
     for r in rows:
         ts = r["ts"]
         domain = r["domain"]
-        series = r["series"] or "unknown"
+        series = resolve_series(r["series"] or "unknown")
         req = int(r["req"] or 0)
         sig = (r["sig"] or "other").strip()
         notes = r["notes"] or ""
@@ -165,7 +173,8 @@ def main():
         computed = []
 
         for i, item in enumerate(seq):
-            ts, domain, series, req, sig, level_max, heat, matched_json = item
+            ts, domain, series_raw, req, sig, level_max, heat, matched_json = item
+            series = resolve_series(series_raw, domain)
             start = max(0, i - A_WINDOW + 1)
             window = heats[start:i + 1]
             if window:
@@ -250,7 +259,10 @@ def main():
     con.commit()
     con.close()
 
-    print(f"v0.2 done -> metrics_v02 rows={len(inserts)}; views=v02_domain_latest,v02_series_latest")
+    print(
+        f"v0.4 metrics done -> {cfg['db_path']} rows={len(inserts)}; "
+        "views=v02_domain_latest,v02_series_latest"
+    )
 
 
 if __name__ == "__main__":

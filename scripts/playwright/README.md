@@ -1,6 +1,6 @@
 ﻿# Playwright Dashboard Workflow
 
-Automates the local `dashboard_v02.html` interaction flow with Playwright and writes artifacts to `output/playwright/`.
+Automates the local `output/dashboard_v04.html` interaction flow with Playwright and writes artifacts to `output/playwright/`.
 
 ## What it does
 - Opens the dashboard from a local file path.
@@ -25,7 +25,7 @@ npm run playwright:dashboard:headed
 
 Custom file path:
 ```bash
-node scripts/playwright/dashboard_workflow.mjs --dashboard dashboard_v02.html
+node scripts/playwright/dashboard_workflow.mjs --dashboard output/dashboard_v04.html
 ```
 
 ## Artifacts

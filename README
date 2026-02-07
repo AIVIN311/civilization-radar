@@ -1,122 +1,47 @@
-# Civilization Radar
+# Civilization Radar v0.4
 
-English version: see `README.md`.
+中文版快速說明。英文完整版請看 `README.md`。
 
-Civilization Radar 是一個「事件驅動的跨系列風險傳導雷達」。
-它把 domain 級別訊號轉成事件強度，再映射為 series 之間的推力，最後在 dashboard 呈現「誰在推動誰、推力多大、事件是否放大了傳導」。
+## v0.4 重點
 
-## 核心能力
-- Snapshot 生成與入庫（`input/snapshots.jsonl` -> `metrics_v02`）
-- Daily 事件推導（`output/daily_snapshots.jsonl` -> `output/events_derived.jsonl`）
-- 事件強度寫入 `events_v01`（含 `strength`, `series_raw`, resolved `series`）
-- Chain matrix 計算（含 event boost 與時間衰減）
-- Dashboard 呈現（Domain / Series / Top-3 傳導邊）
+- 快照輸入先 normalize，固定 schema，並記錄缺欄位/多欄位。
+- series alias 單一來源：`config/series_aliases.json`。
+- 事件強度有 explain payload，寫入 `events_v01.strength_explain_json`。
+- chain 推力拆成 `base_score / boosted_score / delta_boost`。
+- edge 帶 `src_event_*` 說明欄位，可追溯事件來源。
+- `half_life_days` 可由 CLI 或 ENV 調整。
+- `eval_quality` 變成 hard gate（critical 直接 non-zero）。
+- 生成物統一在 `output/`。
 
-## 專案結構（重點）
-- `gen_snapshots_50.py`: 產生模擬 snapshots
-- `seed_from_snapshots.py`: 將 snapshots 匯入 SQLite
-- `upgrade_to_v02.py`: 產生 `metrics_v02` 與 v02 views
-- `scripts/derive_events_from_daily.py`: 從 daily snapshots 推導事件
-- `scripts/load_events_into_db.py`: 寫入 `events_v01`
-- `build_chain_matrix_v10.py`: 計算 chain edges / series chain（含 decay）
-- `render_dashboard_v02.py`: 產生 `dashboard_v02.html`
-- `scripts/apply_sql_migrations.py`: 套用 `events_v01` 與相關 SQL views
+## 完整流程
 
-## 快速開始
-
-### 方式 A：一鍵基本流程
 ```bash
-python run_pipeline_50.py
+python scripts/apply_sql_migrations.py --output-dir output
+python seed_from_snapshots.py --input input/snapshots.jsonl --output-dir output
+python upgrade_to_v02.py --output-dir output
+python scripts/derive_events_from_daily.py --input output/daily_snapshots.jsonl --output-dir output
+python scripts/load_events_into_db.py --output-dir output
+python build_chain_matrix_v10.py --half-life-days 7 --output-dir output
+python upgrade_to_v03_chain.py --output-dir output
+python render_dashboard_v02.py --half-life-days 7 --output-dir output
+python scripts/eval_quality.py --missing-ratio-threshold 0.0 --output-dir output
 ```
-會執行：
-1. `gen_snapshots_50.py`
-2. `seed_from_snapshots.py`
-3. `upgrade_to_v02.py`
-4. `render_dashboard_v02.py`
 
-### 方式 B：完整事件 + 鏈式流程（建議）
+輸出：
+
+- `output/radar.db`
+- `output/dashboard_v04.html`
+- `output/reports/eval_quality.json`
+
+## 一鍵執行
+
 ```bash
-python scripts/apply_sql_migrations.py
-python gen_snapshots_50.py
-python seed_from_snapshots.py
-python upgrade_to_v02.py
-python scripts/derive_events_from_daily.py
-python scripts/load_events_into_db.py
-python build_chain_matrix_v10.py
-python render_dashboard_v02.py
-python scripts/eval_quality.py
+python run_pipeline_50.py --output-dir output --half-life-days 7 --input-snapshots input/snapshots.jsonl
 ```
 
-輸出重點：
-- DB: `radar.db`
-- Dashboard: `dashboard_v02.html`
+## 固定回歸驗收
 
-## 資料流與模型語義
+- 固定樣本：`input/snapshots.sample.jsonl`
+- 驗收腳本：`python scripts/run_acceptance_v04.py`
 
-1. `metrics_v02`：domain 時序熱度（W/A 等）
-2. `events_v01`：每日事件（type/ratio/delta/strength）
-3. `chain_edges_v10`、`chain_edges_decay_latest`：series 間推力邊
-4. `series_chain_v10`、`series_chain_decay_latest`：series 級彙總（W_avg/W_proj/chain_flag）
-
-## 關鍵公式（目前版本）
-
-### 1) Event Strength（`src/event_strength.py`）
-`event_strength` 會把異常倍率、origin/cf 結構與流量量級壓縮成 `0~10` 分數。
-
-### 2) Event Boost（`src/chain_event_boost.py`）
-```text
-event_boost = 1 + log1p(strength) / 2
-```
-
-### 3) 時間衰減（`build_chain_matrix_v10.py`）
-對事件強度做半衰期衰減（預設 7 天）：
-```text
-decayed_strength = strength * exp(-ln(2) * age_days / half_life_days)
-```
-
-### 4) Chain Push（v1.1）
-```text
-push = corr * dW * event_boost(decayed_strength)
-```
-
-Dashboard 另外並列：
-- `base_score`（結構推力）
-- `boosted_score`（事件態推力）
-
-## Dashboard 讀法
-
-### Domain 表
-- `Event` 欄：`event_type | s=<strength> | req_key`
-- 無事件時顯示 `—`
-
-### Series 表
-- `base_score`: 未加事件放大的推力
-- `boosted_score`: 加上事件放大後的推力
-
-### Top-3 展開
-- 顯示 `event_boost = x...`
-- 每列顯示 `dst_boost_applied: x...`
-
-## 新增網域（已納入）
-目前已加入以下 4 個新網域，並可進 snapshots 與 dashboard：
-- `algorithmicallocation.ai`
-- `algorithmicallocation.systems`
-- `algorithmiclegitimacy.ai`
-- `syntheticsolvency.ai`
-
-## 常見問題
-
-### 1) `event_boost` 長期是 `x1.00`
-常見原因：目前 `events_v01` 沒有對應 series 的有效事件，或事件日期晚於最新 metrics ts（屬未來事件，會被忽略）。
-
-### 2) migration 重跑出現 duplicate column
-`scripts/apply_sql_migrations.py` 已做容錯，會自動忽略 duplicate column。
-
-### 3) `src` 匯入路徑錯誤
-已在主要 scripts 加入 repo root 的 `sys.path` fallback；請從 repo 根目錄執行指令。
-
-## 版本定位
-目前可視為 `v0.3`：
-- 已具備 event-driven chain push
-- 已具備 event boost time decay
-- 已具備可解釋 dashboard（base vs boosted + Top-3 說明）
+驗收腳本會驗證 deterministic hash、alias 收斂、cf/origin 強度差、Top-3 explain、half-life 敏感度、L3 一致性、與 gate 失敗條件。

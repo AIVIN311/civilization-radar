@@ -1,6 +1,13 @@
 import sqlite3
+import argparse
+import sys
+from pathlib import Path
 
-DB_PATH = "radar.db"
+ROOT = Path(__file__).resolve().parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from src.settings import add_common_args, from_args
 
 def table_or_view_exists(cur, name: str) -> bool:
     row = cur.execute(
@@ -10,7 +17,12 @@ def table_or_view_exists(cur, name: str) -> bool:
     return bool(row)
 
 def main():
-    con = sqlite3.connect(DB_PATH)
+    parser = argparse.ArgumentParser()
+    add_common_args(parser)
+    args = parser.parse_args()
+    cfg = from_args(args)
+
+    con = sqlite3.connect(cfg["db_path"])
     cur = con.cursor()
 
     # ensure tables exist by running builder at least once

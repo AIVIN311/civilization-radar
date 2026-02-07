@@ -1,7 +1,14 @@
 import sqlite3
+import argparse
+import sys
 from pathlib import Path
 
-DB_PATH = "radar.db"
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from src.settings import add_common_args, from_args
+
 SQL_FILES = [
     "scripts/sql/events_v01.sql",
     "scripts/sql/views_events_series.sql",
@@ -18,7 +25,12 @@ def read_sql(path: str) -> str:
     return p.read_text(encoding="utf-8")
 
 def main():
-    con = sqlite3.connect(DB_PATH)
+    parser = argparse.ArgumentParser()
+    add_common_args(parser)
+    args = parser.parse_args()
+    cfg = from_args(args)
+
+    con = sqlite3.connect(cfg["db_path"])
     cur = con.cursor()
 
     # Make sure foreign keys on (harmless even if unused)
@@ -45,7 +57,7 @@ def main():
     # quick verify
     tables = [r[0] for r in cur.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name").fetchall()]
     views  = [r[0] for r in cur.execute("SELECT name FROM sqlite_master WHERE type='view' ORDER BY name").fetchall()]
-    print(f"✅ tables: {len(tables)}  views: {len(views)}")
+    print(f"tables: {len(tables)}  views: {len(views)}")
     print("tables sample:", tables[:15])
     print("views  sample:", views[:15])
 

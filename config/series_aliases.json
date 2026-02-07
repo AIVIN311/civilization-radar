@@ -1,0 +1,29 @@
+{
+  "schema_version": "v0.4",
+  "default_series": "unmapped",
+  "canonical_series": [
+    "algorithmic_governance",
+    "monetary_infrastructure",
+    "synthetic_systems",
+    "civilization_resilience",
+    "identity_data",
+    "human_manifesto",
+    "offworld_expansion",
+    "unmapped"
+  ],
+  "aliases": {
+    "identity": "identity_data",
+    "identity-data": "identity_data",
+    "identity_data": "identity_data",
+    "algorithmic-governance": "algorithmic_governance",
+    "monetary-infrastructure": "monetary_infrastructure",
+    "synthetic-systems": "synthetic_systems",
+    "civilization-resilience": "civilization_resilience",
+    "human-manifesto": "human_manifesto",
+    "offworld-expansion": "offworld_expansion",
+    "algorithmicallocation.ai": "algorithmic_governance",
+    "algorithmicallocation.systems": "algorithmic_governance",
+    "algorithmiclegitimacy.ai": "algorithmic_governance",
+    "syntheticsolvency.ai": "monetary_infrastructure"
+  }
+}
