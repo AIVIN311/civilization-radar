@@ -34,3 +34,18 @@ def event_strength_v11(
 
     raw = base * origin_weight * cf_penalty * volume_guard
     return round(clamp(raw), 2)
+
+
+# backward-compatible name used by existing scripts
+def event_strength(
+    baseline_avg: float,
+    current: float,
+    origin_served: float = 0.0,
+    cf_served: float = 0.0,
+):
+    return event_strength_v11(
+        baseline_avg=baseline_avg,
+        current=current,
+        origin_served=origin_served,
+        cf_served=cf_served,
+    )
