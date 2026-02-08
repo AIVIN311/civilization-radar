@@ -4,6 +4,7 @@ from pathlib import Path
 
 DEFAULT_GEO_PROFILES_PATH = Path("config") / "geo_profiles_v1.json"
 GEO_PROFILES_VERSION = "geo_profiles_v1"
+ALLOWED_PROFILE_KINDS = {"weighted", "baseline"}
 
 
 def _as_non_negative_float(value, default=0.0):
@@ -12,6 +13,14 @@ def _as_non_negative_float(value, default=0.0):
     except Exception:
         return float(default)
     return num if num >= 0 else float(default)
+
+
+def _as_non_negative_int(value, default=0):
+    try:
+        num = int(value)
+    except Exception:
+        return int(default)
+    return num if num >= 0 else int(default)
 
 
 def _validate_profile(name: str, profile: dict):
@@ -26,6 +35,8 @@ def _validate_profile(name: str, profile: dict):
     cap_share = _as_non_negative_float(profile["cap_share"], default=-1.0)
     alpha = _as_non_negative_float(profile["alpha"], default=-1.0)
     weights = profile["weights"]
+    kind = str(profile.get("kind", "weighted")).strip().lower()
+    min_countries = _as_non_negative_int(profile.get("min_countries", 0), default=-1)
 
     if min_total < 0:
         raise ValueError(f"Invalid profile '{name}': min_total must be >= 0")
@@ -35,6 +46,11 @@ def _validate_profile(name: str, profile: dict):
         raise ValueError(f"Invalid profile '{name}': alpha must be > 0")
     if not isinstance(weights, dict):
         raise ValueError(f"Invalid profile '{name}': weights must be an object")
+    if kind not in ALLOWED_PROFILE_KINDS:
+        allowed = ", ".join(sorted(ALLOWED_PROFILE_KINDS))
+        raise ValueError(f"Invalid profile '{name}': kind must be one of [{allowed}]")
+    if min_countries < 0:
+        raise ValueError(f"Invalid profile '{name}': min_countries must be >= 0")
 
     for country, weight in weights.items():
         country_key = str(country).strip().upper()
@@ -75,6 +91,8 @@ def load_geo_profiles(path: str | Path = DEFAULT_GEO_PROFILES_PATH) -> dict:
             "min_total": float(profile["min_total"]),
             "cap_share": float(profile["cap_share"]),
             "alpha": float(profile["alpha"]),
+            "kind": str(profile.get("kind", "weighted")).strip().lower() or "weighted",
+            "min_countries": _as_non_negative_int(profile.get("min_countries", 0), default=0),
             "weights": weights,
         }
 
@@ -100,7 +118,76 @@ def compute_geo_factor(top_countries: dict | None, profile_name: str, profiles: 
     min_total = float(profile["min_total"])
     cap_share = float(profile["cap_share"])
     alpha = float(profile["alpha"])
+    kind = str(profile.get("kind", "weighted")).strip().lower() or "weighted"
+    min_countries = int(profile.get("min_countries", 0) or 0)
     weights = profile["weights"]
+
+    if kind == "baseline":
+        baseline_vector = []
+        ranked = sorted(counts.items(), key=lambda x: (-x[1], x[0]))
+        distinct_countries = len(ranked)
+
+        if not profile["enabled"]:
+            gate = {"passed": False, "reason": "profile_disabled"}
+        elif total_counts < min_total:
+            gate = {"passed": False, "reason": "insufficient_samples"}
+        elif distinct_countries < min_countries:
+            gate = {"passed": False, "reason": "insufficient_countries"}
+        else:
+            capped = []
+            sum_capped = 0.0
+            for country, count in ranked:
+                share = float(count) / total_counts
+                share_capped = min(share, cap_share)
+                sum_capped += share_capped
+                capped.append((country, float(count), share, share_capped))
+
+            if sum_capped <= 1e-12:
+                gate = {"passed": False, "reason": "invalid_capped_distribution"}
+            else:
+                gate = {"passed": True, "reason": "ok"}
+                for country, count, share, share_capped in capped:
+                    baseline_share = share_capped / sum_capped
+                    baseline_vector.append(
+                        {
+                            "country": country,
+                            "count": count,
+                            "share": share,
+                            "share_capped": share_capped,
+                            "baseline_share": baseline_share,
+                        }
+                    )
+                baseline_vector.sort(key=lambda x: (-float(x["baseline_share"]), x["country"]))
+
+        if gate["passed"]:
+            geo_factor = 1.0
+            raw = 1.0
+        else:
+            geo_factor = 0.0
+            raw = 0.0
+            baseline_vector = []
+
+        explain = {
+            "version": "geo_explain_v1",
+            "profile": profile_name,
+            "kind": "baseline",
+            "total": total_counts,
+            "min_total": min_total,
+            "min_countries": min_countries,
+            "cap_share": cap_share,
+            "alpha": alpha,
+            "raw": raw,
+            "geo_factor": geo_factor,
+            "gate": gate,
+            "baseline_vector": baseline_vector[:12],
+            "matched": [],
+            "unmatched_top": [],
+            "notes": [
+                "baseline_vector derived from capped and renormalized top_countries shares",
+                "geo_factor compatibility scalar: 1.0 when gate passed, else 0.0",
+            ],
+        }
+        return geo_factor, explain
 
     matched = []
     unmatched_top = []
