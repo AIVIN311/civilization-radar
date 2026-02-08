@@ -95,6 +95,19 @@ def run_pipeline(profile: str, run_tag: str, input_sample: Path, output_root: Pa
     return latest
 
 
+def run_render_only(output_dir: Path) -> None:
+    sh(
+        [
+            PY,
+            "render_dashboard_v02.py",
+            "--half-life-days",
+            "7",
+            "--output-dir",
+            str(output_dir),
+        ]
+    )
+
+
 def load_derived_payloads(latest_dir: Path, profile: str) -> tuple[dict, dict, str, str]:
     token = _safe_profile_token(profile)
     persistence_path = latest_dir / "derived" / f"persistence_v1_{token}.json"
@@ -115,7 +128,25 @@ def hash_text(value: str) -> str:
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
+def read_delta_meta(persistence: dict, label: str) -> dict[str, str]:
+    meta = persistence.get("meta")
+    if not isinstance(meta, dict):
+        raise AssertionError(f"[FAIL] {label}: missing meta object")
+    source = str(meta.get("delta_source_used") or "")
+    if source not in {"artifact", "artifact_vector", "fallback_db"}:
+        raise AssertionError(
+            f"[FAIL] {label}: invalid meta.delta_source_used={source!r}"
+        )
+    artifact_path = str(meta.get("artifact_path") or "")
+    return {
+        "delta_source_used": source,
+        "artifact_path": artifact_path,
+    }
+
+
 def check_schema_acceptance(persistence: dict, kernel: dict, cfg: dict, label: str) -> None:
+    read_delta_meta(persistence, label)
+
     if "persistence_v1" not in persistence or not isinstance(persistence["persistence_v1"], dict):
         raise AssertionError(f"[FAIL] {label}: missing persistence_v1 object")
     p = persistence["persistence_v1"]
@@ -165,6 +196,88 @@ def check_schema_acceptance(persistence: dict, kernel: dict, cfg: dict, label: s
             for key in ("domain", "kernel", "dir", "streak"):
                 if key not in d:
                     raise AssertionError(f"[FAIL] {label}: top_domains[{j}] missing '{key}'")
+
+
+def write_valid_delta_artifact(path: Path, geo: str, window: int) -> None:
+    n = max(int(window), 16)
+    tags = {}
+    for tag_idx, tag in enumerate(["identity_data", "monetary_infrastructure"]):
+        series = []
+        for i in range(n):
+            ts = f"2025-01-{i + 1:02d}"
+            delta = round((tag_idx + 1) * 0.01 + i * 0.001, 6)
+            series.append({"ts": ts, "delta": delta})
+        tags[tag] = series
+    payload = {
+        "version": "deltaT_v1",
+        "geo": str(geo),
+        "tags": tags,
+    }
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
+
+
+def write_invalid_delta_artifact(path: Path, geo: str) -> None:
+    payload = {
+        "version": "deltaT_v1",
+        "geo": str(geo),
+        "tags": {
+            "identity_data": [
+                {"ts": "2025-01-02", "delta": 0.20},
+                {"ts": "2025-01-01", "delta": 0.10},
+            ]
+        },
+    }
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
+
+
+def check_provider_swap_acceptance(cfg: dict, output_root: Path) -> None:
+    latest = run_pipeline("tw", "run_provider_swap", INPUT_SAMPLE, output_root)
+    token = _safe_profile_token("tw")
+    derived_dir = latest / "derived"
+    artifact_path = derived_dir / f"deltaT_v1_{token}.json"
+    expected_rel = f"derived/deltaT_v1_{token}.json"
+
+    write_valid_delta_artifact(artifact_path, "tw", int(cfg["window"]))
+    run_render_only(latest)
+    persistence_artifact_a, kernel_artifact_a, p_raw_a, _ = load_derived_payloads(latest, "tw")
+    check_schema_acceptance(persistence_artifact_a, kernel_artifact_a, cfg, "provider_artifact_a")
+    meta_a = read_delta_meta(persistence_artifact_a, "provider_artifact_a")
+    if meta_a["delta_source_used"] != "artifact" or meta_a["artifact_path"] != expected_rel:
+        raise AssertionError(
+            "[FAIL] provider_artifact_a: expected artifact source with deterministic relative path"
+        )
+
+    run_render_only(latest)
+    persistence_artifact_b, kernel_artifact_b, p_raw_b, _ = load_derived_payloads(latest, "tw")
+    check_schema_acceptance(persistence_artifact_b, kernel_artifact_b, cfg, "provider_artifact_b")
+    meta_b = read_delta_meta(persistence_artifact_b, "provider_artifact_b")
+    if meta_b["delta_source_used"] != "artifact" or meta_b["artifact_path"] != expected_rel:
+        raise AssertionError(
+            "[FAIL] provider_artifact_b: expected artifact source with deterministic relative path"
+        )
+    if hash_text(p_raw_a) != hash_text(p_raw_b):
+        raise AssertionError("[FAIL] provider artifact path is not deterministic across repeated renders")
+
+    if artifact_path.exists():
+        artifact_path.unlink()
+    run_render_only(latest)
+    persistence_absent, kernel_absent, _, _ = load_derived_payloads(latest, "tw")
+    check_schema_acceptance(persistence_absent, kernel_absent, cfg, "provider_absent")
+    meta_absent = read_delta_meta(persistence_absent, "provider_absent")
+    if meta_absent["delta_source_used"] != "fallback_db" or meta_absent["artifact_path"] != "":
+        raise AssertionError(
+            "[FAIL] provider_absent: expected fallback_db source and empty artifact_path"
+        )
+
+    write_invalid_delta_artifact(artifact_path, "tw")
+    run_render_only(latest)
+    persistence_reject, kernel_reject, _, _ = load_derived_payloads(latest, "tw")
+    check_schema_acceptance(persistence_reject, kernel_reject, cfg, "provider_schema_reject")
+    meta_reject = read_delta_meta(persistence_reject, "provider_schema_reject")
+    if meta_reject["delta_source_used"] != "fallback_db" or meta_reject["artifact_path"] != "":
+        raise AssertionError(
+            "[FAIL] provider_schema_reject: expected fallback_db source and empty artifact_path"
+        )
 
 
 def check_none_behavior(persistence_none: dict) -> None:
@@ -324,6 +437,9 @@ def main() -> None:
     check_schema_acceptance(persistence_tw_b, kernel_tw_b, cfg, "tw_b")
     check_deterministic_acceptance(p_raw_tw_a, p_raw_tw_b, k_raw_tw_a, k_raw_tw_b)
     print("[OK] deterministic acceptance for tw")
+
+    check_provider_swap_acceptance(cfg, output_root)
+    print("[OK] provider swap acceptance")
 
     latest_none = run_pipeline("none", "run_none", INPUT_SAMPLE, output_root)
     persistence_none, kernel_none, _, _ = load_derived_payloads(latest_none, "none")

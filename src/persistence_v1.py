@@ -32,6 +32,17 @@ def _as_positive_float(value, default: float) -> float:
     return num if num > 0 else float(default)
 
 
+def _as_string_list(value, default: list[str]) -> list[str]:
+    if not isinstance(value, list):
+        return list(default)
+    out: list[str] = []
+    for item in value:
+        text = str(item or "").strip()
+        if text:
+            out.append(text)
+    return out or list(default)
+
+
 def _sign(value: float, eps: float) -> int:
     if value > eps:
         return 1
@@ -72,6 +83,23 @@ def load_persistence_config(path: str | Path = DEFAULT_PERSISTENCE_CONFIG_PATH) 
     kernel_cfg = payload.get("kernel") if isinstance(payload.get("kernel"), dict) else {}
     top_k_domains = _as_positive_int(kernel_cfg.get("top_k_domains"), 3)
 
+    delta_source_cfg = payload.get("delta_source") if isinstance(payload.get("delta_source"), dict) else {}
+    delta_mode = str(delta_source_cfg.get("mode") or "artifact_first").strip().lower() or "artifact_first"
+    artifact_globs = _as_string_list(
+        delta_source_cfg.get("artifact_globs"),
+        [
+            "derived/deltaT_v1_{token}.json",
+            "derived/tag_vector_v1_{token}.json",
+            "derived/tag_vector_v1_global.json",
+            "derived/semantic_projection_v1_{token}.json",
+            "derived/semantic_projection_v1_global.json",
+        ],
+    )
+    allowed_versions = _as_string_list(
+        delta_source_cfg.get("allowed_versions"),
+        ["deltaT_v1", "tag_vector_v1", "semantic_projection_v1"],
+    )
+
     if not (0.0 < alpha <= 1.0):
         raise ValueError("Invalid persistence config: alpha must be in (0,1]")
     if not (0.0 <= watch_p <= 1.0 and 0.0 <= eligible_p <= 1.0):
@@ -94,6 +122,11 @@ def load_persistence_config(path: str | Path = DEFAULT_PERSISTENCE_CONFIG_PATH) 
         },
         "kernel": {
             "top_k_domains": int(top_k_domains),
+        },
+        "delta_source": {
+            "mode": delta_mode,
+            "artifact_globs": artifact_globs,
+            "allowed_versions": allowed_versions,
         },
     }
 
