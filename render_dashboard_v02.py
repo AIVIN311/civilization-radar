@@ -2,7 +2,14 @@ import argparse
 import json
 import sqlite3
 from html import escape
+from pathlib import Path
 
+from src.persistence_v1 import (
+    build_delta_series_from_db,
+    compute_event_kernel,
+    compute_tag_persistence,
+    load_persistence_config,
+)
 from src.settings import add_common_args, from_args
 from src.version import __version__
 
@@ -26,6 +33,56 @@ def parse_explain_payload(raw_value):
         return {"error": "Invalid explain JSON", "raw": raw}, fallback, False
     pretty = json.dumps(payload, ensure_ascii=False, indent=2)
     return payload, pretty, True
+
+
+def _safe_profile_token(value: str) -> str:
+    raw = str(value or "").strip().lower()
+    if not raw:
+        return "unknown"
+    out = []
+    for ch in raw:
+        if ch.isalnum() or ch in ("_", "-"):
+            out.append(ch)
+        else:
+            out.append("_")
+    token = "".join(out).strip("_")
+    return token or "unknown"
+
+
+def write_persistence_outputs(cfg, latest_ts, geo_profile, persistence_state, kernel_state):
+    derived_dir = Path(cfg["output_dir"]) / "derived"
+    derived_dir.mkdir(parents=True, exist_ok=True)
+    token = _safe_profile_token(geo_profile)
+
+    persistence_payload = {
+        "ts": str(persistence_state.get("latest_ts") or latest_ts or ""),
+        "geo": str(geo_profile or ""),
+        "persistence_v1": {
+            "window": int(persistence_state.get("window") or 0),
+            "tags": list(persistence_state.get("tags") or []),
+        },
+    }
+    kernel_payload = {
+        "ts": str(kernel_state.get("latest_ts") or latest_ts or ""),
+        "geo": str(geo_profile or ""),
+        "event_kernel_v1": {
+            "window": int(kernel_state.get("window") or 0),
+            "tags": list(kernel_state.get("tags") or []),
+            "top_domains": list(kernel_state.get("top_domains") or []),
+        },
+    }
+
+    persistence_path = derived_dir / f"persistence_v1_{token}.json"
+    kernel_path = derived_dir / f"event_kernel_v1_{token}.json"
+    persistence_path.write_text(
+        json.dumps(persistence_payload, ensure_ascii=False, indent=2, sort_keys=True),
+        encoding="utf-8",
+    )
+    kernel_path.write_text(
+        json.dumps(kernel_payload, ensure_ascii=False, indent=2, sort_keys=True),
+        encoding="utf-8",
+    )
+    return str(persistence_path), str(kernel_path)
 
 
 def fetch_domain_rows(cur):
@@ -207,7 +264,7 @@ def fetch_chain_rows(cur):
     return series_rows, edges
 
 
-def render(cfg, latest_ts, domains, events, chains, top3):
+def render(cfg, latest_ts, domains, events, chains, top3, persistence_state, kernel_state):
     html = []
     html.append("<!doctype html><html><head><meta charset='utf-8'>")
     html.append("<meta name='viewport' content='width=device-width, initial-scale=1'>")
@@ -240,6 +297,12 @@ th{color:#555}
 .geo-col summary{cursor:pointer;font-size:12px;color:#1f2937}
 .geo-col pre{max-height:180px;overflow:auto;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:8px;font-size:11px;line-height:1.35}
 body.geo-off .geo-col{display:none}
+.pers-note{font-size:12px;color:#4b5563;margin:0 0 8px}
+.pers-table td,.pers-table th{font-size:12px}
+.ers-badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;border:1px solid #d1d5db}
+.ers-watch{background:#fff7ed;border-color:#fdba74;color:#9a3412}
+.ers-eligible{background:#ecfeff;border-color:#67e8f9;color:#155e75}
+.kernel-muted{font-size:11px;color:#6b7280}
 </style>
 """
     )
@@ -259,6 +322,53 @@ body.geo-off .geo-col{display:none}
     )
 
     html.append("<div class='grid'>")
+
+    persistence_tags = list((persistence_state or {}).get("tags") or [])
+    kernel_tags = {}
+    for row in list((kernel_state or {}).get("tags") or []):
+        tag = str(row.get("tag") or "")
+        if tag:
+            kernel_tags[tag] = list(row.get("top_domains") or [])
+
+    observed_tags = [
+        t for t in persistence_tags if str(t.get("ers") or "none") in ("watch", "eligible")
+    ][:3]
+    html.append("<div class='card'><h3>Persistence (Observation)</h3>")
+    html.append(
+        "<p class='pers-note'>Observation-only. Not used in scoring or gating.</p>"
+    )
+    if not observed_tags:
+        html.append("<span class='muted'>none</span>")
+    else:
+        html.append("<table class='pers-table'><thead><tr>")
+        html.append(
+            "<th>tag</th><th>ΔT now</th><th>p</th><th>streak</th><th>dir</th><th>ers</th><th>Top domains (explanatory)</th>"
+        )
+        html.append("</tr></thead><tbody>")
+        for row in observed_tags:
+            tag = str(row.get("tag") or "")
+            domains_top = kernel_tags.get(tag) or []
+            if domains_top:
+                domain_text = " / ".join(
+                    [f"{str(x.get('domain') or '')} ({float(x.get('kernel') or 0.0):.3f})" for x in domains_top]
+                )
+            else:
+                domain_text = "n/a"
+            ers = str(row.get("ers") or "none")
+            ers_class = "ers-watch" if ers == "watch" else "ers-eligible"
+            html.append(
+                "<tr>"
+                f"<td>{escape(tag)}</td>"
+                f"<td>{float(row.get('delta') or 0.0):+.4f}</td>"
+                f"<td>{float(row.get('p') or 0.0):.4f}</td>"
+                f"<td>{int(row.get('streak') or 0)}</td>"
+                f"<td>{escape(str(row.get('dir') or '0'))}</td>"
+                f"<td><span class='ers-badge {ers_class}'>{escape(ers)}</span></td>"
+                f"<td><span class='kernel-muted'>{escape(domain_text)}</span></td>"
+                "</tr>"
+            )
+        html.append("</tbody></table>")
+    html.append("</div>")
 
     html.append("<div class='card'><h3>Domain 榜</h3><table id='domainTable'><thead><tr>")
     html.append("<th>domain</th><th>series</th><th>level</th><th>A</th><th>W</th><th>event</th><th>matched</th>")
@@ -540,9 +650,26 @@ def main():
     domains = fetch_domain_rows(cur)
     events = fetch_event_rows(cur)
     chains, top3 = fetch_chain_rows(cur)
+    persistence_cfg = load_persistence_config()
+    delta_series_by_tag = build_delta_series_from_db(cur, persistence_cfg)
+    persistence_state = compute_tag_persistence(delta_series_by_tag, persistence_cfg)
+    persistence_latest_ts = str(persistence_state.get("latest_ts") or latest_ts)
+    kernel_state = compute_event_kernel(cur, persistence_latest_ts, persistence_cfg)
     con.close()
 
-    html = render(cfg, latest_ts, domains, events, chains, top3)
+    geo_profile = str(chains[0].get("geo_profile") or "unknown") if chains else "unknown"
+    write_persistence_outputs(cfg, latest_ts, geo_profile, persistence_state, kernel_state)
+
+    html = render(
+        cfg,
+        latest_ts,
+        domains,
+        events,
+        chains,
+        top3,
+        persistence_state,
+        kernel_state,
+    )
     with open(cfg["out_html"], "w", encoding="utf-8") as f:
         f.write(html)
     print(f"Wrote {cfg['out_html']}")
