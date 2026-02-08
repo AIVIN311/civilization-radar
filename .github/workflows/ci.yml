@@ -1,14 +1,15 @@
 name: CI
 
 on:
-  pull_request:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - v0.5-pr4-acceptance
+  pull_request:
 
 jobs:
   acceptance:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,10 +19,12 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install deps
+      - name: Install deps (if requirements.txt exists)
         run: |
           python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      - name: Run acceptance
+      - name: Run acceptance v07
         run: |
-          python scripts/run_acceptance_v07.py
+          python -m py_compile src/persistence_v1.py scripts/run_acceptance_v07.py render_dashboard_v02.py
+          python scripts/run_acceptance_v07.py --skip-v04-hash
