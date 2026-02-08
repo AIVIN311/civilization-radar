@@ -39,6 +39,16 @@
         "TH": 0.18,
         "TW": 0.18
       }
+    },
+    "global_baseline": {
+      "enabled": true,
+      "kind": "baseline",
+      "min_total": 200,
+      "min_countries": 6,
+      "cap_share": 0.18,
+      "alpha": 0.25,
+      "weights": {}
     }
   }
 }
+

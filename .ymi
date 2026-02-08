@@ -1,0 +1,2 @@
+- name: Languine.ai
+  uses: languine-ai/languine@v1
