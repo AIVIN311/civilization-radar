@@ -11,5 +11,20 @@
   },
   "kernel": {
     "top_k_domains": 3
+  },
+  "delta_source": {
+    "mode": "artifact_first",
+    "artifact_globs": [
+      "derived/deltaT_v1_{token}.json",
+      "derived/tag_vector_v1_{token}.json",
+      "derived/tag_vector_v1_global.json",
+      "derived/semantic_projection_v1_{token}.json",
+      "derived/semantic_projection_v1_global.json"
+    ],
+    "allowed_versions": [
+      "deltaT_v1",
+      "tag_vector_v1",
+      "semantic_projection_v1"
+    ]
   }
 }

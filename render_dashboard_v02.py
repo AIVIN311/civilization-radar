@@ -4,8 +4,8 @@ import sqlite3
 from html import escape
 from pathlib import Path
 
+from src.delta_provider_v1 import get_delta_series, get_last_delta_meta
 from src.persistence_v1 import (
-    build_delta_series_from_db,
     compute_event_kernel,
     compute_tag_persistence,
     load_persistence_config,
@@ -49,14 +49,19 @@ def _safe_profile_token(value: str) -> str:
     return token or "unknown"
 
 
-def write_persistence_outputs(cfg, latest_ts, geo_profile, persistence_state, kernel_state):
+def write_persistence_outputs(cfg, latest_ts, geo_profile, persistence_state, kernel_state, delta_meta):
     derived_dir = Path(cfg["output_dir"]) / "derived"
     derived_dir.mkdir(parents=True, exist_ok=True)
     token = _safe_profile_token(geo_profile)
+    source_meta = delta_meta if isinstance(delta_meta, dict) else {}
 
     persistence_payload = {
         "ts": str(persistence_state.get("latest_ts") or latest_ts or ""),
         "geo": str(geo_profile or ""),
+        "meta": {
+            "delta_source_used": str(source_meta.get("delta_source_used") or "fallback_db"),
+            "artifact_path": str(source_meta.get("artifact_path") or ""),
+        },
         "persistence_v1": {
             "window": int(persistence_state.get("window") or 0),
             "tags": list(persistence_state.get("tags") or []),
@@ -650,15 +655,21 @@ def main():
     domains = fetch_domain_rows(cur)
     events = fetch_event_rows(cur)
     chains, top3 = fetch_chain_rows(cur)
+    geo_profile = str(chains[0].get("geo_profile") or "unknown") if chains else "unknown"
     persistence_cfg = load_persistence_config()
-    delta_series_by_tag = build_delta_series_from_db(cur, persistence_cfg)
+    delta_series_by_tag = get_delta_series(
+        geo=geo_profile,
+        window=int(persistence_cfg["window"]),
+        output_dir=str(cfg["output_dir"]),
+        cfg=persistence_cfg,
+    )
+    delta_meta = get_last_delta_meta()
     persistence_state = compute_tag_persistence(delta_series_by_tag, persistence_cfg)
     persistence_latest_ts = str(persistence_state.get("latest_ts") or latest_ts)
     kernel_state = compute_event_kernel(cur, persistence_latest_ts, persistence_cfg)
     con.close()
 
-    geo_profile = str(chains[0].get("geo_profile") or "unknown") if chains else "unknown"
-    write_persistence_outputs(cfg, latest_ts, geo_profile, persistence_state, kernel_state)
+    write_persistence_outputs(cfg, latest_ts, geo_profile, persistence_state, kernel_state, delta_meta)
 
     html = render(
         cfg,
