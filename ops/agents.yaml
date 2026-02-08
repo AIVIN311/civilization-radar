@@ -1,0 +1,94 @@
+version: 0.1
+registry:
+  default_policy:
+    mode: "human_led"   # human_led | semi_auto | autonomous
+    pr_required: true
+    direct_push_allowed: false
+    artifacts_must_be_namespaced: true
+    max_open_pr_per_agent: 1
+    require_acceptance_tag: true
+    acceptance_tags:
+      - accepted-analysis
+      - accepted-derived
+      - accepted-experiment
+      - accepted-patch
+
+  shared_paths:
+    allowed_write_roots:
+      - "output/"
+      - "reports/"
+      - "notes/"
+      - "docs/"
+    forbidden_write_roots:
+      - ".github/workflows/"   # 先鎖死，除非你明確開放
+      - "signals.json"         # 你核心規則檔，預設不可碰
+      - "schema/"              # 你若有 schema 目錄也可鎖
+    forbidden_actions:
+      - "overwrite_baseline"
+      - "rewrite_history"
+      - "reset_thresholds"
+      - "mass_pr_spam"
+
+agents:
+  - id: "civilization-persistence-v0.7"
+    owner: "AISIA.WORLD"
+    status: "active"   # active | paused | retired
+    description: >
+      Persistence 核心代理：監測語意 ΔT(t)，識別 Regime Shift，
+      對抗 Autophagy 型吞噬，維持 sovereignty layer 的定義穩定。
+    scope:
+      allowed_tasks:
+        - "semantic_delta_monitoring"
+        - "crawler_pressure_analysis"
+        - "regime_shift_flags"
+        - "artifact_generation"
+      forbidden_tasks:
+        - "edit_core_signal_schema"
+        - "modify_workflows"
+        - "change_acceptance_rules"
+    io:
+      artifact_namespace: "output/agents/civilization-persistence-v0.7/"
+      reports_namespace: "reports/agents/civilization-persistence-v0.7/"
+      notes_namespace: "notes/agents/civilization-persistence-v0.7/"
+    pr_policy:
+      max_open_pr: 1
+      require_labels:
+        - "agent"
+        - "needs-review"
+      allowed_files_glob:
+        - "output/**"
+        - "reports/**"
+        - "notes/**"
+        - "docs/**"
+    guardrails:
+      require_non_interference_ack: true
+      require_acceptance_protocol_ack: true
+
+  - id: "ci-helper-v0.1"
+    owner: "AISIA.WORLD"
+    status: "active"
+    description: >
+      只負責 CI 可重現性、測試快照、驗收輸出整理；
+      不碰 workflow 本體（除非你解鎖）。
+    scope:
+      allowed_tasks:
+        - "acceptance_runs"
+        - "reproducibility_checks"
+        - "report_summarization"
+      forbidden_tasks:
+        - "modify_workflows"
+        - "change_repo_settings"
+    io:
+      artifact_namespace: "output/agents/ci-helper-v0.1/"
+      reports_namespace: "reports/agents/ci-helper-v0.1/"
+      notes_namespace: "notes/agents/ci-helper-v0.1/"
+    pr_policy:
+      max_open_pr: 1
+      require_labels:
+        - "agent"
+        - "ci"
+        - "needs-review"
+      allowed_files_glob:
+        - "output/**"
+        - "reports/**"
+        - "notes/**"
