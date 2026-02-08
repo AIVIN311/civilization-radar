@@ -21,9 +21,6 @@ from src.persistence_v1 import compute_tag_persistence, load_persistence_config
 PY = sys.executable
 INPUT_SAMPLE = REPO_ROOT / "input" / "snapshots.geo.sample.jsonl"
 OUT_ROOT = REPO_ROOT / "output" / "acceptance_v07"
-PROVIDER_FIXTURE_DIR = REPO_ROOT / "scripts" / "fixtures" / "v07_provider_swap"
-PROVIDER_FIXTURE_GOOD = PROVIDER_FIXTURE_DIR / "deltaT_v1_tw.json"
-PROVIDER_FIXTURE_BAD = PROVIDER_FIXTURE_DIR / "deltaT_v1_tw_bad_schema.json"
 EXPECTED_V04_SUMMARY_HASH = "73040be047b87d6638347a2dca4f9ba4a39490fd8c615d679695752b635dd235"
 FORBIDDEN_CORE_FILES = [
     REPO_ROOT / "build_chain_matrix_v10.py",
@@ -74,19 +71,6 @@ def _safe_profile_token(value: str) -> str:
     return token or "unknown"
 
 
-def run_render_only(latest_dir: Path, half_life_days: float = 7.0) -> None:
-    sh(
-        [
-            PY,
-            "render_dashboard_v02.py",
-            "--output-dir",
-            str(latest_dir),
-            "--half-life-days",
-            str(half_life_days),
-        ]
-    )
-
-
 def run_pipeline(profile: str, run_tag: str, input_sample: Path, output_root: Path) -> Path:
     out_dir = output_root / run_tag
     safe_rmtree(out_dir)
@@ -109,6 +93,19 @@ def run_pipeline(profile: str, run_tag: str, input_sample: Path, output_root: Pa
     if not latest.exists():
         raise AssertionError(f"[FAIL] missing latest output dir: {latest}")
     return latest
+
+
+def run_render_only(output_dir: Path) -> None:
+    sh(
+        [
+            PY,
+            "render_dashboard_v02.py",
+            "--half-life-days",
+            "7",
+            "--output-dir",
+            str(output_dir),
+        ]
+    )
 
 
 def load_derived_payloads(latest_dir: Path, profile: str) -> tuple[dict, dict, str, str]:
@@ -148,18 +145,10 @@ def read_delta_meta(persistence: dict, label: str) -> dict[str, str]:
 
 
 def check_schema_acceptance(persistence: dict, kernel: dict, cfg: dict, label: str) -> None:
-    meta = persistence.get("meta")
-    if not isinstance(meta, dict):
-        raise AssertionError(f"[FAIL] {label}: missing persistence meta object")
-    source = str(meta.get("delta_source_used") or "")
-    if source not in {"artifact", "artifact_vector", "fallback_db"}:
-        raise AssertionError(f"[FAIL] {label}: invalid delta_source_used={source!r}")
-    if "artifact_path" not in meta:
-        raise AssertionError(f"[FAIL] {label}: missing meta.artifact_path")
+    read_delta_meta(persistence, label)
 
     if "persistence_v1" not in persistence or not isinstance(persistence["persistence_v1"], dict):
         raise AssertionError(f"[FAIL] {label}: missing persistence_v1 object")
-    read_delta_meta(persistence, label)
     p = persistence["persistence_v1"]
     if int(p.get("window") or -1) != int(cfg["window"]):
         raise AssertionError(
@@ -209,19 +198,6 @@ def check_schema_acceptance(persistence: dict, kernel: dict, cfg: dict, label: s
                     raise AssertionError(f"[FAIL] {label}: top_domains[{j}] missing '{key}'")
 
 
-def run_render_only(output_dir: Path) -> None:
-    sh(
-        [
-            PY,
-            "render_dashboard_v02.py",
-            "--half-life-days",
-            "7",
-            "--output-dir",
-            str(output_dir),
-        ]
-    )
-
-
 def write_valid_delta_artifact(path: Path, geo: str, window: int) -> None:
     n = max(int(window), 16)
     tags = {}
@@ -254,27 +230,6 @@ def write_invalid_delta_artifact(path: Path, geo: str) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True), encoding="utf-8")
 
 
-def check_delta_source_meta(
-    persistence: dict,
-    expected_source: str,
-    expected_artifact_path: str,
-    label: str,
-) -> None:
-    meta = persistence.get("meta")
-    if not isinstance(meta, dict):
-        raise AssertionError(f"[FAIL] {label}: missing persistence meta object")
-    got_source = str(meta.get("delta_source_used") or "")
-    got_path = str(meta.get("artifact_path") or "")
-    if got_source != expected_source:
-        raise AssertionError(
-            f"[FAIL] {label}: delta_source_used mismatch expected={expected_source!r} got={got_source!r}"
-        )
-    if got_path != expected_artifact_path:
-        raise AssertionError(
-            f"[FAIL] {label}: artifact_path mismatch expected={expected_artifact_path!r} got={got_path!r}"
-        )
-
-
 def check_provider_swap_acceptance(cfg: dict, output_root: Path) -> None:
     latest = run_pipeline("tw", "run_provider_swap", INPUT_SAMPLE, output_root)
     token = _safe_profile_token("tw")
@@ -286,12 +241,20 @@ def check_provider_swap_acceptance(cfg: dict, output_root: Path) -> None:
     run_render_only(latest)
     persistence_artifact_a, kernel_artifact_a, p_raw_a, _ = load_derived_payloads(latest, "tw")
     check_schema_acceptance(persistence_artifact_a, kernel_artifact_a, cfg, "provider_artifact_a")
-    check_delta_source_meta(persistence_artifact_a, "artifact", expected_rel, "provider_artifact_a")
+    meta_a = read_delta_meta(persistence_artifact_a, "provider_artifact_a")
+    if meta_a["delta_source_used"] != "artifact" or meta_a["artifact_path"] != expected_rel:
+        raise AssertionError(
+            "[FAIL] provider_artifact_a: expected artifact source with deterministic relative path"
+        )
 
     run_render_only(latest)
     persistence_artifact_b, kernel_artifact_b, p_raw_b, _ = load_derived_payloads(latest, "tw")
     check_schema_acceptance(persistence_artifact_b, kernel_artifact_b, cfg, "provider_artifact_b")
-    check_delta_source_meta(persistence_artifact_b, "artifact", expected_rel, "provider_artifact_b")
+    meta_b = read_delta_meta(persistence_artifact_b, "provider_artifact_b")
+    if meta_b["delta_source_used"] != "artifact" or meta_b["artifact_path"] != expected_rel:
+        raise AssertionError(
+            "[FAIL] provider_artifact_b: expected artifact source with deterministic relative path"
+        )
     if hash_text(p_raw_a) != hash_text(p_raw_b):
         raise AssertionError("[FAIL] provider artifact path is not deterministic across repeated renders")
 
@@ -300,13 +263,21 @@ def check_provider_swap_acceptance(cfg: dict, output_root: Path) -> None:
     run_render_only(latest)
     persistence_absent, kernel_absent, _, _ = load_derived_payloads(latest, "tw")
     check_schema_acceptance(persistence_absent, kernel_absent, cfg, "provider_absent")
-    check_delta_source_meta(persistence_absent, "fallback_db", "", "provider_absent")
+    meta_absent = read_delta_meta(persistence_absent, "provider_absent")
+    if meta_absent["delta_source_used"] != "fallback_db" or meta_absent["artifact_path"] != "":
+        raise AssertionError(
+            "[FAIL] provider_absent: expected fallback_db source and empty artifact_path"
+        )
 
     write_invalid_delta_artifact(artifact_path, "tw")
     run_render_only(latest)
     persistence_reject, kernel_reject, _, _ = load_derived_payloads(latest, "tw")
     check_schema_acceptance(persistence_reject, kernel_reject, cfg, "provider_schema_reject")
-    check_delta_source_meta(persistence_reject, "fallback_db", "", "provider_schema_reject")
+    meta_reject = read_delta_meta(persistence_reject, "provider_schema_reject")
+    if meta_reject["delta_source_used"] != "fallback_db" or meta_reject["artifact_path"] != "":
+        raise AssertionError(
+            "[FAIL] provider_schema_reject: expected fallback_db source and empty artifact_path"
+        )
 
 
 def check_none_behavior(persistence_none: dict) -> None:
@@ -330,66 +301,6 @@ def check_deterministic_acceptance(
         raise AssertionError("[FAIL] persistence derived output hash mismatch across deterministic runs")
     if hash_text(k_raw_a) != hash_text(k_raw_b):
         raise AssertionError("[FAIL] event kernel derived output hash mismatch across deterministic runs")
-
-
-def check_provider_swap_acceptance(latest_dir: Path, profile: str) -> None:
-    if not PROVIDER_FIXTURE_GOOD.exists():
-        raise AssertionError(f"[FAIL] missing provider fixture: {PROVIDER_FIXTURE_GOOD}")
-    if not PROVIDER_FIXTURE_BAD.exists():
-        raise AssertionError(f"[FAIL] missing provider fixture: {PROVIDER_FIXTURE_BAD}")
-
-    token = _safe_profile_token(profile)
-    artifact_path = latest_dir / "derived" / f"deltaT_v1_{token}.json"
-    artifact_path.parent.mkdir(parents=True, exist_ok=True)
-
-    shutil.copy2(PROVIDER_FIXTURE_GOOD, artifact_path)
-    run_render_only(latest_dir)
-    persistence_present_a, _, p_raw_present_a, _ = load_derived_payloads(latest_dir, profile)
-    meta_present_a = read_delta_meta(persistence_present_a, "provider_swap_present_a")
-    if meta_present_a["delta_source_used"] != "artifact":
-        raise AssertionError(
-            "[FAIL] provider_swap_present_a: expected delta_source_used=artifact, "
-            f"got={meta_present_a['delta_source_used']!r}"
-        )
-
-    run_render_only(latest_dir)
-    persistence_present_b, _, p_raw_present_b, _ = load_derived_payloads(latest_dir, profile)
-    meta_present_b = read_delta_meta(persistence_present_b, "provider_swap_present_b")
-    if meta_present_b["delta_source_used"] != "artifact":
-        raise AssertionError(
-            "[FAIL] provider_swap_present_b: expected delta_source_used=artifact, "
-            f"got={meta_present_b['delta_source_used']!r}"
-        )
-    if hash_text(p_raw_present_a) != hash_text(p_raw_present_b):
-        raise AssertionError(
-            "[FAIL] provider_swap_present: persistence hash mismatch across rerenders"
-        )
-    print("[OK] provider swap artifact-present path")
-
-    if artifact_path.exists():
-        artifact_path.unlink()
-    run_render_only(latest_dir)
-    persistence_absent, _, _, _ = load_derived_payloads(latest_dir, profile)
-    meta_absent = read_delta_meta(persistence_absent, "provider_swap_absent")
-    if meta_absent["delta_source_used"] != "fallback_db":
-        raise AssertionError(
-            "[FAIL] provider_swap_absent: expected delta_source_used=fallback_db, "
-            f"got={meta_absent['delta_source_used']!r}"
-        )
-    print("[OK] provider swap artifact-absent path")
-
-    shutil.copy2(PROVIDER_FIXTURE_BAD, artifact_path)
-    run_render_only(latest_dir)
-    persistence_bad, _, _, _ = load_derived_payloads(latest_dir, profile)
-    meta_bad = read_delta_meta(persistence_bad, "provider_swap_schema_reject")
-    if meta_bad["delta_source_used"] != "fallback_db":
-        raise AssertionError(
-            "[FAIL] provider_swap_schema_reject: expected delta_source_used=fallback_db, "
-            f"got={meta_bad['delta_source_used']!r}"
-        )
-    if artifact_path.exists():
-        artifact_path.unlink()
-    print("[OK] provider swap schema-reject path")
 
 
 def check_isolation_acceptance() -> None:
@@ -520,7 +431,6 @@ def main() -> None:
     persistence_tw_a, kernel_tw_a, p_raw_tw_a, k_raw_tw_a = load_derived_payloads(latest_tw_a, "tw")
     check_schema_acceptance(persistence_tw_a, kernel_tw_a, cfg, "tw_a")
     print("[OK] schema acceptance for tw_a")
-    check_provider_swap_acceptance(latest_tw_a, "tw")
 
     latest_tw_b = run_pipeline("tw", "run_tw_b", INPUT_SAMPLE, output_root)
     persistence_tw_b, kernel_tw_b, p_raw_tw_b, k_raw_tw_b = load_derived_payloads(latest_tw_b, "tw")
