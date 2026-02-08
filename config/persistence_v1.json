@@ -1,0 +1,15 @@
+{
+  "version": "persistence_v1",
+  "window": 16,
+  "alpha": 0.11764705882352941,
+  "eps": 0.01,
+  "ers_thresholds": {
+    "watch_p": 0.55,
+    "watch_streak": 3,
+    "eligible_p": 0.7,
+    "eligible_streak": 5
+  },
+  "kernel": {
+    "top_k_domains": 3
+  }
+}
