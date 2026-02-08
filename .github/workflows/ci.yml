@@ -25,4 +25,3 @@ jobs:
       - name: Run acceptance
         run: |
           python scripts/run_acceptance_v07.py --skip-v04-hash
-
