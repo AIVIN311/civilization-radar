@@ -8,6 +8,7 @@ registry:
     max_open_pr_per_agent: 1
     require_acceptance_tag: true
     acceptance_tags:
+    observation_mode: true
       - accepted-analysis
       - accepted-derived
       - accepted-experiment
@@ -28,6 +29,7 @@ registry:
       - "rewrite_history"
       - "reset_thresholds"
       - "mass_pr_spam"
+      - modify_observation_baseline
 
 agents:
   - id: "civilization-persistence-v0.7"
