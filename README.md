@@ -2,6 +2,7 @@
 
 Civilization Radar is an event-driven cross-series risk propagation radar.
 v0.4 is the stable base. v0.5 PR-2 adds geo_factor data-layer outputs without changing v0.4 core scoring semantics.
+This repository is currently operating in observation-first mode.
 
 ## What Is New In v0.4
 
