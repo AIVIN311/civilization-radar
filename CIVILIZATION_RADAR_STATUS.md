@@ -16,3 +16,8 @@
 - `output/latest/radar.db` is not refreshed after promote/month-end run.
 - `output/latest/reports/eval_quality.json` is missing or `ok != true`.
 - Any task `Task To Run` path is not under `C:\dev\civilization-radar\ops\*.ps1`.
+
+## 4. Observation KPI (30-day)
+- KPI-1 (quality gate): over a 30-day window, `output/latest/reports/eval_quality.json` exists and `ok = true`, with at least one refresh after each Friday promote.
+- KPI-2 (data continuity): `input/snapshots.jsonl` gains at least one new row every day, validated by dual checks (`mtime` + the latest row `date`/`ts`).
+- KPI-3 (promote freshness): after each Friday promote run, `output/latest/radar.db` mtime is later than promote start time (or consistent with the newest `output/reports/acceptance_latest_*.json` timestamp).
