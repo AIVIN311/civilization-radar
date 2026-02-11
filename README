@@ -43,6 +43,43 @@ python run_pipeline_50.py --output-dir output --half-life-days 7 --geo-profile t
 - `output/runs/<YYYYMMDDTHHMMSSZ>/`
 - 成功後 promote 到 `output/latest/`
 
+## 長期自動化狀態（Ops）
+
+目前判斷：
+
+- ✅ repo 內已具備自動化腳本與排程定義。
+- ⚠️ 是否「已在正式主機持續運行」仍需看 Windows Task Scheduler 上是否已註冊並成功執行。
+
+預期任務（Windows 主機，時區需為 Asia/Taipei）：
+
+- `CivilizationRadar-WeekdaySnapshots`（Mon–Thu 18:00）
+- `CivilizationRadar-FridayPromote`（Fri 18:00）
+- `CivilizationRadar-MonthEndPipelineTag`（Daily 19:00，僅月底實際執行）
+
+快速驗證（在 Windows runner 的 PowerShell）：
+
+```powershell
+# 查任務是否存在、上次/下次執行時間
+schtasks /Query /TN "CivilizationRadar-WeekdaySnapshots" /V /FO LIST
+schtasks /Query /TN "CivilizationRadar-FridayPromote" /V /FO LIST
+schtasks /Query /TN "CivilizationRadar-MonthEndPipelineTag" /V /FO LIST
+
+# 一次重註冊三個任務
+powershell -ExecutionPolicy Bypass -File .\ops\register_weekly_tasks.ps1
+```
+
+判斷「已進入長期收集」可看這些證據：
+
+- `input/snapshots.jsonl` 在平日持續 append
+- 週五後有新的 `output/reports/acceptance_latest_*.json`
+- `output/latest/reports/eval_quality.json` 內 `ok: true`
+
+若中斷，依序手動修復：
+
+- `ops/collect_snapshots_weekday.ps1`
+- `ops/promote_latest.ps1`
+- `ops/month_end_release.ps1`
+
 ## 固定回歸驗收
 
 - 固定樣本：`input/snapshots.sample.jsonl`
@@ -51,19 +88,23 @@ python run_pipeline_50.py --output-dir output --half-life-days 7 --geo-profile t
 
 驗收腳本會驗證 deterministic hash、alias 收斂、cf/origin 強度差、Top-3 explain、half-life 敏感度、L3 一致性、與 gate 失敗條件。
 
-輸出清理：
+## 文件完整性檢查
+
+目前 README（中/英）已涵蓋：
+
+- 版本範圍與架構定位
+- 完整流程與一鍵執行
+- 固定回歸驗收入口
+- 長期自動化檢查與修復方式
+
+建議下一步補齊：
+
+- `.env` 各參數逐項說明（含範例）
+- 常見錯誤與排障手冊
+- `output/runs/` 與 `input/snapshots.jsonl` 保留/輪替策略
+- dashboard 欄位字典（`geo_factor`、`tw_rank_*`）
+
+## 輸出清理
 
 - `python scripts/clean_output.py`
 - `python scripts/clean_output.py --nuke`
-# Weekly Rhythm
-
-Monday
-- Snapshot collection (automatic)
-
-Friday
-- Promote latest acceptance to output/latest
-
-End of Month
-- Full pipeline run
-- Release tag
-- Archive outputs

@@ -58,6 +58,43 @@ Output:
 - `output/runs/<YYYYMMDDTHHMMSSZ>/`
 - promotes successful run to `output/latest/`
 
+## Long-term Automation Status (Ops)
+
+Current assessment:
+
+- ✅ Automation scripts and schedule definitions are present in repo.
+- ⚠️ Whether automation is **already running in production** depends on host-level Windows Task Scheduler registration.
+
+Expected scheduled tasks (Windows host, Asia/Taipei timezone):
+
+- `CivilizationRadar-WeekdaySnapshots` (Mon-Thu 18:00)
+- `CivilizationRadar-FridayPromote` (Fri 18:00)
+- `CivilizationRadar-MonthEndPipelineTag` (Daily 19:00, self-gated for month-end)
+
+Quick verification commands (PowerShell on the Windows runner):
+
+```powershell
+# list tasks
+schtasks /Query /TN "CivilizationRadar-WeekdaySnapshots" /V /FO LIST
+schtasks /Query /TN "CivilizationRadar-FridayPromote" /V /FO LIST
+schtasks /Query /TN "CivilizationRadar-MonthEndPipelineTag" /V /FO LIST
+
+# (re)register all three tasks from repo scripts
+powershell -ExecutionPolicy Bypass -File .\ops\register_weekly_tasks.ps1
+```
+
+Recent-run evidence to collect when checking "is long-term collection active":
+
+- `input/snapshots.jsonl` keeps appending on weekdays
+- new `output/reports/acceptance_latest_*.json` appears after Friday promote
+- `output/latest/reports/eval_quality.json` has `ok: true`
+
+If these artifacts stop updating, run:
+
+- `ops/collect_snapshots_weekday.ps1` for collection repair
+- `ops/promote_latest.ps1` for Friday promotion repair
+- `ops/month_end_release.ps1` for month-end repair
+
 ## Fixed Regression / Acceptance
 
 Fixture:
@@ -91,3 +128,19 @@ This validates:
 - Cleanup helper:
   - `python scripts/clean_output.py`
   - `python scripts/clean_output.py --nuke`
+
+## Documentation Completeness Checklist
+
+This README currently covers:
+
+- architecture + version scope (v0.4 base, v0.5 PR-2 data-layer extension)
+- one-command and full-pipeline execution
+- acceptance regression entry points
+- long-term automation scripts and verification checklist
+
+If you want fully "ops-ready" docs, add these next:
+
+- `.env` key-by-key reference with examples
+- failure-playbook examples (common stack traces + fixes)
+- data retention/rotation policy for `output/runs/` and `input/snapshots.jsonl`
+- dashboard field dictionary for `geo_factor` and `tw_rank_*`
