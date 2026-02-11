@@ -27,9 +27,8 @@ New-Item -ItemType Directory -Force -Path (Split-Path $outFile) | Out-Null
 
 Write-Host "[weekday collect] repo=$RepoRoot daysBack=$daysBack out=$outFile"
 
-# ✅ Adjust these args ONLY if your script uses different flags.
-# Assumes: cf_pull_daily_v2.py supports --days-back and --output and --mode append.
-& $Py "cf_pull_daily_v2.py" "--mode" "append" "--days-back" "$daysBack" "--output" "$outFile"
+# cf_pull_daily_v2.py appends by default and supports --days / --out.
+& $Py "cf_pull_daily_v2.py" "--days" "$daysBack" "--out" "$outFile"
 if ($LASTEXITCODE -ne 0) { throw "cf_pull_daily_v2.py failed with exit code $LASTEXITCODE" }
 
 Write-Host "[weekday collect] OK"
