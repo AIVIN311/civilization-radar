@@ -1,5 +1,5 @@
 ﻿# AGENTS.md (Map)
-
+  If any path conflicts with docs/ops, docs/ops is canonical.
 > This repo is a long-running observation system. Prefer minimal, reversible changes.
 > This file is a map: where to look, what not to break, how to verify.
 
