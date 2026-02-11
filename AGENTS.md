@@ -1,7 +1,14 @@
-# AGENTS.md (Map)
+﻿# AGENTS.md (Map)
 
 > This repo is a long-running observation system. Prefer minimal, reversible changes.
 > This file is a map: where to look, what not to break, how to verify.
+
+## Docs Index
+- `docs/architecture/OUTPUTS.md`
+- `docs/metrics/EVAL.md`
+- `docs/ops/BASELINE.md`
+- `docs/ops/RUNBOOK.md`
+- `docs/tasks/2026-02-12_dt-artifactfirst.md`
 
 ## 0) Golden rule
 - If you cannot verify, do not change behavior.
@@ -12,7 +19,7 @@
 - Ops & Runbook: `docs/ops/`
 - Architecture / outputs: `docs/architecture/`
 - Metrics & eval notes: `docs/metrics/`
-- Task-specific guardrails & checklists (append-only): `docs/ops/tasks/`
+- Task-specific guardrails & checklists (append-only): `docs/tasks/`
 
 ## 2) Scope model (what changes are allowed)
 ### Allowed by default
@@ -39,7 +46,7 @@ Unless the prompt explicitly says otherwise, do NOT change:
 - When adding fallbacks:
   - log/annotate fallback in render metadata (do not throw)
   - keep outputs stable; no silent behavior changes without notes
-- Avoid large instruction dumps in this file. Put task details under `docs/ops/tasks/`.
+- Avoid large instruction dumps in this file. Put task details under `docs/tasks/`.
 
 ## 5) Verification (minimum checklist)
 Every change must include a verification note (even docs-only should be a quick check).
@@ -52,11 +59,11 @@ Every change must include a verification note (even docs-only should be a quick 
 - Run: collect/promote smoke test (must not be polluted by snapshots)
 - Confirm: `git status` clean after running (snapshots do not dirty the repo)
 - Confirm: render works with missing artifacts (fallback path works; no crash)
-- Record results in: `docs/ops/tasks/<YYYY-MM-DD>_<task>.md`
+- Record results in: `docs/tasks/<YYYY-MM-DD>_<task>.md`
 
 ## 6) Task log pattern (required for “don’t touch” lists)
 When a prompt includes “do not touch” items or special verification, create:
-- `docs/ops/tasks/<YYYY-MM-DD>_<task-id>.md`
+- `docs/tasks/<YYYY-MM-DD>_<task-id>.md`
 
 Template:
 - Goal

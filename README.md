@@ -3,6 +3,25 @@
 Civilization Radar is an event-driven cross-series risk propagation radar.
 The project has moved from experiment-heavy iteration into observation-first operations.
 
+## For Agents / Baseline Ops
+
+Route lock (single onboarding path):
+1. `README.md`
+2. `AGENTS.md`
+3. `docs/ops/RUNBOOK.md`
+4. `docs/architecture/OUTPUTS.md` + `docs/metrics/EVAL.md`
+5. `docs/tasks/2026-02-12_route-lock.md`
+
+Direct links:
+- `AGENTS.md`
+- `docs/ops/BASELINE.md`
+- `docs/ops/RUNBOOK.md`
+
+Ops docs contract:
+- Canonical operations docs live in `docs/ops/*`.
+- `ops/*.md` files are allowed only as legacy tombstones (redirect notes, no canonical body).
+- Runtime scripts remain in `ops/*.ps1`.
+
 ## Current Stage
 
 This repository is now in `Observation Baseline` mode.
@@ -87,13 +106,13 @@ Planned follow-up (`v0.7.1 ops`):
 
 Canonical reading order:
 1. `README.md` (this file)
-2. `docs/README.md` (document index)
-3. `ops/OBSERVATION_BASELINE.md`
-4. `CIVILIZATION_RADAR_STATUS.md`
-5. `docs/releases/v0.4.md` to `docs/releases/v0.7.md`
+2. `AGENTS.md`
+3. `docs/ops/RUNBOOK.md`
+4. `docs/architecture/OUTPUTS.md` + `docs/metrics/EVAL.md`
+5. `docs/tasks/2026-02-12_route-lock.md`
 
 Key links:
+- Baseline definition: `docs/ops/BASELINE.md`
+- Document index: `docs/README.md`
 - Status/KPI: `CIVILIZATION_RADAR_STATUS.md`
-- Ops rhythm: `ops/weekly_rhythm.md`
-- Acceptance protocol: `ops/radar_acceptance_protocol.md`
-- Non-interference rules: `ops/radar_non_interference_rules.md`
+- Release notes: `docs/releases/v0.4.md` to `docs/releases/v0.7.md`

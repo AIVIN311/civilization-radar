@@ -1,7 +1,47 @@
 ﻿# Civilization Radar — v0.7 Observation Baseline
 
 中文版快速導覽。英文完整說明請看 `README.md`。
-本專案已從實驗期轉為 observation-first 維運階段。
+
+## v0.7 — Observation Baseline
+
+v0.7 標誌著 Civilization Radar 進入「觀測模式」。
+
+在此階段，系統的首要目標不是擴張功能、優化分數或追求指標成長，而是確立一個穩定、可重現、可驗證的觀測基準。所有 pipeline、artifact 與 render 輸出，都必須在不改變核心計算邏輯的前提下，保持一致性與可追溯性。
+
+此版本凍結核心演算法（persistence / kernel / gate / scoring）路徑。任何實驗性改動，必須以 artifact-first 的方式引入，並具備安全 fallback。render 層可調整，資料來源可優化，但不得污染 baseline 或改寫既有數學結構。
+
+在 Observation Baseline 階段：
+- 正確性優先於速度
+- 穩定性優先於創新
+- 可解釋性優先於複雜度
+
+所有輸出皆應可回溯至明確 artifact。
+任何例外情況不得中斷主流程。
+
+這不是停滯，而是壓縮。
+這不是保守，而是建立未來擴張的參考點。
+
+v0.7 是一個基準版本。
+未來所有變動，都必須能與它比較。
+
+## For Agents / Baseline Ops
+
+Route lock（唯一入口路線）：
+1. `README.md`
+2. `AGENTS.md`
+3. `docs/ops/RUNBOOK.md`
+4. `docs/architecture/OUTPUTS.md` + `docs/metrics/EVAL.md`
+5. `docs/tasks/2026-02-12_route-lock.md`
+
+直連：
+- `AGENTS.md`
+- `docs/ops/BASELINE.md`
+- `docs/ops/RUNBOOK.md`
+
+規則：
+- Ops 文件 SSOT 在 `docs/ops/*`。
+- `ops/*.md` 允許存在，但僅作 tombstone（轉址說明，不承載正文）。
+- 執行腳本維持在 `ops/*.ps1`。
 
 ## Current Stage
 
@@ -86,13 +126,13 @@ schtasks /Query /TN "CivilizationRadar-MonthEndPipelineTag" /V /FO LIST
 
 建議閱讀順序：
 1. `README.md`（英文主文）
-2. `docs/README.md`（文件索引）
-3. `ops/OBSERVATION_BASELINE.md`
-4. `CIVILIZATION_RADAR_STATUS.md`
-5. `docs/releases/v0.4.md` 到 `docs/releases/v0.7.md`
+2. `AGENTS.md`
+3. `docs/ops/RUNBOOK.md`
+4. `docs/architecture/OUTPUTS.md` + `docs/metrics/EVAL.md`
+5. `docs/tasks/2026-02-12_route-lock.md`
 
 關鍵連結：
+- baseline 定義：`docs/ops/BASELINE.md`
+- 文件索引：`docs/README.md`
 - 狀態/KPI：`CIVILIZATION_RADAR_STATUS.md`
-- 週期節奏：`ops/weekly_rhythm.md`
-- 驗收規範：`ops/radar_acceptance_protocol.md`
-- 非干擾規則：`ops/radar_non_interference_rules.md`
+- 發版紀錄：`docs/releases/v0.4.md` 到 `docs/releases/v0.7.md`
