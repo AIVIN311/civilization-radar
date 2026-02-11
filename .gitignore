@@ -47,6 +47,7 @@ dashboard_v04.html
 *.log
 *.pid
 *.seed
+input/snapshots.jsonl
 
 # =========================
 # OS / Editor junk
