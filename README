@@ -1,110 +1,98 @@
-# Civilization Radar v0.5（PR-2 進行中）
+﻿# Civilization Radar — v0.7 Observation Baseline
 
-中文版快速說明。英文完整版請看 `README.md`。
-v0.4 為穩定底座；v0.5 PR-2 只新增 geo 資料層，不改 v0.4 核心分數語意。
+中文版快速導覽。英文完整說明請看 `README.md`。
+本專案已從實驗期轉為 observation-first 維運階段。
 
-## v0.4 重點
+## Current Stage
 
-- 快照輸入先 normalize，固定 schema，並記錄缺欄位/多欄位。
-- series alias 單一來源：`config/series_aliases.json`。
-- 事件強度有 explain payload，寫入 `events_v01.strength_explain_json`。
-- chain 推力拆成 `base_score / boosted_score / delta_boost`。
-- edge 帶 `src_event_*` 說明欄位，可追溯事件來源。
-- `half_life_days` 可由 CLI 或 ENV 調整。
-- `eval_quality` 變成 hard gate（critical 直接 non-zero）。
-- 生成物使用穩定結構，最新成功輸出固定在 `output/latest/`。
+目前狀態：`Observation Baseline`。
 
-## v0.5 PR-2（Geo Factor 資料層）
+核心原則：
+- 盡量不做不必要的新功能擴張。
+- 以可驗證、可重現為優先。
+- 以營運穩定性為主要交付目標。
 
-- SSOT 路徑固定：`config/geo_profiles_v1.json`。
-- 每次 run 單一 active profile：`--geo-profile`（預設 `tw`）。
-- 鏈式輸出新增欄位（不改 v0.4 base/boosted/delta）：
-  - `geo_factor`
-  - `geo_factor_explain_json`
-  - `tw_rank_score`
-  - `tw_rank_explain_json`
+## Core Pipeline Contract
 
-## 完整流程
+主要流程命令：
 
 ```bash
 python run_pipeline_50.py --output-dir output --half-life-days 7 --geo-profile tw --input-snapshots input/snapshots.jsonl
 ```
 
-輸出：
-
+主要輸出：
 - `output/latest/radar.db`
 - `output/latest/dashboard_v04.html`
-- `output/reports/eval_quality_<run_id>.json`
+- `output/latest/reports/eval_quality.json`
+- `output/reports/acceptance_latest_<timestamp>.json`
 
-## 一鍵執行
+驗收入口：
 
-`run_pipeline_50.py` 會把每次完整輸出寫到：
+```bash
+python scripts/run_acceptance_v04.py
+python scripts/run_acceptance_latest.py
+python scripts/run_acceptance_v07.py --skip-v04-hash
+```
 
-- `output/runs/<YYYYMMDDTHHMMSSZ>/`
-- 成功後 promote 到 `output/latest/`
+## Runtime Data Policy
 
-## 長期自動化狀態（Ops）
+`input/snapshots.jsonl` 為 runtime artifact：
+- 由排程收集任務維護。
+- 故意不納入 Git 追蹤。
+- fixture/sample 仍保留追蹤：
+  - `input/snapshots.sample.jsonl`
+  - `input/snapshots.geo.sample.jsonl`
 
-目前判斷：
+## Operations Rhythm
 
-- ✅ repo 內已具備自動化腳本與排程定義。
-- ⚠️ 是否「已在正式主機持續運行」仍需看 Windows Task Scheduler 上是否已註冊並成功執行。
+預設節奏（主機時區 Asia/Taipei）：
+- Mon-Thu 18:00：`CivilizationRadar-WeekdaySnapshots`
+- Fri 18:00：`CivilizationRadar-FridayPromote`
+- Daily 19:00（月底自我判斷執行）：`CivilizationRadar-MonthEndPipelineTag`
 
-預期任務（Windows 主機，時區需為 Asia/Taipei）：
+修復命令：
+- `powershell -ExecutionPolicy Bypass -File .\ops\collect_snapshots_weekday.ps1`
+- `powershell -ExecutionPolicy Bypass -File .\ops\promote_latest.ps1`
+- `powershell -ExecutionPolicy Bypass -File .\ops\month_end_release.ps1`
 
-- `CivilizationRadar-WeekdaySnapshots`（Mon–Thu 18:00）
-- `CivilizationRadar-FridayPromote`（Fri 18:00）
-- `CivilizationRadar-MonthEndPipelineTag`（Daily 19:00，僅月底實際執行）
+## Health Checks
 
-快速驗證（在 Windows runner 的 PowerShell）：
+最小檢查命令：
 
 ```powershell
-# 查任務是否存在、上次/下次執行時間
 schtasks /Query /TN "CivilizationRadar-WeekdaySnapshots" /V /FO LIST
 schtasks /Query /TN "CivilizationRadar-FridayPromote" /V /FO LIST
 schtasks /Query /TN "CivilizationRadar-MonthEndPipelineTag" /V /FO LIST
-
-# 一次重註冊三個任務
-powershell -ExecutionPolicy Bypass -File .\ops\register_weekly_tasks.ps1
 ```
 
-判斷「已進入長期收集」可看這些證據：
+通過條件：
+- task `Last Result = 0`
+- `output/latest/reports/eval_quality.json` 存在且 `ok = true`
+- promote/month-end 後 `output/latest/radar.db` 有刷新
+- promote 後出現新的 `output/reports/acceptance_latest_*.json`
 
-- `input/snapshots.jsonl` 在平日持續 append
-- 週五後有新的 `output/reports/acceptance_latest_*.json`
-- `output/latest/reports/eval_quality.json` 內 `ok: true`
+## Known Operational Constraints
 
-若中斷，依序手動修復：
+目前排程仍是互動模式：
+- `Logon Mode`: `Interactive only`
+- XML `LogonType`: `InteractiveToken`
+- `WakeToRun`: 未啟用
 
-- `ops/collect_snapshots_weekday.ps1`
-- `ops/promote_latest.ps1`
-- `ops/month_end_release.ps1`
+後續（`v0.7.1 ops`）會再處理：
+- headless 排程模式
+- 是否啟用 wake-to-run（依主機政策）
 
-## 固定回歸驗收
+## Documentation Map
 
-- 固定樣本：`input/snapshots.sample.jsonl`
-- 驗收腳本：`python scripts/run_acceptance_v04.py`
-- latest 包裝器：`python scripts/run_acceptance_latest.py`
+建議閱讀順序：
+1. `README.md`（英文主文）
+2. `docs/README.md`（文件索引）
+3. `ops/OBSERVATION_BASELINE.md`
+4. `CIVILIZATION_RADAR_STATUS.md`
+5. `docs/releases/v0.4.md` 到 `docs/releases/v0.7.md`
 
-驗收腳本會驗證 deterministic hash、alias 收斂、cf/origin 強度差、Top-3 explain、half-life 敏感度、L3 一致性、與 gate 失敗條件。
-
-## 文件完整性檢查
-
-目前 README（中/英）已涵蓋：
-
-- 版本範圍與架構定位
-- 完整流程與一鍵執行
-- 固定回歸驗收入口
-- 長期自動化檢查與修復方式
-
-建議下一步補齊：
-
-- `.env` 各參數逐項說明（含範例）
-- 常見錯誤與排障手冊
-- `output/runs/` 與 `input/snapshots.jsonl` 保留/輪替策略
-- dashboard 欄位字典（`geo_factor`、`tw_rank_*`）
-
-## 輸出清理
-
-- `python scripts/clean_output.py`
-- `python scripts/clean_output.py --nuke`
+關鍵連結：
+- 狀態/KPI：`CIVILIZATION_RADAR_STATUS.md`
+- 週期節奏：`ops/weekly_rhythm.md`
+- 驗收規範：`ops/radar_acceptance_protocol.md`
+- 非干擾規則：`ops/radar_non_interference_rules.md`
