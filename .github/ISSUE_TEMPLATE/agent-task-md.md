@@ -2,7 +2,7 @@
 name: agent-task.md
 about: Agent Task Template
 title: ''
-labels: ''
+labels: 代理人
 assignees: AIVIN311
 
 ---
