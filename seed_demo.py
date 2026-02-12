@@ -1,4 +1,4 @@
-import sqlite3, time
+
 DB="radar.db"
 
 conn=sqlite3.connect(DB)
