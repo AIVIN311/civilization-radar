@@ -13,7 +13,8 @@ function Resolve-Python {
 }
 
 function Is-MonthEnd([datetime]$d) {
-  return $d.Date -eq (Get-Date $d.Year $d.Month 1).AddMonths(1).AddDays(-1).Date
+  $firstDay = Get-Date -Year $d.Year -Month $d.Month -Day 1
+  return $d.Date -eq $firstDay.AddMonths(1).AddDays(-1).Date
 }
 
 $Py = Resolve-Python
