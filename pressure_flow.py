@@ -67,7 +67,7 @@ def main():
     # 計算 series 的 ΔW（可換成 slope/rolling，先用 diff）
     deltaW = {}
     for s in nodes:
-        deltaW[s] = latest[s]["W"] - prev[s]["W"]
+        deltaW[s] = latest[s]["W"] - prev[s]["W"]m
 
     # 依 edge 計算 push：Push = activation(W) * max(0, ΔW) * weight
     # 這裡把 ΔW 當「加速度」，只吃正向（升溫）以避免雜訊反向震盪
