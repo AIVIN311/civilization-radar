@@ -12,7 +12,7 @@ function Resolve-Python {
   throw "python.exe not found (neither .venv nor PATH)."
 }
 
-function Is-MonthEnd([datetime]$d) {
+function Test-MonthEnd([datetime]$d) {
   $firstDay = Get-Date -Year $d.Year -Month $d.Month -Day 1
   return $d.Date -eq $firstDay.AddMonths(1).AddDays(-1).Date
 }
@@ -22,7 +22,7 @@ $now = Get-Date
 $startUtc = $now.ToUniversalTime()
 
 # Collision gate: if today is Friday AND month-end -> skip promote (monthly job owns the heavy run)
-if ($now.DayOfWeek -eq "Friday" -and (Is-MonthEnd $now)) {
+if ($now.DayOfWeek -eq "Friday" -and (Test-MonthEnd $now)) {
   Write-Host "[promote] month-end Friday collision -> SKIP Friday promote (monthly job only)."
   exit 0
 }

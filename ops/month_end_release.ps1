@@ -12,7 +12,7 @@ function Resolve-Python {
   throw "python.exe not found (neither .venv nor PATH)."
 }
 
-function Is-MonthEnd([datetime]$d) {
+function Test-MonthEnd([datetime]$d) {
   $firstDay = Get-Date -Year $d.Year -Month $d.Month -Day 1
   return $d.Date -eq $firstDay.AddMonths(1).AddDays(-1).Date
 }
@@ -20,7 +20,7 @@ function Is-MonthEnd([datetime]$d) {
 $Py = Resolve-Python
 $now = Get-Date
 
-if (!(Is-MonthEnd $now)) {
+if (!(Test-MonthEnd $now)) {
   Write-Host "[month-end] not month-end -> no-op"
   exit 0
 }
