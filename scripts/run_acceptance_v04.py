@@ -1,4 +1,5 @@
 import hashlib
+import argparse
 import json
 import os
 import shutil
@@ -78,8 +79,8 @@ def summarize_db(db_path: Path):
     return summary
 
 
-def assert_schema_fixed():
-    out = ROOT / "output" / "accept_schema"
+def assert_schema_fixed(output_root: Path):
+    out = output_root / "accept_schema"
     if out.exists():
         shutil.rmtree(out)
     out.mkdir(parents=True, exist_ok=True)
@@ -231,8 +232,8 @@ def assert_l3_consistency(db_path: Path):
         raise SystemExit("L3 consistency check failed")
 
 
-def assert_eval_fail_on_bad_input():
-    out = ROOT / "output" / "accept_bad"
+def assert_eval_fail_on_bad_input(output_root: Path):
+    out = output_root / "accept_bad"
     if out.exists():
         shutil.rmtree(out)
     out.mkdir(parents=True, exist_ok=True)
@@ -264,10 +265,23 @@ def assert_eval_fail_on_bad_input():
 
 
 def main():
-    assert_schema_fixed()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--output-root",
+        default="output",
+        help="Output root directory for acceptance artifacts (default: output)",
+    )
+    args = parser.parse_args()
 
-    run1 = ROOT / "output" / "accept_run1"
-    run2 = ROOT / "output" / "accept_run2"
+    output_root = Path(args.output_root)
+    if not output_root.is_absolute():
+        output_root = (ROOT / output_root).resolve()
+    output_root.mkdir(parents=True, exist_ok=True)
+
+    assert_schema_fixed(output_root)
+
+    run1 = output_root / "accept_run1"
+    run2 = output_root / "accept_run2"
     db1 = pipeline_run(run1, SAMPLE)
     db2 = pipeline_run(run2, SAMPLE)
 
@@ -280,7 +294,7 @@ def main():
     assert_chain_explain_and_delta(db1)
     assert_l3_consistency(db1)
     assert_half_life_sensitivity(run1)
-    assert_eval_fail_on_bad_input()
+    assert_eval_fail_on_bad_input(output_root)
 
     print("=== v0.4 acceptance summary ===")
     print(json.dumps({"run1": s1, "run2": s2}, ensure_ascii=False, indent=2))

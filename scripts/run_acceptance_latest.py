@@ -73,7 +73,7 @@ def main():
     ensure_layout(output_root)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
-    cmd = [PY, "scripts/run_acceptance_v04.py"]
+    cmd = [PY, "scripts/run_acceptance_v04.py", "--output-root", str(output_root)]
     print(">>", " ".join(cmd))
     r = subprocess.run(cmd, cwd=ROOT)
     if r.returncode != 0:

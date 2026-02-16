@@ -97,4 +97,3 @@ if ($LASTEXITCODE -ne 0) { throw "git push tag failed" }
 
 Write-Host "[month-end] OK: pipeline + monthly quality + tag pushed ($tag)"
 exit 0
-month_end_release.ps1
