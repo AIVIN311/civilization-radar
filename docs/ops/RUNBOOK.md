@@ -20,6 +20,26 @@ Verify:
 
 ---
 
+## 1.1 Scheduler Diagnostics (Collect Failure)
+
+If `CivilizationRadar-WeekdaySnapshots` reports `Last Result != 0`:
+
+1. Query task status:
+   - `schtasks /Query /TN "CivilizationRadar-WeekdaySnapshots" /V /FO LIST`
+2. Enable Task Scheduler operational log (requires elevated shell):
+   - `wevtutil set-log Microsoft-Windows-TaskScheduler/Operational /enabled:true`
+3. Verify log status:
+   - `Get-WinEvent -ListLog 'Microsoft-Windows-TaskScheduler/Operational'`
+4. Re-run collect task once and inspect related events:
+   - `schtasks /Run /TN "CivilizationRadar-WeekdaySnapshots"`
+   - `Get-WinEvent -LogName 'Microsoft-Windows-TaskScheduler/Operational' -MaxEvents 200`
+
+Expected:
+- Collect stdout includes retry/progress lines when transient upstream errors occur.
+- Task event log records the run outcome and exit status.
+
+---
+
 ## 2. Acceptance
 
 Single entry command:
