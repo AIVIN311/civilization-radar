@@ -50,8 +50,14 @@ Acceptance entry points:
 ```bash
 python scripts/run_acceptance_v04.py
 python scripts/run_acceptance_latest.py
+python scripts/run_acceptance_latest.py --legacy-v04
 python scripts/run_acceptance_v07.py --skip-v04-hash
 ```
+
+`run_acceptance_latest.py` default contract:
+- uses v0.7 acceptance in CI-aligned fast mode (`--skip-v04-hash`)
+- can be switched to full v0.7 via `--full-v07`
+- keeps explicit legacy fallback via `--legacy-v04`
 
 ## Runtime Data Policy
 

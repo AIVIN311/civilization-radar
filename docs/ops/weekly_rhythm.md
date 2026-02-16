@@ -23,6 +23,7 @@ End of Month
 ## Command Matrix
 - collect: ops/collect_snapshots_weekday.ps1
 - promote: ops/promote_latest.ps1
+- acceptance target (via promote): scripts/run_acceptance_latest.py default v0.7 fast mode
 - month-end: ops/month_end_release.ps1
 - registrar: ops/register_weekly_tasks.ps1
 
@@ -30,7 +31,7 @@ End of Month
 | Task | When | Does |
 |---|---|---|
 | CivilizationRadar-WeekdaySnapshots | Mon–Thu 18:00 | Append snapshots (daysBack: Mon=3, else=1) |
-| CivilizationRadar-FridayPromote | Fri 18:00 | run_acceptance_latest.py + gates |
+| CivilizationRadar-FridayPromote | Fri 18:00 | run_acceptance_latest.py (default v0.7 fast mode) + gates |
 | CivilizationRadar-MonthEndPipelineTag | Daily 19:00 | If month-end: full pipeline + eval_quality_monthly + tag push |
 
 ## Timezone Requirement

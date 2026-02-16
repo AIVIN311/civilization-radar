@@ -65,6 +65,11 @@ Expected:
 Single entry command:
 `python scripts/run_acceptance_latest.py`
 
+Mode switches:
+- default: v0.7 acceptance (CI-aligned fast mode, includes `--skip-v04-hash`)
+- full v0.7: `python scripts/run_acceptance_latest.py --full-v07`
+- legacy fallback: `python scripts/run_acceptance_latest.py --legacy-v04`
+
 Expected:
 - Deterministic metrics
 - No schema drift
