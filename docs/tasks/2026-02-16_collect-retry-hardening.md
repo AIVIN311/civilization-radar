@@ -89,3 +89,22 @@ Upstream Cloudflare GraphQL transient 502 caused single-run failure; immediate r
 
 - Re-run operational log enable command from an elevated PowerShell session.
 - After enabling, validate event emission with one scheduler-triggered collect run.
+## Update — 2026-02-16 (Resolved)
+
+- Task Scheduler Operational log enable verification now passed:
+  - `LogName: Microsoft-Windows-TaskScheduler/Operational`
+  - `IsEnabled: True`
+  - `RecordCount: 22`
+  - `LastWriteTime: 2026/2/16 下午 10:56:44`
+- Scheduler run verification passed:
+  - Task: `\CivilizationRadar-WeekdaySnapshots`
+  - `Last Run Time: 2026/2/16 下午 10:54:45`
+  - `Last Result: 0`
+- Event ingestion verification passed:
+  - Related events observed in Operational log (`Id 100, 129, 200, 201, 102`)
+  - `Id 325` indicates queued instance (non-blocking warning)
+
+## Follow-ups (Updated)
+
+- [x] Re-run operational log enable command from an elevated PowerShell session.
+- [x] Validate event emission with one scheduler-triggered collect run.
