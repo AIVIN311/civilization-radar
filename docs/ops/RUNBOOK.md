@@ -13,10 +13,30 @@ Single entry command:
 
 Expected:
 - Appends runtime snapshots via scheduled collection logic
+- Writes live receipt artifacts:
+  - `output/live/live_snapshot_status.json`
+  - `output/live/latest_day_domains.txt`
 - Does not modify Git-tracked source files
 
 Verify:
 - `git status --short` has no snapshot pollution
+- `Get-Content .\output\live\live_snapshot_status.json` is readable
+- `max_date` and `today_unique_domains` are present in receipt JSON
+
+---
+
+## 1.0 Date Bucket Resolution (v0.7)
+
+Receipt `max_date` is resolved as:
+
+1. If `ts` exists, bucket = UTC date(`ts`)
+2. Else, bucket = `row["date"]`
+
+Notes:
+- `ts` is optional in v0.7 ingestion.
+- Receipt remains forward-compatible when `ts` starts appearing in runtime rows.
+- `dups_date_domain_estimate` is intentionally `null` in v0.7.
+  This field is reserved for future expansion and is not estimated now to avoid false-positive duplicate signals.
 
 ---
 

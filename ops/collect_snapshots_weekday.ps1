@@ -32,5 +32,13 @@ Write-Host "[weekday collect] repo=$RepoRoot daysBack=$daysBack out=$outFile"
 & $Py "-u" "cf_pull_daily_v2.py" "--days" "$daysBack" "--out" "$outFile"
 if ($LASTEXITCODE -ne 0) { throw "cf_pull_daily_v2.py failed with exit code $LASTEXITCODE" }
 
+# write live status receipt (non-invasive, non-blocking)
+& $Py "-u" ".\ops\write_live_status.py"
+if ($LASTEXITCODE -ne 0) {
+  Write-Warning "[weekday collect] live status receipt failed (non-blocking)"
+} else {
+  Write-Host "[weekday collect] live status receipt OK"
+}
+
 Write-Host "[weekday collect] OK"
 exit 0
