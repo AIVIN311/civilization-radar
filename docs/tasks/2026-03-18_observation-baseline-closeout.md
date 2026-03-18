@@ -110,19 +110,55 @@ Pass criterion:
 - Stop-point check for `2026-03-17`:
   - working tree remained limited to the existing docs-only scaffold plus pre-existing local operator noise such as `.codex/`
   - no new code / config / runtime mutations were introduced in the stop-point batch
+- Pre-closeout observation snapshot captured at `2026-03-18T16:54:09.3441109+08:00`
+- `2026-03-18` pre-closeout scheduler snapshot:
+  - `CivilizationRadar-WeekdaySnapshots`: `Status = Ready`, `Scheduled Task State = Enabled`, `Last Run Time = 2026/3/17 18:00`, `Next Run Time = 2026/3/18 18:00`, `Last Result = 0`, `Logon Mode = Interactive only`
+  - `CivilizationRadar-FridayPromote`: `Status = Ready`, `Scheduled Task State = Enabled`, `Last Run Time = 2026/3/13 18:00`, `Next Run Time = 2026/3/20 18:00`, `Last Result = 0`, `Logon Mode = Interactive only`
+  - `CivilizationRadar-MonthEndPipelineTag`: `Status = Ready`, `Scheduled Task State = Enabled`, `Last Run Time = 2026/3/17 19:00:01`, `Next Run Time = 2026/3/18 19:00`, `Last Result = 0`, `Logon Mode = Interactive only`
+- `2026-03-18` pre-closeout runtime freshness:
+  - `generated_utc = 2026-03-17T10:01:19.865727+00:00`
+  - `max_date = 2026-03-17`
+  - `today_unique_domains = 67`
+  - `bad_json_lines = 0`
+  - `max_date = 2026-03-17` is acceptable in this snapshot because the `2026-03-18 18:00 +08:00` weekday scheduler window had not yet run
+- `2026-03-18` pre-closeout acceptance receipt:
+  - newest file `output/reports/acceptance_latest_20260313T100004Z.json`
+  - `LastWriteTimeUtc = 2026-03-13T10:00:23Z`
+  - Wednesday closeout continues to anchor freshness to the last Friday promote until `2026-03-20`
+- `2026-03-18` pre-closeout promoted gate snapshot:
+  - `output/latest/reports/eval_quality.json` parsed successfully
+  - `ok = true`
+  - `db_path = C:\dev\civilization-radar\output\acceptance_v07\run_tw_a\runs\20260313T100005Z\radar.db`
+- `2026-03-18` pre-closeout canonical artifact snapshot:
+  - `output/latest/radar.db`: `LastWriteTimeUtc = 2026-03-13T10:00:07Z`, `Length = 167936`
+  - `output/latest/dashboard_v04.html`: `LastWriteTimeUtc = 2026-03-13T10:00:07Z`, `Length = 26357`
+- `2026-03-18` pre-closeout dashboard smoke check:
+  - PASS: local dashboard loaded with title `Civilization Radar v0.4`
+  - main UI sections were present: domain table, event list, chain list
+  - only console error was missing `favicon.ico`, treated as non-fatal
+- `2026-03-18` pre-closeout repo status:
+  - `git status --short` returned:
+    - `M docs/context/THREE_PROJECTS_OVERVIEW.md`
+    - `?? .codex/`
+    - `?? docs/context/RESEARCH_PRODUCT_LAYER_MAP.md`
+  - treat those entries as expected local baseline state, not runtime pollution
+  - no extra tracked/runtime drift was observed before the final receipt window
+- Final closeout receipt completed after the post-`2026-03-18 19:05 +08:00` refresh at `2026-03-18T19:18:20.8494629+08:00`
 
-### Final closeout receipt (to complete on 2026-03-18)
+### Final closeout receipt (completed on 2026-03-18)
 
-- Verification time:
-- `CivilizationRadar-WeekdaySnapshots` result:
-- `CivilizationRadar-FridayPromote` result:
-- `CivilizationRadar-MonthEndPipelineTag` result:
-- `output/live/live_snapshot_status.json` fresh `max_date`:
-- newest `acceptance_latest_*.json`:
-- `output/latest/reports/eval_quality.json` `ok`:
-- `output/latest/radar.db` freshness:
-- `git status --short` result:
-- Closeout result: `PASS` or `OBSERVED_ISSUES`
+- Verification time: `2026-03-18T19:18:20.8494629+08:00`
+- `CivilizationRadar-WeekdaySnapshots` result: `Status = Ready; Scheduled Task State = Enabled; Last Run Time = 2026/3/18 18:00; Next Run Time = 2026/3/19 18:00; Last Result = 0; Logon Mode = Interactive only`
+- `CivilizationRadar-FridayPromote` result: `Status = Ready; Scheduled Task State = Enabled; Last Run Time = 2026/3/13 18:00; Next Run Time = 2026/3/20 18:00; Last Result = 0; Logon Mode = Interactive only`
+- `CivilizationRadar-MonthEndPipelineTag` result: `Status = Ready; Scheduled Task State = Enabled; Last Run Time = 2026/3/18 19:00:01; Next Run Time = 2026/3/19 19:00; Last Result = 0; Logon Mode = Interactive only`
+- `output/live/live_snapshot_status.json` fresh `max_date`: `generated_utc = 2026-03-18T10:01:29.075369+00:00; max_date = 2026-03-18; today_unique_domains = 67; bad_json_lines = 0`
+- newest `acceptance_latest_*.json`: `output/reports/acceptance_latest_20260313T100004Z.json; LastWriteTimeUtc = 2026-03-13T10:00:23Z`
+- `output/latest/reports/eval_quality.json` `ok`: `true; db_path = C:\dev\civilization-radar\output\acceptance_v07\run_tw_a\runs\20260313T100005Z\radar.db`
+- `output/latest/radar.db` freshness: `LastWriteTimeUtc = 2026-03-13T10:00:07Z; Length = 167936; unchanged from the last Friday promote and still consistent on Wednesday 2026-03-18`
+- `git status --short` result: `M docs/context/THREE_PROJECTS_OVERVIEW.md; M docs/tasks/2026-03-18_observation-baseline-closeout.md; ?? .codex/; ?? docs/context/RESEARCH_PRODUCT_LAYER_MAP.md`
+- Closeout result: PASS
+
+- Final closeout dashboard note: `Phase 1 dashboard smoke PASS remains valid because output/latest/dashboard_v04.html remained unchanged at LastWriteTimeUtc = 2026-03-13T10:00:07Z and Length = 26357.`
 
 ## Known residual risks
 
@@ -134,8 +170,7 @@ Pass criterion:
 
 ## Follow-ups
 
-- Complete the final closeout receipt on `2026-03-18`.
-- If closeout result is `PASS`, open `A. blocking operational fixes`.
-- If closeout result is `OBSERVED_ISSUES`, do not open batch A; switch to incident / recovery triage.
+- Observation Baseline closeout completed on `2026-03-18` with result `PASS`.
+- Open `A. blocking operational fixes` as the next implementation batch.
 - Keep `B. v0.7.1 ops` deferred until after batch A.
 - Use `docs/tasks/2026-03-18_post-closeout-triage.md` only after closeout receipt has been completed.
