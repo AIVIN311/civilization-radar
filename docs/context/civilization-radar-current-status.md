@@ -1,10 +1,10 @@
 # civilization-radar current status
 
-Status snapshot: 2026-03-17
+Status snapshot: 2026-03-19
 
 ## Current Stage
 
-`civilization-radar` is in `v0.7 Observation Baseline`. The repo is operating in a minimal-change, verification-first mode where deterministic maintenance matters more than new features.
+`civilization-radar` is in `v0.7 Observation Baseline`. The repo is still operating in a minimal-change, verification-first mode where deterministic maintenance matters more than new features, but the closeout checkpoint and first post-closeout operational batch are now both recorded history.
 
 ## What It Does
 
@@ -37,6 +37,7 @@ Time-scoped context currently in use:
 
 - `docs/tasks/2026-03-18_observation-baseline-closeout.md`
 - `docs/tasks/2026-03-18_post-closeout-triage.md`
+- `docs/tasks/2026-03-19_blocking-operational-fixes.md`
 
 ## Operational Rhythm
 
@@ -55,31 +56,30 @@ Operational rules that matter most:
 
 ## Current Closeout Status
 
-As of `2026-03-17`, the repo is at a closeout scaffold stop point, not formal closeout completion.
+Observation Baseline closeout is complete.
 
-- closeout date remains `2026-03-18`
-- today is docs-only preparation
-- final receipt is intentionally still unfilled
-- no implementation work is approved in the stop-point batch
-
-Approved next-step rule:
-
-- on `2026-03-18`, run closeout final receipt verification only
-- if closeout passes, open `A. blocking operational fixes`
-- if closeout fails, switch to incident / recovery triage
-- keep `B. v0.7.1 ops` deferred until after batch A
+- closeout completed on `2026-03-18` with result `PASS`
+- the formal closeout receipt was recorded in commit `4119d66`
+- `A. blocking operational fixes` completed on `2026-03-19`
+- the completed Batch A checkpoint was recorded in commit `ebb3e34`
+- `Observation Baseline` remains the active stage label after Batch A
+- `B. v0.7.1 ops` remains deferred pending an explicit next decision
 
 ## Current Issues
 
-Three verified operational issues are currently recorded but intentionally deferred until after closeout:
+The three blocking operational issues carried out of closeout were resolved in Batch A (`ebb3e34`):
 
-- render non-fatal fallback is broken when DB or schema is missing
-- promoted `eval_quality.json` is not self-contained because it points at an acceptance-run DB path
-- artifact-first render can backdate explanatory kernel output when a valid stale artifact is present
+- render now remains non-fatal when DB or schema is missing
+- promoted `eval_quality.json` is now self-contained through canonical `output/latest/radar.db`
+- kernel timestamp alignment no longer backdates explanatory output when a stale artifact is present
+
+There is no new implementation batch opened by this file. The remaining deferred operational topic is still `B. v0.7.1 ops`.
 
 ## Next Step
 
-The next approved action is not implementation today. The next approved action is the `2026-03-18` closeout final receipt verification. Only after a passing closeout should the repo open `A. blocking operational fixes`.
+Batch A is complete.
+
+This status file does not open a new batch on its own. The next repo decision is to review the completed closeout and Batch A checkpoints, then explicitly choose the next implementation batch, with `B. v0.7.1 ops` still the leading deferred candidate.
 
 ## Deferred
 
@@ -92,4 +92,4 @@ The next approved action is not implementation today. The next approved action i
 - Prioritize `docs/ops/*` when questions involve operations or baseline policy.
 - Treat task files as time-scoped status artifacts, not permanent architecture docs.
 - Do not recommend code changes that touch scoring, kernel, gate, persistence, or schema unless the prompt explicitly authorizes that class of work.
-- When discussing current status, include the concrete date `2026-03-17` or `2026-03-18` so closeout timing stays clear.
+- When discussing current status, include the concrete dates `2026-03-18` and `2026-03-19` so the closeout and Batch A checkpoints stay clear.
