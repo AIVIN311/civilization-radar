@@ -109,6 +109,29 @@ def ensure_layout(output_root: Path):
     (output_root / "tmp").mkdir(parents=True, exist_ok=True)
 
 
+def canonicalize_latest_eval_quality(output_root: Path):
+    latest_dir = output_root / "latest"
+    db_path = (latest_dir / "radar.db").resolve()
+    eval_path = latest_dir / "reports" / "eval_quality.json"
+
+    if not db_path.exists():
+        raise SystemExit(f"missing promoted radar DB: {db_path}")
+    if not eval_path.exists():
+        raise SystemExit(f"missing promoted eval_quality.json: {eval_path}")
+
+    try:
+        payload = json.loads(eval_path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        raise SystemExit(f"invalid promoted eval_quality.json: {eval_path} ({exc})")
+    if not isinstance(payload, dict):
+        raise SystemExit(f"invalid promoted eval_quality.json object: {eval_path}")
+    if "db_path" not in payload:
+        raise SystemExit(f"promoted eval_quality.json missing db_path: {eval_path}")
+
+    payload["db_path"] = str(db_path)
+    eval_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 def promote_to_latest(source_dir: Path, output_root: Path, stamp: str):
     latest = output_root / "latest"
     tmp = output_root / "tmp" / f"latest_tmp_{stamp}"
@@ -196,6 +219,7 @@ def main():
         raise SystemExit(f"missing acceptance source directory: {source}")
 
     promote_to_latest(source, output_root, stamp)
+    canonicalize_latest_eval_quality(output_root)
 
     summary = {
         "generated_at": datetime.now(timezone.utc).isoformat(),

@@ -49,6 +49,135 @@ def _safe_profile_token(value: str) -> str:
     return token or "unknown"
 
 
+def infer_geo_profile(output_dir: str, chains=None) -> str:
+    if chains:
+        for row in chains:
+            geo_profile = str(row.get("geo_profile") or "").strip()
+            if geo_profile:
+                return geo_profile
+
+    derived_dir = Path(output_dir) / "derived"
+    if not derived_dir.exists():
+        return "unknown"
+
+    prefixes = (
+        "persistence_v1_",
+        "event_kernel_v1_",
+        "deltaT_v1_",
+        "tag_vector_v1_",
+        "semantic_projection_v1_",
+    )
+    candidates = set()
+    for path in sorted(derived_dir.glob("*.json")):
+        stem = path.stem
+        for prefix in prefixes:
+            if stem.startswith(prefix):
+                token = stem[len(prefix) :].strip()
+                if token and token not in {"global", "unknown"}:
+                    candidates.add(token)
+                break
+    return sorted(candidates)[0] if candidates else "unknown"
+
+
+def empty_kernel_state(cfg, latest_ts: str = ""):
+    return {
+        "version": "event_kernel_v1",
+        "window": int(cfg["window"]),
+        "latest_ts": str(latest_ts or ""),
+        "tags": [],
+        "top_domains": [],
+    }
+
+
+def _connect_db_readonly(db_path: Path):
+    return sqlite3.connect(f"{db_path.resolve().as_uri()}?mode=ro", uri=True)
+
+
+def load_render_state(cfg):
+    persistence_cfg = load_persistence_config()
+    db_path = Path(cfg["db_path"])
+
+    latest_ts = ""
+    domains = []
+    events = []
+    chains = []
+    top3 = {}
+    fallback_reason = ""
+    cur = None
+    con = None
+
+    try:
+        if not db_path.exists():
+            fallback_reason = f"missing radar DB at {db_path}"
+        else:
+            try:
+                con = _connect_db_readonly(db_path)
+                cur = con.cursor()
+            except Exception as exc:
+                fallback_reason = f"failed to open radar DB read-only ({exc.__class__.__name__})"
+
+        if cur is not None and not fallback_reason:
+            try:
+                if not table_exists(cur, "metrics_v02"):
+                    fallback_reason = "metrics_v02 missing"
+                else:
+                    latest_ts = str(cur.execute("SELECT MAX(ts) FROM metrics_v02").fetchone()[0] or "")
+                    if not latest_ts:
+                        fallback_reason = "metrics_v02 empty"
+                    else:
+                        domains = fetch_domain_rows(cur)
+                        events = fetch_event_rows(cur)
+                        chains, top3 = fetch_chain_rows(cur)
+            except sqlite3.Error as exc:
+                latest_ts = ""
+                domains = []
+                events = []
+                chains = []
+                top3 = {}
+                fallback_reason = f"dashboard query failed ({exc.__class__.__name__})"
+
+        geo_profile = infer_geo_profile(cfg["output_dir"], chains)
+        delta_series_by_tag = get_delta_series(
+            geo=geo_profile,
+            window=int(persistence_cfg["window"]),
+            output_dir=str(cfg["output_dir"]),
+            cfg=persistence_cfg,
+        )
+        delta_meta = get_last_delta_meta()
+        persistence_state = compute_tag_persistence(delta_series_by_tag, persistence_cfg)
+
+        if cur is not None and latest_ts and not fallback_reason:
+            try:
+                kernel_state = compute_event_kernel(cur, latest_ts, persistence_cfg)
+            except sqlite3.Error as exc:
+                fallback_reason = f"kernel query failed ({exc.__class__.__name__})"
+                kernel_state = empty_kernel_state(persistence_cfg, latest_ts="")
+                latest_ts = ""
+                domains = []
+                events = []
+                chains = []
+                top3 = {}
+        else:
+            kernel_state = empty_kernel_state(persistence_cfg, latest_ts="")
+
+        return {
+            "latest_ts": latest_ts,
+            "domains": domains,
+            "events": events,
+            "chains": chains,
+            "top3": top3,
+            "geo_profile": geo_profile,
+            "persistence_cfg": persistence_cfg,
+            "persistence_state": persistence_state,
+            "kernel_state": kernel_state,
+            "delta_meta": delta_meta,
+            "fallback_reason": fallback_reason,
+        }
+    finally:
+        if con is not None:
+            con.close()
+
+
 def write_persistence_outputs(cfg, latest_ts, geo_profile, persistence_state, kernel_state, delta_meta):
     derived_dir = Path(cfg["output_dir"]) / "derived"
     derived_dir.mkdir(parents=True, exist_ok=True)
@@ -269,7 +398,7 @@ def fetch_chain_rows(cur):
     return series_rows, edges
 
 
-def render(cfg, latest_ts, domains, events, chains, top3, persistence_state, kernel_state):
+def render(cfg, latest_ts, domains, events, chains, top3, persistence_state, kernel_state, fallback_reason=""):
     html = []
     html.append("<!doctype html><html><head><meta charset='utf-8'>")
     html.append("<meta name='viewport' content='width=device-width, initial-scale=1'>")
@@ -308,15 +437,23 @@ body.geo-off .geo-col{display:none}
 .ers-watch{background:#fff7ed;border-color:#fdba74;color:#9a3412}
 .ers-eligible{background:#ecfeff;border-color:#67e8f9;color:#155e75}
 .kernel-muted{font-size:11px;color:#6b7280}
+.notice{margin:0 0 14px;padding:10px 12px;border-radius:10px;border:1px solid #e5e7eb;font-size:13px}
+.notice.notice-warn{background:#fff7ed;border-color:#fdba74;color:#9a3412}
 </style>
 """
     )
     html.append("</head><body><main>")
     html.append("<h1>Civilization Radar v0.4</h1>")
+    display_latest_ts = str(latest_ts or "n/a")
     html.append(
-        f"<div class='meta'>version={escape(__version__)} | latest_ts={escape(str(latest_ts))} | "
+        f"<div class='meta'>version={escape(__version__)} | latest_ts={escape(display_latest_ts)} | "
         f"half_life_days={cfg['half_life_days']} | output={escape(cfg['output_dir'])}</div>"
     )
+    if fallback_reason:
+        html.append(
+            "<div class='notice notice-warn'><strong>Render fallback active.</strong> "
+            f"{escape(str(fallback_reason))}. Empty dashboard sections were rendered safely.</div>"
+        )
     html.append(
         """
 <div class="controls">
@@ -646,40 +783,27 @@ def main():
     args = parser.parse_args()
     cfg = from_args(args)
 
-    con = sqlite3.connect(cfg["db_path"])
-    cur = con.cursor()
-    latest_ts = cur.execute("SELECT MAX(ts) FROM metrics_v02").fetchone()[0]
-    if not latest_ts:
-        raise SystemExit("metrics_v02 is empty. Run upgrade_to_v02.py")
+    state = load_render_state(cfg)
 
-    domains = fetch_domain_rows(cur)
-    events = fetch_event_rows(cur)
-    chains, top3 = fetch_chain_rows(cur)
-    geo_profile = str(chains[0].get("geo_profile") or "unknown") if chains else "unknown"
-    persistence_cfg = load_persistence_config()
-    delta_series_by_tag = get_delta_series(
-        geo=geo_profile,
-        window=int(persistence_cfg["window"]),
-        output_dir=str(cfg["output_dir"]),
-        cfg=persistence_cfg,
+    write_persistence_outputs(
+        cfg,
+        state["latest_ts"],
+        state["geo_profile"],
+        state["persistence_state"],
+        state["kernel_state"],
+        state["delta_meta"],
     )
-    delta_meta = get_last_delta_meta()
-    persistence_state = compute_tag_persistence(delta_series_by_tag, persistence_cfg)
-    persistence_latest_ts = str(persistence_state.get("latest_ts") or latest_ts)
-    kernel_state = compute_event_kernel(cur, persistence_latest_ts, persistence_cfg)
-    con.close()
-
-    write_persistence_outputs(cfg, latest_ts, geo_profile, persistence_state, kernel_state, delta_meta)
 
     html = render(
         cfg,
-        latest_ts,
-        domains,
-        events,
-        chains,
-        top3,
-        persistence_state,
-        kernel_state,
+        state["latest_ts"],
+        state["domains"],
+        state["events"],
+        state["chains"],
+        state["top3"],
+        state["persistence_state"],
+        state["kernel_state"],
+        state["fallback_reason"],
     )
     with open(cfg["out_html"], "w", encoding="utf-8") as f:
         f.write(html)

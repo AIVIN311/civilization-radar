@@ -36,13 +36,21 @@ function parseArgs(argv) {
   return opts;
 }
 
-async function getVisibleDomainRows(page) {
-  return page.locator("#domainTable tbody tr").evaluateAll((rows) =>
+async function getVisibleRows(page, selector) {
+  return page.locator(selector).evaluateAll((rows) =>
     rows.filter((r) => {
       const style = window.getComputedStyle(r);
       return style.display !== "none" && style.visibility !== "hidden";
     }).length,
   );
+}
+
+async function getVisibleDomainRows(page) {
+  return getVisibleRows(page, "#domainTable tbody tr");
+}
+
+async function getVisibleChainRows(page) {
+  return getVisibleRows(page, "#chainTable tbody tr.chain-main");
 }
 
 async function clickIfVisible(locator) {
@@ -124,65 +132,53 @@ async function main() {
   await page.screenshot({ path: shot0, fullPage: true });
   summary.screenshots.push(shot0);
 
-  await page.getByRole("button", { name: "事件", exact: true }).click();
-  const eventCount = await getVisibleDomainRows(page);
+  await page.getByRole("button", { name: "只看 L3", exact: true }).click();
+  const l3Count = await getVisibleDomainRows(page);
   summary.checks.push({
-    name: "event_filter_rows",
-    ok: eventCount > 0 && eventCount <= baselineCount,
-    value: eventCount,
+    name: "l3_filter_rows",
+    ok: l3Count <= baselineCount,
+    value: l3Count,
+    baseline: baselineCount,
   });
 
-  const shot1 = path.join(outputDir, "02-event-filter.png");
+  const shot1 = path.join(outputDir, "02-l3-filter.png");
   await page.screenshot({ path: shot1, fullPage: true });
   summary.screenshots.push(shot1);
 
-  const search = page.locator("#search");
-  await search.fill("algorithmicallocation");
-  const searchCount = await getVisibleDomainRows(page);
+  await page.getByRole("button", { name: "全部", exact: true }).click();
+  const restoredCount = await getVisibleDomainRows(page);
   summary.checks.push({
-    name: "search_filter_rows",
-    ok: searchCount > 0,
-    value: searchCount,
+    name: "all_filter_restore",
+    ok: restoredCount === baselineCount,
+    value: restoredCount,
+    baseline: baselineCount,
   });
 
-  const shot2 = path.join(outputDir, "03-search.png");
+  const profileFilter = page.locator("#profileFilter");
+  const hasTwProfile = (await page.locator("#profileFilter option[value='tw']").count()) > 0;
+  if (hasTwProfile) {
+    await profileFilter.selectOption("tw");
+    const chainCount = await getVisibleChainRows(page);
+    summary.checks.push({
+      name: "profile_filter_rows",
+      ok: chainCount > 0,
+      value: chainCount,
+      profile: "tw",
+    });
+  } else {
+    summary.checks.push({
+      name: "profile_filter_rows",
+      ok: false,
+      skipped: true,
+      reason: "No tw profile option",
+    });
+  }
+
+  const shot2 = path.join(outputDir, "03-profile-filter.png");
   await page.screenshot({ path: shot2, fullPage: true });
   summary.screenshots.push(shot2);
 
-  const firstMatch = page.locator("#domainTable tbody tr .match:visible");
-  const expandedMatch = await clickIfVisible(firstMatch);
-  if (expandedMatch) {
-    const firstBox = page.locator("#domainTable tbody tr .matchbox:visible");
-    const visibleBoxes = await firstBox.count();
-    summary.checks.push({ name: "matchbox_expand", ok: visibleBoxes > 0, value: visibleBoxes });
-  } else {
-    summary.checks.push({ name: "matchbox_expand", ok: false, skipped: true, reason: "No visible match control" });
-  }
-
-  const shot3 = path.join(outputDir, "04-match-expanded.png");
-  await page.screenshot({ path: shot3, fullPage: true });
-  summary.screenshots.push(shot3);
-
-  await search.fill("");
-  await page.getByRole("button", { name: "全部", exact: true }).click();
-
-  const stormBtn = page.locator("#stormToggle");
-  const hasStorm = (await stormBtn.count()) > 0;
-  if (hasStorm) {
-    const seriesRows = page.locator("tr.series-row");
-    const before = await seriesRows.evaluateAll((rows) =>
-      rows.filter((r) => window.getComputedStyle(r).display !== "none").length,
-    );
-    await stormBtn.click();
-    const after = await seriesRows.evaluateAll((rows) =>
-      rows.filter((r) => window.getComputedStyle(r).display !== "none").length,
-    );
-    summary.checks.push({ name: "storm_toggle_applied", ok: after <= before, before, after });
-  } else {
-    summary.checks.push({ name: "storm_toggle_applied", ok: false, skipped: true, reason: "No storm button" });
-  }
-
-  const top3Button = page.locator(".top3-btn");
+  const top3Button = page.locator("#chainTable tbody tr.chain-main .toggle");
   if ((await top3Button.count()) > 0) {
     const firstTop3 = top3Button.first();
     const targetId = await firstTop3.getAttribute("data-target");
@@ -193,6 +189,20 @@ async function main() {
     summary.checks.push({ name: "top3_expand", ok: Boolean(isVisible), targetId: targetId || "" });
   } else {
     summary.checks.push({ name: "top3_expand", ok: false, skipped: true, reason: "No top3 buttons in this dashboard" });
+  }
+
+  const shot3 = path.join(outputDir, "04-top3-expanded.png");
+  await page.screenshot({ path: shot3, fullPage: true });
+  summary.screenshots.push(shot3);
+
+  const geoToggle = page.locator("#geoColsToggle");
+  if ((await geoToggle.count()) > 0) {
+    await geoToggle.uncheck();
+    const geoOff = await page.locator("body").evaluate((body) => body.classList.contains("geo-off"));
+    summary.checks.push({ name: "geo_toggle_applied", ok: Boolean(geoOff) });
+    await geoToggle.check();
+  } else {
+    summary.checks.push({ name: "geo_toggle_applied", ok: false, skipped: true, reason: "No geo toggle" });
   }
 
   const shot4 = path.join(outputDir, "05-final.png");

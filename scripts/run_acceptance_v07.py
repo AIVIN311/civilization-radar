@@ -6,6 +6,7 @@ import json
 import os
 import re
 import shutil
+import sqlite3
 import stat
 import subprocess
 import sys
@@ -122,6 +123,31 @@ def load_derived_payloads(latest_dir: Path, profile: str) -> tuple[dict, dict, s
     persistence = parse_json_safe(persistence_path, "persistence")
     kernel = parse_json_safe(kernel_path, "event_kernel")
     return persistence, kernel, persistence_raw, kernel_raw
+
+
+def fetch_db_latest_ts(latest_dir: Path) -> str:
+    db_path = latest_dir / "radar.db"
+    if not db_path.exists():
+        raise AssertionError(f"[FAIL] missing radar DB for latest_ts check: {db_path}")
+    con = sqlite3.connect(f"{db_path.resolve().as_uri()}?mode=ro", uri=True)
+    try:
+        row = con.execute("SELECT MAX(ts) FROM metrics_v02").fetchone()
+    finally:
+        con.close()
+    latest_ts = str((row[0] if row else "") or "")
+    if not latest_ts:
+        raise AssertionError(f"[FAIL] missing DB latest_ts for {db_path}")
+    return latest_ts
+
+
+def check_kernel_ts_alignment(kernel: dict, latest_dir: Path, label: str) -> None:
+    db_latest_ts = fetch_db_latest_ts(latest_dir)
+    kernel_ts = str(kernel.get("ts") or "")
+    if kernel_ts != db_latest_ts:
+        raise AssertionError(
+            f"[FAIL] {label}: kernel ts must match DB latest_ts "
+            f"expected={db_latest_ts} got={kernel_ts!r}"
+        )
 
 
 def hash_text(value: str) -> str:
@@ -241,6 +267,7 @@ def check_provider_swap_acceptance(cfg: dict, output_root: Path) -> None:
     run_render_only(latest)
     persistence_artifact_a, kernel_artifact_a, p_raw_a, _ = load_derived_payloads(latest, "tw")
     check_schema_acceptance(persistence_artifact_a, kernel_artifact_a, cfg, "provider_artifact_a")
+    check_kernel_ts_alignment(kernel_artifact_a, latest, "provider_artifact_a")
     meta_a = read_delta_meta(persistence_artifact_a, "provider_artifact_a")
     if meta_a["delta_source_used"] != "artifact" or meta_a["artifact_path"] != expected_rel:
         raise AssertionError(
@@ -250,6 +277,7 @@ def check_provider_swap_acceptance(cfg: dict, output_root: Path) -> None:
     run_render_only(latest)
     persistence_artifact_b, kernel_artifact_b, p_raw_b, _ = load_derived_payloads(latest, "tw")
     check_schema_acceptance(persistence_artifact_b, kernel_artifact_b, cfg, "provider_artifact_b")
+    check_kernel_ts_alignment(kernel_artifact_b, latest, "provider_artifact_b")
     meta_b = read_delta_meta(persistence_artifact_b, "provider_artifact_b")
     if meta_b["delta_source_used"] != "artifact" or meta_b["artifact_path"] != expected_rel:
         raise AssertionError(
@@ -263,6 +291,7 @@ def check_provider_swap_acceptance(cfg: dict, output_root: Path) -> None:
     run_render_only(latest)
     persistence_absent, kernel_absent, _, _ = load_derived_payloads(latest, "tw")
     check_schema_acceptance(persistence_absent, kernel_absent, cfg, "provider_absent")
+    check_kernel_ts_alignment(kernel_absent, latest, "provider_absent")
     meta_absent = read_delta_meta(persistence_absent, "provider_absent")
     if meta_absent["delta_source_used"] != "fallback_db" or meta_absent["artifact_path"] != "":
         raise AssertionError(
@@ -273,11 +302,50 @@ def check_provider_swap_acceptance(cfg: dict, output_root: Path) -> None:
     run_render_only(latest)
     persistence_reject, kernel_reject, _, _ = load_derived_payloads(latest, "tw")
     check_schema_acceptance(persistence_reject, kernel_reject, cfg, "provider_schema_reject")
+    check_kernel_ts_alignment(kernel_reject, latest, "provider_schema_reject")
     meta_reject = read_delta_meta(persistence_reject, "provider_schema_reject")
     if meta_reject["delta_source_used"] != "fallback_db" or meta_reject["artifact_path"] != "":
         raise AssertionError(
             "[FAIL] provider_schema_reject: expected fallback_db source and empty artifact_path"
         )
+
+
+def read_dashboard_html(output_dir: Path, label: str) -> str:
+    html_path = output_dir / "dashboard_v04.html"
+    if not html_path.exists():
+        raise AssertionError(f"[FAIL] {label}: missing dashboard output {html_path}")
+    return html_path.read_text(encoding="utf-8")
+
+
+def assert_contains(text: str, needle: str, label: str) -> None:
+    if needle not in text:
+        raise AssertionError(f"[FAIL] {label}: missing text {needle!r}")
+
+
+def check_non_fatal_render_acceptance(output_root: Path) -> None:
+    missing_dir = output_root / "render_db_missing"
+    safe_rmtree(missing_dir)
+    missing_dir.mkdir(parents=True, exist_ok=True)
+    run_render_only(missing_dir)
+    html_missing = read_dashboard_html(missing_dir, "render_db_missing")
+    assert_contains(html_missing, "Render fallback active.", "render_db_missing")
+    assert_contains(html_missing, "missing radar DB", "render_db_missing")
+    if (missing_dir / "radar.db").exists():
+        raise AssertionError("[FAIL] render_db_missing: render created radar.db unexpectedly")
+
+    schema_dir = output_root / "render_schema_missing"
+    safe_rmtree(schema_dir)
+    schema_dir.mkdir(parents=True, exist_ok=True)
+    con = sqlite3.connect(str(schema_dir / "radar.db"))
+    try:
+        con.execute("CREATE TABLE placeholder (id INTEGER PRIMARY KEY)")
+        con.commit()
+    finally:
+        con.close()
+    run_render_only(schema_dir)
+    html_schema = read_dashboard_html(schema_dir, "render_schema_missing")
+    assert_contains(html_schema, "Render fallback active.", "render_schema_missing")
+    assert_contains(html_schema, "metrics_v02 missing", "render_schema_missing")
 
 
 def check_none_behavior(persistence_none: dict) -> None:
@@ -440,6 +508,9 @@ def main() -> None:
 
     check_provider_swap_acceptance(cfg, output_root)
     print("[OK] provider swap acceptance")
+
+    check_non_fatal_render_acceptance(output_root)
+    print("[OK] non-fatal render acceptance")
 
     latest_none = run_pipeline("none", "run_none", INPUT_SAMPLE, output_root)
     persistence_none, kernel_none, _, _ = load_derived_payloads(latest_none, "none")
