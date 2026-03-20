@@ -1,10 +1,10 @@
 # civilization-radar current status
 
-Status snapshot: 2026-03-19
+Status snapshot: 2026-03-20
 
 ## Current Stage
 
-`civilization-radar` is in `v0.7 Observation Baseline`. The repo is still operating in a minimal-change, verification-first mode where deterministic maintenance matters more than new features, but the closeout checkpoint and first post-closeout operational batch are now both recorded history.
+`civilization-radar` remains in `v0.7 Observation Baseline`. The repo is still operating in a minimal-change, verification-first mode where deterministic maintenance matters more than new features. Within that stage, `v0.7.1 ops` slice 1 is now completed and naturally validated, but `v0.7.1 ops` as a whole is not complete.
 
 ## What It Does
 
@@ -38,6 +38,10 @@ Time-scoped context currently in use:
 - `docs/tasks/2026-03-18_observation-baseline-closeout.md`
 - `docs/tasks/2026-03-18_post-closeout-triage.md`
 - `docs/tasks/2026-03-19_blocking-operational-fixes.md`
+- `docs/tasks/2026-03-20_30d-baseline-findings.md`
+- `docs/tasks/2026-03-20_v0.7.1-headless-scheduler-hardening.md`
+- `docs/tasks/2026-03-20_v0.7.1-headless-scheduler-hardening-implementation.md`
+- `docs/tasks/2026-03-20_v0.7.1-natural-window-receipt.md`
 
 ## Operational Rhythm
 
@@ -56,14 +60,16 @@ Operational rules that matter most:
 
 ## Current Closeout Status
 
-Observation Baseline closeout is complete.
+Observation Baseline closeout is complete, and the first `v0.7.1 ops` slice is now closed as completed history.
 
-- closeout completed on `2026-03-18` with result `PASS`
-- the formal closeout receipt was recorded in commit `4119d66`
-- `A. blocking operational fixes` completed on `2026-03-19`
-- the completed Batch A checkpoint was recorded in commit `ebb3e34`
-- `Observation Baseline` remains the active stage label after Batch A
-- `B. v0.7.1 ops` remains deferred pending an explicit next decision
+- closeout completed on `2026-03-18` and was recorded in commit `4119d66`
+- `A. blocking operational fixes` completed on `2026-03-19` and was recorded in commit `ebb3e34`
+- the 30-day findings memo was recorded in commit `f1900d9`
+- the first `v0.7.1 ops` slice definition was recorded in commit `ca1ee3a`
+- slice 1 implementation was recorded in commit `8587a68`
+- slice 1 was naturally validated in production cadence on `2026-03-20`
+- `Observation Baseline` remains the active top-level stage label after slice 1 validation
+- `v0.7.1 ops` slice 2 has not been opened
 
 ## Current Issues
 
@@ -73,17 +79,21 @@ The three blocking operational issues carried out of closeout were resolved in B
 - promoted `eval_quality.json` is now self-contained through canonical `output/latest/radar.db`
 - kernel timestamp alignment no longer backdates explanatory output when a stale artifact is present
 
-There is no new implementation batch opened by this file. The remaining deferred operational topic is still `B. v0.7.1 ops`.
+There is no new implementation batch opened by this file. The remaining deferred operational topics are the natural month-end proof for same-user background mode and the question of whether to open a later `v0.7.1 ops` slice.
 
 ## Next Step
 
-Batch A is complete.
+Slice 1 is complete and naturally validated.
 
-This status file does not open a new batch on its own. The next repo decision is to review the completed closeout and Batch A checkpoints, then explicitly choose the next implementation batch, with `B. v0.7.1 ops` still the leading deferred candidate.
+This status file does not open slice 2 on its own. The next repo decision point is:
+
+- continue observing the natural month-end window to capture full headless month-end `git push` proof
+- or re-read the 30-day findings and explicitly decide whether to open a new `v0.7.1 ops` slice
 
 ## Deferred
 
-- `B. v0.7.1 ops` headless scheduler hardening
+- full headless month-end `git push` proof at the natural month-end window
+- `v0.7.1 ops` slice 2 (still unopened)
 - observer rollout as a mainline implementation topic
 - any changes to scoring, gate, kernel, persistence logic, pipeline flow, or DB schema
 
@@ -92,4 +102,4 @@ This status file does not open a new batch on its own. The next repo decision is
 - Prioritize `docs/ops/*` when questions involve operations or baseline policy.
 - Treat task files as time-scoped status artifacts, not permanent architecture docs.
 - Do not recommend code changes that touch scoring, kernel, gate, persistence, or schema unless the prompt explicitly authorizes that class of work.
-- When discussing current status, include the concrete dates `2026-03-18` and `2026-03-19` so the closeout and Batch A checkpoints stay clear.
+- When discussing current status, include the concrete dates `2026-03-18`, `2026-03-19`, and `2026-03-20` so the closeout, Batch A, and slice 1 natural-validation checkpoints stay clear.
