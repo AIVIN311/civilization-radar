@@ -36,6 +36,14 @@ Scope: docs-only interpretation memo for the completed 30-day observation window
 - `directional > precise`: read the window for direction, stability class, and trust boundaries more than for precise magnitude claims.
 - `hypotheses > strong claims`: use this memo to decide what deserves re-check, follow-up, or later study, not to close debate with high-confidence assertions.
 
+## Companion Reading
+
+For a human-readable Traditional Chinese interpretation of this memo, see:
+
+- [30-Day Baseline 中文解讀](../context/2026-03-20_30d-baseline-interpretation-zh.md)
+
+This companion note does not replace the decision role of this memo.
+
 ## Cross-Project Framing
 
 - `DBAI` answers `who / how something is found`, with its strongest current layer in research/spec framing around identity anchors and discoverability.
