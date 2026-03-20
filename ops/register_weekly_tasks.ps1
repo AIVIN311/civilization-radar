@@ -1,6 +1,7 @@
 # ops/register_weekly_tasks.ps1
 param(
-  [string]$RepoRoot = (Join-Path $PSScriptRoot "..")
+  [string]$RepoRoot = (Join-Path $PSScriptRoot ".."),
+  [switch]$InteractiveOnly
 )
 
 $ErrorActionPreference = "Stop"
@@ -12,32 +13,138 @@ try {
 }
 
 $me = "$env:USERDOMAIN\$env:USERNAME"
+$schtasks = "$env:WINDIR\System32\schtasks.exe"
 
 $collect = (Resolve-Path (Join-Path $RepoRoot "ops\collect_snapshots_weekday.ps1")).Path
 $promote = (Resolve-Path (Join-Path $RepoRoot "ops\promote_latest.ps1")).Path
 $monthly = (Resolve-Path (Join-Path $RepoRoot "ops\month_end_release.ps1")).Path
 
-function Create-Task($name, $scheduleArgs, $scriptPath) {
-  $ps = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$scriptPath`""
+$taskSpecs = @(
+  @{
+    Name = "CivilizationRadar-WeekdaySnapshots"
+    ScheduleArgs = @("/SC","WEEKLY","/D","MON,TUE,WED,THU","/ST","18:00")
+    ScriptPath = $collect
+  },
+  @{
+    Name = "CivilizationRadar-FridayPromote"
+    ScheduleArgs = @("/SC","WEEKLY","/D","FRI","/ST","18:00")
+    ScriptPath = $promote
+  },
+  @{
+    Name = "CivilizationRadar-MonthEndPipelineTag"
+    ScheduleArgs = @("/SC","DAILY","/ST","19:00")
+    ScriptPath = $monthly
+  }
+)
+
+function ConvertTo-PlainText([Security.SecureString]$SecureString) {
+  if ($null -eq $SecureString) {
+    throw "secure password is required"
+  }
+
+  $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecureString)
+  try {
+    return [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
+  } finally {
+    if ($bstr -ne [IntPtr]::Zero) {
+      [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
+    }
+  }
+}
+
+function Get-RegistrationPassword([string]$UserName) {
+  Write-Host "[register] mode: same-user non-interactive"
+  Write-Host "[register] Password entry is a one-time registration cost."
+  Write-Host "[register] Scheduled runs should execute non-interactively after registration."
+  Write-Host "[register] This preserves the existing user environment for month-end git push and credentials."
+
+  $secure = Read-Host -AsSecureString "Enter the Windows password for $UserName"
+  $plain = ConvertTo-PlainText $secure
+  if ([string]::IsNullOrWhiteSpace($plain)) {
+    throw "password cannot be blank"
+  }
+  return $plain
+}
+
+function Create-Task($TaskSpec, [string]$PlainPassword) {
+  $ps = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$($TaskSpec.ScriptPath)`""
   $args = @(
     "/Create", "/F",
-    "/TN", $name,
+    "/TN", $TaskSpec.Name,
     "/TR", $ps,
-    "/RU", $me, "/IT"
-  ) + $scheduleArgs
+    "/RU", $me
+  )
 
-  $schtasks = "$env:WINDIR\System32\schtasks.exe"
-  Write-Host "[register] $name -> $scriptPath"
+  if ($InteractiveOnly) {
+    $args += "/IT"
+  } else {
+    $args += @("/RP", $PlainPassword)
+  }
+
+  $args += $TaskSpec.ScheduleArgs
+
+  Write-Host "[register] $($TaskSpec.Name) -> $($TaskSpec.ScriptPath)"
   & $schtasks @args
-  if ($LASTEXITCODE -ne 0) { throw "schtasks create failed: $name" }
+  if ($LASTEXITCODE -ne 0) {
+    throw "schtasks create failed: $($TaskSpec.Name)"
+  }
+}
+
+function Register-TaskSet([string]$PlainPassword) {
+  foreach ($taskSpec in $taskSpecs) {
+    Create-Task $taskSpec $PlainPassword
+  }
+}
+
+function Restore-InteractiveOnly {
+  Write-Warning "[register] restoring previous interactive-only registration for all three tasks"
+  foreach ($taskSpec in $taskSpecs) {
+    $ps = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$($taskSpec.ScriptPath)`""
+    $args = @(
+      "/Create", "/F",
+      "/TN", $taskSpec.Name,
+      "/TR", $ps,
+      "/RU", $me,
+      "/IT"
+    ) + $taskSpec.ScheduleArgs
+
+    Write-Host "[register] rollback $($taskSpec.Name) -> $($taskSpec.ScriptPath)"
+    & $schtasks @args
+    if ($LASTEXITCODE -ne 0) {
+      throw "rollback failed while restoring $($taskSpec.Name)"
+    }
+  }
 }
 
 Write-Host "[register] repo root: $RepoRoot"
+Write-Host "[register] rollback command: powershell -NoProfile -ExecutionPolicy Bypass -File .\ops\register_weekly_tasks.ps1 -InteractiveOnly"
 
-# Schedules (host local time; ensure Windows timezone = Asia/Taipei)
-Create-Task "CivilizationRadar-WeekdaySnapshots" @("/SC","WEEKLY","/D","MON,TUE,WED,THU","/ST","18:00") $collect
-Create-Task "CivilizationRadar-FridayPromote" @("/SC","WEEKLY","/D","FRI","/ST","18:00") $promote
-Create-Task "CivilizationRadar-MonthEndPipelineTag" @("/SC","DAILY","/ST","19:00") $monthly
+$plainPassword = $null
 
-Write-Host "[register] OK: 3 tasks created/updated as $me (interactive)"
-exit 0
+try {
+  if ($InteractiveOnly) {
+    Write-Host "[register] mode: interactive-only rollback path"
+    Register-TaskSet $null
+    Write-Host "[register] OK: 3 tasks created/updated as $me (interactive only)"
+    exit 0
+  }
+
+  $plainPassword = Get-RegistrationPassword $me
+
+  try {
+    Register-TaskSet $plainPassword
+  } catch {
+    $registrationError = $_
+    try {
+      Restore-InteractiveOnly
+    } catch {
+      throw "non-interactive registration failed and rollback also failed. Run '.\ops\register_weekly_tasks.ps1 -InteractiveOnly' to restore interactive-only mode. Original error: $registrationError. Rollback error: $_"
+    }
+    throw "non-interactive registration failed; interactive-only mode was restored to avoid mixed registration state. Original error: $registrationError"
+  }
+
+  Write-Host "[register] OK: 3 tasks created/updated as $me (non-interactive same-user mode)"
+  exit 0
+} finally {
+  $plainPassword = $null
+}

@@ -99,13 +99,14 @@ Pass criteria:
 
 ## Known Operational Constraints
 
-Current scheduler mode is still interactive:
-- `Logon Mode`: `Interactive only`
-- XML `LogonType`: `InteractiveToken`
+Scheduler registration for the three baseline tasks is intended to use the same current user in non-interactive mode:
+- one-time interactive password entry may be required at registration time
+- scheduled runs are expected to execute without depending on an active interactive session
+- task names, cadence, and called scripts remain unchanged
+- month-end tag push continues to rely on the existing user environment and credential availability
 - `WakeToRun`: not enabled
 
-Planned follow-up (`v0.7.1 ops`):
-- move to headless-capable scheduler mode
+Planned follow-up after this first hardening slice:
 - evaluate enabling wake-to-run based on host policy
 
 ## Documentation Map

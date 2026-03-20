@@ -45,5 +45,6 @@ End of Month
 
 ## Known Windows Scheduler Pitfalls
 - Host timezone controls trigger time (no per-task timezone).
-- Run-as context affects env/.env/OneDrive access; start with interactive current user.
+- Run-as context affects env/.env/OneDrive access; v0.7.1 registration keeps the same current user but moves tasks to non-interactive registration with one-time password entry at registration.
+- Month-end tag push depends on that same user environment and credential availability remaining intact.
 - OneDrive sync/lock can cause PermissionError; prefer stable local availability.
