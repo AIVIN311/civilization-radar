@@ -46,5 +46,7 @@ End of Month
 ## Known Windows Scheduler Pitfalls
 - Host timezone controls trigger time (no per-task timezone).
 - Run-as context affects env/.env/OneDrive access; v0.7.1 registration keeps the same current user but moves tasks to non-interactive registration with one-time password entry at registration.
+- v0.7.1 registration should also enable `StartWhenAvailable`, so a missed schedule can catch up after the host becomes available again.
 - Month-end tag push depends on that same user environment and credential availability remaining intact.
+- `WakeToRun` remains disabled in this slice, so a sleeping host is not expected to wake itself at 18:00/19:00.
 - OneDrive sync/lock can cause PermissionError; prefer stable local availability.

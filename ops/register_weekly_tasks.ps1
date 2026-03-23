@@ -56,6 +56,8 @@ function Get-RegistrationPassword([string]$UserName) {
   Write-Host "[register] mode: same-user non-interactive"
   Write-Host "[register] Password entry is a one-time registration cost."
   Write-Host "[register] Scheduled runs should execute non-interactively after registration."
+  Write-Host "[register] Missed schedules should catch up once the host becomes available again."
+  Write-Host "[register] WakeToRun remains disabled in this slice."
   Write-Host "[register] This preserves the existing user environment for month-end git push and credentials."
 
   $secure = Read-Host -AsSecureString "Enter the Windows password for $UserName"
@@ -90,9 +92,72 @@ function Create-Task($TaskSpec, [string]$PlainPassword) {
   }
 }
 
+function Enable-TaskStartWhenAvailable($TaskSpec, [string]$PlainPassword) {
+  $xmlText = & $schtasks "/Query" "/TN" $TaskSpec.Name "/XML"
+  if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($xmlText)) {
+    throw "schtasks query xml failed: $($TaskSpec.Name)"
+  }
+
+  [xml]$taskXml = $xmlText
+  $nsUri = $taskXml.Task.NamespaceURI
+  $ns = New-Object System.Xml.XmlNamespaceManager($taskXml.NameTable)
+  $ns.AddNamespace("t", $nsUri)
+
+  $settingsNode = $taskXml.SelectSingleNode("/t:Task/t:Settings", $ns)
+  if ($null -eq $settingsNode) {
+    throw "task xml missing Settings node: $($TaskSpec.Name)"
+  }
+
+  $startNode = $taskXml.SelectSingleNode("/t:Task/t:Settings/t:StartWhenAvailable", $ns)
+  if ($null -eq $startNode) {
+    $startNode = $taskXml.CreateElement("StartWhenAvailable", $nsUri)
+    $startNode.InnerText = "true"
+
+    $insertAfter = $taskXml.SelectSingleNode("/t:Task/t:Settings/t:StopIfGoingOnBatteries", $ns)
+    if ($null -ne $insertAfter) {
+      $null = $settingsNode.InsertAfter($startNode, $insertAfter)
+    } else {
+      $insertBefore = $taskXml.SelectSingleNode("/t:Task/t:Settings/t:IdleSettings", $ns)
+      if ($null -ne $insertBefore) {
+        $null = $settingsNode.InsertBefore($startNode, $insertBefore)
+      } else {
+        $null = $settingsNode.AppendChild($startNode)
+      }
+    }
+  } else {
+    $startNode.InnerText = "true"
+  }
+
+  $tempXml = Join-Path $env:TEMP ("{0}-{1}.xml" -f $TaskSpec.Name, [Guid]::NewGuid().ToString("N"))
+  try {
+    $taskXml.Save($tempXml)
+
+    $args = @(
+      "/Create", "/F",
+      "/TN", $TaskSpec.Name,
+      "/XML", $tempXml,
+      "/RU", $me,
+      "/RP", $PlainPassword
+    )
+
+    Write-Host "[register] enabling StartWhenAvailable for $($TaskSpec.Name)"
+    & $schtasks @args
+    if ($LASTEXITCODE -ne 0) {
+      throw "schtasks xml import failed: $($TaskSpec.Name)"
+    }
+  } finally {
+    if (Test-Path $tempXml) {
+      Remove-Item -Path $tempXml -Force -ErrorAction SilentlyContinue
+    }
+  }
+}
+
 function Register-TaskSet([string]$PlainPassword) {
   foreach ($taskSpec in $taskSpecs) {
     Create-Task $taskSpec $PlainPassword
+    if (-not $InteractiveOnly) {
+      Enable-TaskStartWhenAvailable $taskSpec $PlainPassword
+    }
   }
 }
 
