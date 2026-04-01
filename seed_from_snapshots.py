@@ -185,6 +185,45 @@ def _choose(row: dict, keys: list[str], default=None):
     return default, None
 
 
+def _sort_day_key(row: dict) -> str:
+    date_raw, date_src = _choose(row, ["date"])
+    if date_src is not None:
+        return _text(date_raw, "1970-01-01")[:10]
+
+    ts_raw, ts_src = _choose(row, ["ts", "timestamp"])
+    if ts_src is None:
+        return "1970-01-01"
+
+    try:
+        dt = datetime.fromisoformat(str(ts_raw).replace("Z", "+00:00"))
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc).date().isoformat()
+    except Exception:
+        return _text(ts_raw, "1970-01-01")[:10]
+
+
+def canonicalize_rows(rows: list[dict]) -> list[dict]:
+    # Seed in deterministic per-domain chronology so downstream quality checks
+    # reflect temporal disorder, not append-order noise from live catch-up writes.
+    decorated = []
+    for idx, row in enumerate(rows):
+        domain_raw, _ = _choose(row, ["domain"])
+        ts_raw, _ = _choose(row, ["ts", "timestamp"])
+        decorated.append(
+            (
+                _text(domain_raw, "unknown.domain").lower(),
+                _sort_day_key(row),
+                _text(ts_raw, ""),
+                idx,
+                row,
+            )
+        )
+
+    decorated.sort(key=lambda item: (item[0], item[1], item[2], item[3]))
+    return [item[4] for item in decorated]
+
+
 def normalize_row(row: dict):
     known_keys = {
         "ts",
@@ -203,6 +242,7 @@ def normalize_row(row: dict):
         "sig",
         "notes",
     }
+    # Track only trust-relevant omissions that materially weaken the snapshot row.
     missing = []
     ts_raw, ts_src = _choose(row, ["ts", "timestamp"])
     if ts_src is None:
@@ -220,8 +260,6 @@ def normalize_row(row: dict):
     domain = _text(domain_raw, "unknown.domain").lower()
 
     series_raw, series_src = _choose(row, ["series", "series_raw"])
-    if series_src is None:
-        missing.append("series")
     series = resolve_series(_text(series_raw, ""), domain)
 
     req_raw, req_src = _choose(row, ["req", "dns_total", "requests"], 0)
@@ -230,33 +268,25 @@ def normalize_row(row: dict):
     req = safe_int(req_raw, 0)
 
     cf_raw, cf_src = _choose(row, ["cf_served"], 0)
-    if cf_src is None:
-        missing.append("cf_served")
     cf_served = safe_int(cf_raw, 0)
 
     origin_raw, origin_src = _choose(row, ["origin_served"], 0)
-    if origin_src is None:
-        missing.append("origin_served")
+    if cf_src is None and origin_src is None:
+        missing.append("traffic_split")
+    elif cf_src is None:
+        missing.append("cf_served")
     origin_served = safe_int(origin_raw, max(0, req - cf_served))
 
     mitigated_raw, mitigated_src = _choose(row, ["mitigated"], 0)
-    if mitigated_src is None:
-        missing.append("mitigated")
     mitigated = safe_int(mitigated_raw, 0)
 
     tc_raw, tc_src = _choose(row, ["top_countries"], {})
-    if tc_src is None:
-        missing.append("top_countries")
     top_countries = tc_raw if isinstance(tc_raw, dict) else {}
 
     sig_raw, sig_src = _choose(row, ["sig"], "other")
-    if sig_src is None:
-        missing.append("sig")
     sig = _text(sig_raw, "other")
 
     notes_raw, notes_src = _choose(row, ["notes"], "")
-    if notes_src is None:
-        missing.append("notes")
     notes = _text(notes_raw, "")
 
     extra_fields = sorted(k for k in row.keys() if k not in known_keys)
@@ -299,7 +329,9 @@ def main():
     ensure_schema(conn)
     inserted = 0
 
-    for raw in read_jsonl(in_path):
+    rows = canonicalize_rows(list(read_jsonl(in_path)))
+
+    for raw in rows:
         row = normalize_row(raw)
         slot = slot_of_iso(row["ts"], minutes=30)
         scores = compute_scores(

@@ -264,6 +264,64 @@ def assert_eval_fail_on_bad_input(output_root: Path):
         raise SystemExit("eval gate should fail on bad ts order")
 
 
+def assert_eval_pass_on_backfill_ordering(output_root: Path):
+    out = output_root / "accept_backfill_ordering"
+    backfill = output_root / "accept_backfill_ordering_input.jsonl"
+    if out.exists():
+        shutil.rmtree(out)
+    if backfill.exists():
+        backfill.unlink()
+
+    sample_rows = [json.loads(x) for x in SAMPLE.read_text(encoding="utf-8").splitlines() if x.strip()]
+    with backfill.open("w", encoding="utf-8") as f:
+        for row in reversed(sample_rows):
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+    pipeline_run(out, backfill)
+    report = json.loads((out / "reports" / "eval_quality.json").read_text(encoding="utf-8"))
+    if int(report.get("ts_out_of_order") or 0) != 0:
+        raise SystemExit("backfill ordering should not trip ts_out_of_order")
+
+
+def assert_minimal_live_shape_missing_fields(output_root: Path):
+    out = output_root / "accept_minimal_live_shape"
+    live_input = output_root / "accept_minimal_live_shape_input.jsonl"
+    if out.exists():
+        shutil.rmtree(out)
+    if live_input.exists():
+        live_input.unlink()
+
+    sample_rows = [json.loads(x) for x in SAMPLE.read_text(encoding="utf-8").splitlines() if x.strip()]
+    with live_input.open("w", encoding="utf-8") as f:
+        for row in sample_rows:
+            req = int(row.get("dns_total") or row.get("req") or 0)
+            cf_served = int(row.get("cf_served") or 0)
+            origin_served = int(row.get("origin_served") or max(0, req - cf_served))
+            minimal_row = {
+                "date": row["date"],
+                "domain": row["domain"],
+                "dns_total": req,
+                "cf_served": cf_served,
+                "origin_served": origin_served,
+                "edge_origin_ratio": round(cf_served / origin_served, 4) if origin_served > 0 else 0.0,
+            }
+            f.write(json.dumps(minimal_row, ensure_ascii=False) + "\n")
+
+    env = mk_env(out)
+    out.mkdir(parents=True, exist_ok=True)
+    run([PY, "scripts/apply_sql_migrations.py", "--output-dir", str(out)], env=env)
+    run([PY, "seed_from_snapshots.py", "--input", str(live_input), "--output-dir", str(out)], env=env)
+
+    con = sqlite3.connect(out / "radar.db")
+    cur = con.cursor()
+    markers = cur.execute(
+        "SELECT COUNT(*) FROM snapshots_v01 WHERE missing_fields_json NOT IN ('[]','')"
+    ).fetchone()[0]
+    con.close()
+    if markers != 0:
+        raise SystemExit("minimal live-shape rows should not produce trust-missing markers")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -294,6 +352,8 @@ def main():
     assert_chain_explain_and_delta(db1)
     assert_l3_consistency(db1)
     assert_half_life_sensitivity(run1)
+    assert_eval_pass_on_backfill_ordering(output_root)
+    assert_minimal_live_shape_missing_fields(output_root)
     assert_eval_fail_on_bad_input(output_root)
 
     print("=== v0.4 acceptance summary ===")
