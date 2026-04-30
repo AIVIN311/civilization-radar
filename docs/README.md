@@ -22,10 +22,15 @@ Recommended route lock order:
 
 - `docs/ops/BASELINE.md`
 - `docs/ops/RUNBOOK.md`
+- `docs/ops/monthly_observation_memo_v0.1.md`
 - `docs/ops/weekly_rhythm.md`
 - `docs/ops/radar_acceptance_protocol.md`
 - `docs/ops/radar_non_interference_rules.md`
 - `docs/ops/radar_agent_task_template.md`
+
+## Observation Memos
+
+- `docs/observations/2026-04-civilization-radar-monthly-observation-memo-v0.1.md`
 
 ## Agent and Governance Entry Points
 

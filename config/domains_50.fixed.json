@@ -80,8 +80,18 @@
     "profile": "honeypot"
   },
   {
+    "domain": "climatejurisdiction.com",
+    "series": "civilization_resilience",
+    "profile": "normal"
+  },
+  {
     "domain": "climateinterventionism.com",
     "series": "civilization_resilience",
+    "profile": "normal"
+  },
+  {
+    "domain": "computationalsovereignty.com",
+    "series": "algorithmic_governance",
     "profile": "normal"
   },
   {
@@ -120,7 +130,17 @@
     "profile": "hot"
   },
   {
+    "domain": "hybridpersonhood.com",
+    "series": "identity_data",
+    "profile": "normal"
+  },
+  {
     "domain": "invisibledetermination.com",
+    "series": "algorithmic_governance",
+    "profile": "normal"
+  },
+  {
+    "domain": "jurisdictionaldrift.com",
     "series": "algorithmic_governance",
     "profile": "normal"
   },
@@ -140,7 +160,17 @@
     "profile": "honeypot"
   },
   {
+    "domain": "offworldpersonhood.com",
+    "series": "offworld_expansion",
+    "profile": "normal"
+  },
+  {
     "domain": "offworldsovereignty.com",
+    "series": "offworld_expansion",
+    "profile": "normal"
+  },
+  {
+    "domain": "orbitaljurisdiction.com",
     "series": "offworld_expansion",
     "profile": "normal"
   },
@@ -170,6 +200,11 @@
     "profile": "normal"
   },
   {
+    "domain": "protocolaccountability.com",
+    "series": "algorithmic_governance",
+    "profile": "normal"
+  },
+  {
     "domain": "siliconmetabolism.com",
     "series": "synthetic_systems",
     "profile": "hot"
@@ -190,7 +225,27 @@
     "profile": "honeypot"
   },
   {
+    "domain": "syntheticattestation.com",
+    "series": "synthetic_systems",
+    "profile": "normal"
+  },
+  {
+    "domain": "syntheticcertification.com",
+    "series": "synthetic_systems",
+    "profile": "normal"
+  },
+  {
+    "domain": "syntheticcitizenship.com",
+    "series": "synthetic_systems",
+    "profile": "normal"
+  },
+  {
     "domain": "syntheticjurisdiction.com",
+    "series": "synthetic_systems",
+    "profile": "normal"
+  },
+  {
+    "domain": "syntheticlegalentity.com",
     "series": "synthetic_systems",
     "profile": "normal"
   },
@@ -198,6 +253,11 @@
     "domain": "syntheticliability.com",
     "series": "synthetic_systems",
     "profile": "honeypot"
+  },
+  {
+    "domain": "syntheticpersonhood.com",
+    "series": "synthetic_systems",
+    "profile": "normal"
   },
   {
     "domain": "syntheticpollution.com",
@@ -218,6 +278,11 @@
     "domain": "syntheticsolvency.ai",
     "series": "monetary_infrastructure",
     "profile": "honeypot"
+  },
+  {
+    "domain": "syntheticverification.com",
+    "series": "synthetic_systems",
+    "profile": "normal"
   },
   {
     "domain": "technologicalpathdependency.com",
