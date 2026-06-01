@@ -31,6 +31,7 @@ Recommended route lock order:
 ## Observation Memos
 
 - `docs/observations/2026-04-civilization-radar-monthly-observation-memo-v0.1.md`
+- `docs/observations/2026-05-civilization-radar-monthly-observation-memo-v0.1.md`
 
 ## Agent and Governance Entry Points
 
