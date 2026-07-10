@@ -12,6 +12,10 @@ This file is a cross-project context note for GPT support across three related r
 
 It is a synthesis layer, not a replacement for canonical repo docs.
 
+Related positioning note:
+
+- `docs/context/RESEARCH_PRODUCT_LAYER_MAP.md`
+
 ## Three-Project Map
 
 - `concept-markers`: concept and relational layer

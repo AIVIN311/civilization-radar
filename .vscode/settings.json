@@ -1,5 +1,6 @@
 {
     "python.analysis.typeCheckingMode": "standard",
+    "python.terminal.useEnvFile": true,
     "chatgpt.openOnStartup": true,
     "github.copilot.nextEditSuggestions.enabled": true
 }

@@ -9,7 +9,7 @@ Route lock (single onboarding path):
 1. `README.md`
 2. `AGENTS.md`
 3. `docs/ops/RUNBOOK.md`
-4. `docs/architecture/OUTPUTS.md` + `docs/metrics/EVAL.md`
+4. `docs/architecture/CIVILIZATION_RADAR_PURPOSE.md` + `docs/architecture/OUTPUTS.md` + `docs/metrics/EVAL.md`
 5. `docs/tasks/2026-02-12_route-lock.md`
 
 Direct links:
@@ -119,6 +119,7 @@ Canonical reading order:
 5. `docs/tasks/2026-02-12_route-lock.md`
 
 Key links:
+- Project purpose and boundary: `docs/architecture/CIVILIZATION_RADAR_PURPOSE.md`
 - Baseline definition: `docs/ops/BASELINE.md`
 - Document index: `docs/README.md`
 - Status/KPI: `CIVILIZATION_RADAR_STATUS.md`
