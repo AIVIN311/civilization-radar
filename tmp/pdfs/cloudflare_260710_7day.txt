@@ -1,0 +1,144 @@
+--- PAGE 1 ---
+流量概覽 列印 複製連結 新增圖表
+Total Requests
+27.58M↑5.0%
+Total Visits
+25.01M↑53.%
+Cache Hit Rate
+.7%↑1.2%
+Bandwidth Served
+3.72 GB↑5.3%
+Requests over time xxvvv
+⾃動RequestsM
+新增篩選條件 過去  7 天 UTC
+--- PAGE 2 ---
+Requests by device type
+DesktopM Mobilek
+Tabletk
+Requests by Country xxvvv
+
+
+United Kingdom M
+Russian Federation M
+France M
+Canada M
+United States k
+Japan k
+Korea, South k
+Brazil k
+Hong Kong k
+Netherlands k
+Status Codes xxvvv
+2xxM 3xxk xxk 5xx
+Top Paths
+/favicon.ico k
+/markers.js k
+/cdn-cgi/speculation k
+/lang-toggle.js k
+/ k
+Top Hosts
+biometricsovereignty.… M
+unannouncedsoverei… M
+sovereignairesilience.… M
+theincrementalism.com M
+ hilibili k
+Top IPs
+20.20.105.13 k
+20.21.13.3 k
+20.8.2. k
+20.8.28.158 k
+2012118 k
+--- PAGE 3 ---
+/ k
+/robots.txt k
+/sitemap.xml k
+/wp-content/plugins/… k
+/this_is_a_new_hello_… k
+/wp-content/admin.php k
+/file5.php k
+/mac.php k
+syntheticliability.com k
+dollardisruption.com k
+automatedjurisprude… k
+biometricliability.com k
+climateinterventionis… k
+posthumousidentity.c… k
+thefirstmarscitizen.com k
+thepowerofdefault.com k
+20..121.18 k
+20.8.133.18 k
+5.18.10.15 k
+20.21.13.77 k
+52.237.12.1 k
+87.250.22.112 k
+5.255.231.7 k
+5.108.213.10 k
+Top Browsers
+未知 / 其他 M
+YandexBot M
+BingBot k
+Curl k
+Chrome k
+MobileSafari k
+Firefox k
+ChromeMobile k
+FirefoxMobile k
+Safari k
+Edge k
+GoogleBot k
+Top Operating Syste…
+未知 / 其他 M
+Windows k
+iOS k
+Linux k
+MacOSX k
+Android k
+ChromeOS 
+Top User Agents
+Mozilla/5.0 (compatib… M
+Mozilla/5.0 (compatib… M
+Mozilla/5.0 (compatib… M
+Mozilla/5.0 (compatib… M
+( 空的使⽤者代理程式 ) k
+Mozilla/5.0 (iPhone; C… k
+Mozilla/5.0 AppleWeb… k
+Mozilla/5.0 (iPhone; C… k
+curl/8.7.1 k
+TLMAudit-Scanner/1.0 k
+Mozilla/5.0 (iPhone; C… k
+Mozilla/5.0 (compatib… k
+Top HTTP Versions
+HTTP/2 M
+Top Cache Statuses
+無 M
+Top Origin Status Co…
+無 M
+--- PAGE 4 ---
+HTTP/1.1 M
+HTTP/3 k
+HTTP/1.0 
+UNK 
+遺漏 M
+點閱 M
+已過期 k
+已重新驗證 k
+動態 k
+旁路 
+200 OK M
+0 Not Found k
+30 Not Modified k
+05 Method Not Allo… k
+308 Permanent Redir… 
+301 Moved Permanen… 
+500 Internal Server Er… 
+03 Forbidden 
+502 Bad Gateway 
+AI Crawler Control
+Mozilla/5.0 (compatib…M
+Mozilla/5.0 (compatible…M
+Mozilla/5.0 (compatible…M
+Mozilla/5.0 (compatible…M
+( 空的使⽤者代理程式 )k
+Mozilla/5.0 (iPhone; C… k
+
+--- PAGE 5 ---

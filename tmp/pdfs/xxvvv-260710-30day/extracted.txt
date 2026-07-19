@@ -1,0 +1,102 @@
+流量概覽                                                                列印     複製連結             新增圖表
+
+
+
+ 新增篩選條件                                                                  過去 30 天           (UTC)
+
+
+
+             Total Requests   Total Visits      Bandwidth Served
+
+            84.69M ↑ 100.0%   76.67M ↑ 100.0%   285.9 GB ↑ 100.0%
+
+
+                              Cache Hit Rate
+
+                              5.63% ↑ 100.0%
+
+
+Requests over time                                                                 xxvvv
+
+
+  Requests 84.69M                                                                            自動
+Requests by device type                                  Requests by Country                                      xxvvv
+
+
+  Desktop 83.21M       Mobile 1.47M
+                                                                                       United Kingdom                             34.69M   
+  Tablet 10.03k                                                                        Russian Federation                         26.56M
+                                                                                       Canada                                     11.02M
+                                                                                       France                                      7.83M
+                                                                                       United States                               1.34M
+                                                                                       Brazil                                       658k
+                                                                                       Netherlands                            650.81k
+                                                                                       Japan                                  291.56k
+                                                                                       Hong Kong                              235.52k
+                                                                                       Korea, South                           204.14k      
+
+Status Codes                                                                                                              xxvvv
+
+
+  2xx 80.66M       3xx 2.95M     4xx 1.08M   5xx 1.07k
+
+
+
+
+Top Paths                                                Top Hosts                              Top IPs
+
+/favicon.ico                             841.31k         theincrementalism.com     3.03M        195.178.110.199                      135.88k
+/markers.js                              650.17k         sovereignairesilience.…   2.99M        20.206.105.139                        89.96k
+/cdn-cgi/speculation                     610.17k         thepowerofdefault.com     2.97M        45.148.10.67                          83.56k
+/lang-toggle.js                          555.66k         biometricliability.com    2.96M        20.214.136.39                         73.67k
+/                        359.21k   posthumousidentity.c…     2.94M    5.255.231.79               47.23k
+/robots.txt              158.83k   climateinterventionis…    2.85M    213.180.203.18             47.23k
+/sitemap.xml              30.98k   energyjurisdiction.com    2.72M    87.250.224.234             47.12k
+/wp-content/plugins/…      22.8k   unannouncedsoverei…        2.6M    213.180.203.247            47.04k
+/this_is_a_new_hello_…    19.24k   orbitallockdown.com       2.53M    5.255.231.189              46.72k
+/wp-content/admin.php     18.22k   offworldsovereignty.…     2.48M    95.108.213.79              46.69k
+/.env                     16.53k   theanswerisblowinint…     2.46M    95.108.213.143             46.56k
+/x.php                    14.36k   biometricsovereignty.…    2.43M    213.180.203.229            46.55k
+
+
+Top Browsers                       Top Operating Syste…               Top User Agents
+
+未知/其他                    57.35M    未知/其他                    83.37M    Mozilla/5.0 (compatib…    52.82M
+YandexBot                25.45M    Windows                  580.48k   Mozilla/5.0 (compatib…    19.22M
+Chrome                   701.37k   MacOSX                   268.46k   Mozilla/5.0 (compatib…     3.56M
+BingBot                  314.61k   iOS                      204.34k   Mozilla/5.0 (compatib…     2.67M
+Curl                     240.71k   Linux                    187.04k   (空的使用者代理程式)                2.57M
+Firefox                  198.35k   Android                   82.18k   Mozilla/5.0 (iPhone; C…   769.89k
+MobileSafari             171.95k   ChromeOS                    854    Mozilla/5.0 (iPhone; C…   336.64k
+ChromeMobile              71.14k                                      Mozilla/5.0 AppleWeb…     313.11k
+Edge                      68.66k                                      curl/8.7.1                223.18k
+Safari                    59.15k                                      TLM-Audit-Scanner/1.0     219.44k
+Opera                     17.74k                                      Mozilla/5.0 (iPhone; C…   144.79k
+FirefoxMobile             13.34k                                      Mozilla/5.0 (Windows…      75.77k
+
+
+Top HTTP Versions                  Top Cache Statuses                 Top Origin Status Co…
+
+HTTP/2                   57.19M    無                        42.66M    無                         47.41M
+HTTP/1.1                           27.35M    遺漏      37.18M   200 OK                    37.22M
+HTTP/3                             151.02k   點閱       4.75M   404 Not Found             34.74k
+HTTP/1.0                              421    已過期     68.82k   304 Not Modified          20.29k
+UNK                                   172    已重新驗證   20.35k   405 Method Not Allo…       7.19k
+                                             動態      16.58k   301 Moved Permanen…        1.76k
+                                             旁路       1.94k   308 Permanent Redir…       1.05k
+                                                              403 Forbidden                97
+                                                              500 Internal Server Er…      32
+                                                              502 Bad Gateway               5
+
+
+
+
+AI Crawler Control
+
+  Mozilla/5.0 (compatib… 52.82M
+  Mozilla/5.0 (compatib… 19.22M
+  Mozilla/5.0 (compatible… 3.56M
+  Mozilla/5.0 (compatible… 2.67M
+  (空的使用者代理程式) 2.57M
+  Mozilla/5.0 (iPhone; … 769.89k
+
